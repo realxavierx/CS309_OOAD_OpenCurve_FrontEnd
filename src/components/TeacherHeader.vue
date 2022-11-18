@@ -18,10 +18,10 @@
             <router-link to="/TeacherCourseCenter">课程中心</router-link>
           </el-menu-item>
           <el-menu-item index="3">
-            <router-link to="/">通知中心</router-link>
+            <router-link to="/TeacherNotificationCenter">通知中心</router-link>
           </el-menu-item>
           <el-menu-item index="4">
-            <router-link to="/">作业中心</router-link>
+            <router-link to="/TeacherAssignmentCenter">作业中心</router-link>
           </el-menu-item>
           <el-menu-item index="5">
             <router-link to="/">个人中心</router-link>

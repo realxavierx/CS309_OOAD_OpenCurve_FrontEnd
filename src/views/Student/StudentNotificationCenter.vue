@@ -2,18 +2,16 @@
   <div>
     <el-container>
       <el-header>
-        <AdminHeader></AdminHeader>
+        <StudentHeader></StudentHeader>
       </el-header>
 
       <el-container>
         <el-main>
-          <p>Notification Center</p>
-
           <el-table :data="notifications">
             <el-table-column label="Course" prop="course"></el-table-column>
             <el-table-column label="Title" prop="title"></el-table-column>
             <el-table-column label="Sender" prop="sender"></el-table-column>
-            <el-table-column label="Last Edit Time" prop="time"></el-table-column>
+            <el-table-column label="Modified Time" prop="time"></el-table-column>
           </el-table>
         </el-main>
       </el-container>
@@ -22,31 +20,35 @@
 </template>
 
 <script>
-import AdminHeader from "@/components/AdminHeader";
+import StudentHeader from "@/components/StudentHeader";
 export default {
-  name: "AdminNotificationCenter",
-  components: {AdminHeader},
+  name: "StudentNotificationCenter",
+  components: {StudentHeader},
 
   data() {
+
     return {
       notifications: [
         {
+          course: 'OOAD',
           title: 'Notification 1',
           sender: 'AAAAA',
           time: '2022/09/01',
-          course: 'Course 1'
+          message: 'asasasa'
         },
         {
+          course: 'CPP',
           title: 'Notification 2',
           sender: 'BBBBBB',
           time: '2022/09/30',
-          course: 'Course 2'
+          message: 'aaaaaaaa'
         },
         {
+          course: 'JAVA',
           title: 'Notification 3',
           sender: 'CCCCC',
           time: '2022/10/15',
-          course: 'Course 3'
+          message: 'asauequequ'
         }
       ]
     }

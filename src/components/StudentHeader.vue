@@ -16,13 +16,13 @@
           <router-link to="/StudentMain">主页</router-link>
         </el-menu-item>
         <el-menu-item index="2">
-          <router-link to="/StudentLiveCourse">课程中心</router-link>
+          <router-link to="/StudentCourseCenter">课程中心</router-link>
         </el-menu-item>
         <el-menu-item index="3">
-          <router-link to="/">通知中心</router-link>
+          <router-link to="/StudentNotificationCenter">通知中心</router-link>
         </el-menu-item>
         <el-menu-item index="4">
-          <router-link to="/">作业中心</router-link>
+          <router-link to="/StudentAssignmentCenter">作业中心</router-link>
         </el-menu-item>
         <el-menu-item index="5">
           <router-link to="/">个人中心</router-link>

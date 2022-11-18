@@ -9,6 +9,11 @@ import AdminUserCenter from "@/views/Admin/AdminUserCenter";
 import AdminNotificationCenter from "@/views/Admin/AdminNotificationCenter";
 import TeacherCourseCenter from "@/views/Teacher/TeacherCourseCenter";
 import TeacherDetailCourse from "@/views/Teacher/TeacherDetailCourse";
+import TeacherNotificationCenter from "@/views/Teacher/TeacherNotificationCenter";
+import TeacherAssignmentCenter from "@/views/Teacher/TeacherAssignmentCenter";
+import StudentCourseCenter from "@/views/Student/StudentCourseCenter";
+import StudentNotificationCenter from "@/views/Student/StudentNotificationCenter";
+import StudentAssignmentCenter from "@/views/Student/StudentAssignmentCenter";
 
 const routes = [
     {
@@ -27,6 +32,21 @@ const routes = [
         path: '/StudentLiveCourse',
         name: 'StudentLiveCourse',
         component: StudentLiveCourse
+    },
+    {
+        path: '/StudentCourseCenter',
+        name: 'StudentCourseCenter',
+        component: StudentCourseCenter
+    },
+    {
+        path: '/StudentNotificationCenter',
+        name: 'StudentNotificationCenter',
+        component: StudentNotificationCenter
+    },
+    {
+        path: '/StudentAssignmentCenter',
+        name: 'StudentAssignmentCenter',
+        component: StudentAssignmentCenter
     },
 
     // Administrator
@@ -67,6 +87,16 @@ const routes = [
         name: 'TeacherDetailCourse',
         component: TeacherDetailCourse
     },
+    {
+        path: '/TeacherNotificationCenter',
+        name: 'TeacherNotificationCenter',
+        component: TeacherNotificationCenter
+    },
+    {
+        path: '/TeacherAssignmentCenter',
+        name: 'TeacherAssignmentCenter',
+        component: TeacherAssignmentCenter
+    }
 ]
 
 const router = createRouter({
