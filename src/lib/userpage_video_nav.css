@@ -1,0 +1,34 @@
+.activity {
+    position: relative;
+    width: 80%;
+    height: 60px;
+    background-color: rgb(30, 31, 38);
+    border-top: 3px solid rgb(14, 190, 255);
+    box-shadow: 0 2px 3px 3px rgba(0, 0, 0, 0.1);
+    margin: 10px auto;
+    align-content: center;
+}
+
+.activity div {
+    float: left;
+    width: 80px;
+    height: 40px;
+    line-height: 40px;
+    align-content: center;
+    color: rgb(155, 157, 173);
+    background-color: rgb(44, 48, 58);
+    border-radius: 5px;
+    padding: 5px;
+    margin: 5px;
+}
+
+.activity div:hover {
+    background-color: rgb(90, 95, 115);
+    color: #fff;
+    cursor: pointer;
+}
+
+.activity div:focus {
+    background-color: rgb(90, 95, 115);
+    color: #fff;
+}
