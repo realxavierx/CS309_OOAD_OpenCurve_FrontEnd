@@ -14,12 +14,91 @@ import TeacherAssignmentCenter from "@/views/Teacher/TeacherAssignmentCenter";
 import StudentCourseCenter from "@/views/Student/StudentCourseCenter";
 import StudentNotificationCenter from "@/views/Student/StudentNotificationCenter";
 import StudentAssignmentCenter from "@/views/Student/StudentAssignmentCenter";
+import Register from "@/views/Welcome/Register";
+import Sign from "@/views/Welcome/Sign";
+import Login from "@/views/Welcome/Login";
+import Welcome from "@/views/Welcome/Welcome";
+import Student_history from "@/views/UserPage/Student_history";
+import Student from "@/views/UserPage/Student";
+import Userpage from "@/views/UserPage/Userpage";
+import Student_mycourse from "@/views/UserPage/Student_mycourse";
+import Student_upload from "@/views/UserPage/Student_upload";
+import Student_info from "@/views/UserPage/Student_info";
+import Teacher from "@/views/UserPage/Teacher";
 
 const routes = [
     {
         path: '/',
         name: 'home',
         component: HomeView
+    },
+
+    // Welcome Page
+    {
+        path: '/welcome',
+        component: Welcome,
+        children: [
+            {
+                path: 'sign',
+                component: Sign,
+                children: [
+                    {
+                        path: 'register',
+                        component: Register
+                    },
+                    {
+                        path: 'login',
+                        component: Login
+                    }
+                ]
+            },
+        ]
+    },
+
+    // User Page
+    {
+        path: '/userpage',
+        component: Userpage,
+        children: [
+            {
+                path: 'student',
+                component: Student,
+                children: [
+                    {
+                        path: 'history',
+                        component: Student_history
+                    },
+                    {
+                        path: 'mycourse',
+                        component: Student_mycourse
+                    },
+                    {
+                        path: 'upload',
+                        component: Student_upload
+                    },
+                    {
+                        path: 'information',
+                        component: Student_info
+                    }
+                ]
+            },
+            {
+                path: 'teacher',
+                component: Teacher,
+                children: [
+                    {
+                        path: 'history',
+
+                    },
+                    {
+                        path: 'upload'
+                    },
+                    {
+                        path: 'information'
+                    }
+                ]
+            }
+        ]
     },
 
     // Student

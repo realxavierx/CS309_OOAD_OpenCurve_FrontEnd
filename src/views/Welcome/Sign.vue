@@ -54,12 +54,12 @@ export default {
         },
         loginShow() {
             this.$router.push({
-                path: '/welcome/sign/login',
+                path: '/Welcome/sign/login',
             })
         },
         registerShow() {
             this.$router.push({
-                path: '/welcome/sign/register',
+                path: '/Welcome/sign/register',
             })
         }
     }
@@ -68,7 +68,7 @@ export default {
 
 </script>
 
-<style lang="less" scoped>
+<style scoped>
 
 #login_bg {
     position: absolute;

@@ -76,7 +76,9 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style scoped>
+
+@import '../../lib/nav.css';
 
 #header {
     position:absolute;
@@ -88,6 +90,5 @@ export default {
     font-weight: 600;
     z-index: 2;
 }
-@import '../../lib/nav.css';
 
 </style>

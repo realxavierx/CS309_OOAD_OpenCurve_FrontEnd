@@ -11,7 +11,7 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style scoped>
     img {
         height: 100px;
         float:left;
@@ -26,6 +26,6 @@ export default {
         text-align: center;
         line-height: 100px;
         font-weight: 600;
-        // background-color: rgb(255, 79, 79);
+        /*background-color: rgb(255, 79, 79);*/
     }
 </style>
