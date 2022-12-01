@@ -35,10 +35,6 @@ export default {
     Footer
   },
   methods: {
-    showLogin() {
-      this.loginVisible = !this.loginVisible;
-    },
-
   },
 
 }
@@ -47,6 +43,7 @@ export default {
 <style scoped>
 
 #page {
+  overflow: hidden hidden;
   position: absolute;
   width: 100%;
   height: 100%;

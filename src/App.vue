@@ -31,7 +31,7 @@ export default {
 
 <style>
 body, html, #app {
-  overflow: hidden hidden;
+  /*overflow: hidden hidden;*/
   margin: 0;
   width: 100%;
   height: 100%;

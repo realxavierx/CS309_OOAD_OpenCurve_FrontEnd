@@ -1,14 +1,14 @@
 <template>
 
   <div class="header">
+    <img src="../img/logo.png" alt="" style="height:40px;float:left;margin:10px 0 20px 20px;">
     <div class="logo">
       <router-link to="/">OpenCurve</router-link>
     </div>
     <!-- 水平一级菜单 -->
-    <div style="float: left;">
+    <div style="float: left;" class="nav">
       <el-menu
           mode="horizontal"
-          :default-active="false"
           :ellipsis="false"
           text-color="#000000"
           active-text-color="#3989fa">
@@ -62,6 +62,19 @@ export default {
 </script>
 
 <style scoped>
+/*@import '../lib/nav.css';*/
+
+/*.header {*/
+/*  position:absolute;*/
+/*  top:0;*/
+/*  width: 100%;*/
+/*  height:80px;*/
+/*  line-height: 80px;*/
+/*  color: #fff;*/
+/*  font-weight: 600;*/
+/*  z-index: 2;*/
+/*}*/
+
 .header {
   position: relative;
   box-sizing: border-box;

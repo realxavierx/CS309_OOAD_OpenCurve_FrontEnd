@@ -4,12 +4,11 @@
       <!-- 页面头部 -->
       <el-container>
         <el-header>
-          <TeacherHeader></TeacherHeader>
+          <StudentHeader></StudentHeader>
         </el-header>
 
         <el-container>
           <el-aside width="230px" style="background-color: #95c5ef">
-            <el-button type="primary" style="width: 100%; height: 80px" @click="form_dialog_visible = true">添加章节</el-button>
 
             <el-menu>
               <el-sub-menu index="1">
@@ -56,41 +55,6 @@
                   </el-descriptions>
                 </el-col>
               </el-row>
-
-              <el-dialog v-model="form_dialog_visible" title="添加课程章节" @close="cancelAddChapter">
-                <el-form :model="form" ref="formRef">
-                  <el-form-item label="Title">
-                    <el-input v-model="form.title"/>
-                  </el-form-item>
-
-                  <el-form-item label="Session">
-                    <el-input v-model="form.session"/>
-                  </el-form-item>
-
-                  <el-form-item label="description">
-                    <el-input v-model="form.description"/>
-                  </el-form-item>
-
-                  <el-form-item label="Video">
-                    <el-upload
-                        :action="uploadActionUrl"
-                        :on-success="handleSuccess"
-                        accept="video/mp4,image/jpeg,image/gif,image/png"
-                        multiple
-                        :file-list="form.uploadVideo"
-                        :limit="1">
-                      <el-button size="small" type="primary">点击上传</el-button>
-                    </el-upload>
-                  </el-form-item>
-                </el-form>
-
-                <template #footer>
-                  <span class="dialog_footer">
-                    <el-button type="primary" @click="confirmAddChapter()">Submit</el-button>
-                    <el-button @click="cancelAddChapter()">Cancel</el-button>
-                  </span>
-                </template>
-              </el-dialog>
             </div>
 
 
@@ -103,57 +67,16 @@
 
 <script>
 import {reactive, ref} from "vue";
-import TeacherHeader from "@/components/TeacherHeader";
 import axios from "axios";
+import StudentHeader from "@/components/StudentHeader";
 // import {useRoute} from 'vue-router'
 // const route = useRoute()
 
 export default {
-  name: "TeacherLiveCourse",
-  components: {TeacherHeader},
+  name: "StudentDetailCourse",
+  components: {StudentHeader},
 
   methods: {
-    handleSuccess(resp) {
-      console.log('视频存储url为: ' + resp.data.url)
-      this.videoUrl = resp.data.url
-    },
-
-    confirmAddChapter() {
-
-      axios({
-        method: 'POST',
-        url: 'http://localhost:8080/education/video/uploadVideoMeta',
-        data: {
-          course_id: this.$route.params.course_id,
-          title: this.form.title,
-          session: this.form.session,
-          url: this.videoUrl,
-          description: this.form.description
-        },
-        transformRequest: [function (data) {
-          let str = '';
-          for (let key in data) {
-            str += encodeURIComponent(key) + '=' + encodeURIComponent(data[key]) + '&';
-          }
-          return str;
-        }]
-      })
-          .then(response => {
-            console.log(response.data)
-            this.getSessionsCount()
-            this.cancelAddChapter()
-          })
-
-    },
-
-    cancelAddChapter() {
-      this.form_dialog_visible = false
-      this.form.title = ''
-      this.form.session = ''
-      this.form.description = ''
-      this.form.uploadVideo = []
-      this.$refs.formRef.resetFields()
-    },
 
     getSessionsCount() {
       axios({
@@ -180,13 +103,6 @@ export default {
   },
 
   data() {
-    let formRef = reactive(ref(null))
-    let form = reactive({
-      title: '',
-      session: '',
-      description: '',
-      uploadVideo: []
-    })
     let session_info = reactive({
       title: '',
       session: '',
@@ -197,8 +113,6 @@ export default {
     return {
       session_cnt: 0,
       session_info,
-      formRef,
-      form,
       uploadActionUrl: 'http://localhost:8081/cloud_storage/file/uploading',
       form_dialog_visible: false,
       videoUrl: '',

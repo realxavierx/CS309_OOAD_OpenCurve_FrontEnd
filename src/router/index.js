@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import StudentMain from "@/views/Student/StudentMain";
 import HomeView from "@/views/HomeView";
-import StudentLiveCourse from "@/views/Student/StudentLiveCourse";
 import TeacherMain from "@/views/Teacher/TeacherMain";
 import AdminMain from "@/views/Admin/AdminMain";
 import AdminCourseCenter from "@/views/Admin/AdminCourseCenter";
@@ -15,9 +14,8 @@ import StudentCourseCenter from "@/views/Student/StudentCourseCenter";
 import StudentNotificationCenter from "@/views/Student/StudentNotificationCenter";
 import StudentAssignmentCenter from "@/views/Student/StudentAssignmentCenter";
 import Register from "@/views/Welcome/Register";
-import Sign from "@/views/Welcome/Sign";
 import Login from "@/views/Welcome/Login";
-import Welcome from "@/views/Welcome/Welcome";
+import Welcome from "@/views/Welcome/WelcomePage";
 import Student_history from "@/views/UserPage/Student_history";
 import Student from "@/views/UserPage/Student";
 import Userpage from "@/views/UserPage/Userpage";
@@ -25,6 +23,7 @@ import Student_mycourse from "@/views/UserPage/Student_mycourse";
 import Student_upload from "@/views/UserPage/Student_upload";
 import Student_info from "@/views/UserPage/Student_info";
 import Teacher from "@/views/UserPage/Teacher";
+import StudentDetailCourse from "@/views/Student/StudentDetailCourse";
 
 const routes = [
     {
@@ -39,25 +38,20 @@ const routes = [
         component: Welcome,
         children: [
             {
-                path: 'sign',
-                component: Sign,
-                children: [
-                    {
-                        path: 'register',
-                        component: Register
-                    },
-                    {
-                        path: 'login',
-                        component: Login
-                    }
-                ]
+                path: 'register',
+                component: Register
             },
+            {
+                path: 'login',
+                component: Login
+            }
         ]
     },
 
+
     // User Page
     {
-        path: '/userpage',
+        path: '/userPage',
         component: Userpage,
         children: [
             {
@@ -88,7 +82,6 @@ const routes = [
                 children: [
                     {
                         path: 'history',
-
                     },
                     {
                         path: 'upload'
@@ -108,9 +101,9 @@ const routes = [
         component: StudentMain
     },
     {
-        path: '/StudentLiveCourse',
-        name: 'StudentLiveCourse',
-        component: StudentLiveCourse
+        path: '/StudentDetailCourse/:course_id',
+        name: 'StudentDetailCourse',
+        component: StudentDetailCourse
     },
     {
         path: '/StudentCourseCenter',

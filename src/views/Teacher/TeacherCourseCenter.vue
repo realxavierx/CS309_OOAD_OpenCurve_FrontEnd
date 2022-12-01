@@ -20,7 +20,7 @@
                 <el-descriptions-item label="Type">{{ course.courseType }}</el-descriptions-item>
                 <el-descriptions-item label="Credit">{{ course.courseCredit }}</el-descriptions-item>
                 <el-descriptions-item label="Status"> {{ course.courseStatus }}</el-descriptions-item>
-                <el-descriptions-item label="Fees"> {{ course.courseFees }}</el-descriptions-item>
+                <el-descriptions-item label="Fee"> {{ course.courseFee }}</el-descriptions-item>
                 <el-descriptions-item label="Description">{{ course.courseDescription }}</el-descriptions-item>
               </el-descriptions>
             </div>
@@ -61,8 +61,8 @@
                   <el-input v-model="form.courseStatus"/>
                 </el-form-item>
 
-                <el-form-item label="Course Fees">
-                  <el-input v-model="form.courseFees"/>
+                <el-form-item label="Course Fee">
+                  <el-input v-model="form.courseFee"/>
                 </el-form-item>
 
                 <el-form-item label="Description">
@@ -103,7 +103,7 @@ export default {
       courseCredit: '',
       courseDepartment: '',
       courseStatus: '',
-      courseFees: '',
+      courseFee: '',
       courseDescription: ''
     })
 
@@ -140,7 +140,7 @@ export default {
           course_credit: this.form.courseCredit,
           course_type: this.form.courseType,
           course_status: this.form.courseStatus,
-          course_fees: this.form.courseFees,
+          course_fee: this.form.courseFee,
           course_info: this.form.courseDescription
         },
         transformRequest: [function (data) {
@@ -166,7 +166,7 @@ export default {
       this.form.courseType = ''
       this.form.courseCredit = ''
       this.form.courseStatus = ''
-      this.form.courseFees = ''
+      this.form.courseFee = ''
       this.form.courseDescription = ''
       this.$refs.formRef.resetFields()
     },
@@ -176,7 +176,7 @@ export default {
         method: 'GET',
         url: 'http://localhost:8080/education/course/getCoursesOfTeacher?teacher_id=' + '1',
       }).then(response => {
-        console.log(response.data.data.courses)
+        console.log(response.data.message)
         let response_data = response.data.data.courses
         response_data.forEach((data) => {
           let course = {
@@ -186,7 +186,7 @@ export default {
             courseType: data.course_type,
             courseCredit: data.credit,
             courseStatus: data.status,
-            courseFees: data.fees,
+            courseFee: data.fee,
             courseDescription: data.info
           }
           this.courses.push(course)
