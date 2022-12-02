@@ -6,10 +6,34 @@
       </el-header>
 
       <el-container>
-        <el-main>
-          <p>Notification Center</p>
+        <el-aside width="200px">
+          <el-menu mode="vertical" class="side_menu" :default-openeds="Array('1', '2')">
+            <el-sub-menu index="1" >
+              <template #title>
+                <span>课程通知</span>
+              </template>
+              <el-menu-item index="1-1">CS996</el-menu-item>
+            </el-sub-menu>
 
-          <el-button @click="form_dialog_visible = true">Add Notification</el-button>
+            <el-sub-menu index="2">
+              <template #title>
+                <span>院系通知</span>
+              </template>
+              <el-menu-item index="2-1">CSE</el-menu-item>
+            </el-sub-menu>
+          </el-menu>
+        </el-aside>
+
+        <el-main>
+          <el-row>
+            <el-col :span="Number(12)">
+              <h1>Notification Center</h1>
+            </el-col>
+
+            <el-col :span="Number(12)">
+              <el-button style="margin-top: 15px; margin-left: 150px;" size="large" type="primary" @click="form_dialog_visible = true">Add Notification</el-button>
+            </el-col>
+          </el-row>
 
           <el-dialog v-model="form_dialog_visible" title="添加通知" @close="cancelAddNotification">
             <el-form :model="form" ref="formRef">
@@ -38,12 +62,42 @@
             </template>
           </el-dialog>
 
-          <el-table :data="notifications">
-            <el-table-column label="Course" prop="course"></el-table-column>
-            <el-table-column label="Title" prop="title"></el-table-column>
-            <el-table-column label="Sender" prop="sender"></el-table-column>
-            <el-table-column label="Modified Time" prop="time"></el-table-column>
-          </el-table>
+          <div v-for="notification in notifications" v-bind:key="notification">
+            <el-card shadow="always">
+
+              <el-card class="info_card" body-style="padding: 2px" shadow="hover">
+                <el-tag class="info_tag">Title</el-tag>
+                {{ notification.title }}
+              </el-card>
+
+              <el-card class="info_card" body-style="padding: 2px" shadow="hover">
+                <el-row>
+                  <el-col :span="Number(12)">
+                    <el-tag class="info_tag">Course</el-tag>
+                    {{ notification.course }}
+                  </el-col>
+                  <el-col :span="Number(12)">
+                    <el-tag class="info_tag">Sender</el-tag>
+                    {{ notification.sender }}
+                  </el-col>
+                </el-row>
+              </el-card>
+
+              <el-card style="padding: 5px" body-style="padding: 2px" shadow="hover">
+                <el-collapse>
+                  <el-collapse-item>
+                    <template #title>
+                      <el-tag class="info_tag">Message</el-tag>
+                      <p style="color: #729abb">---> click to show content</p>
+                    </template>
+                    {{ notification.message }}
+                  </el-collapse-item>
+                </el-collapse>
+              </el-card>
+
+            </el-card>
+          </div>
+
         </el-main>
       </el-container>
     </el-container>
@@ -54,6 +108,8 @@
 import TeacherHeader from "@/components/TeacherHeader";
 import {reactive, ref} from "vue";
 import axios from "axios";
+import moment from "moment";
+
 export default {
   name: "TeacherNotificationCenter",
   components: {TeacherHeader},
@@ -109,6 +165,8 @@ export default {
     },
 
     confirmAddNotification() {
+      let modified_time = moment().format('L').toString()
+      console.log(modified_time)
       axios({
         method: 'POST',
         url: 'http://localhost:8080/education/notification/addNotification',
@@ -131,10 +189,28 @@ export default {
             this.cancelAddNotification()
           })
     }
+  },
+
+  mounted() {
+    let modified_time = moment().format('L').toString()
+    console.log(modified_time)
   }
 }
 </script>
 
 <style scoped>
 
+.info_card {
+  padding: 5px;
+  height: 40px;
+}
+
+.info_tag {
+  width: 150px;
+  height: 35px;
+  margin-right: 50px;
+  font-weight: bold;
+  font-size: large;
+  font-style: oblique;
+}
 </style>

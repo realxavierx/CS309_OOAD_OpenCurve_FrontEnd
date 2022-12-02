@@ -90,7 +90,7 @@ export default {
       if (res.status === 200 && this.vertiCode === this.vertiCodeFromEnd) {
           console.log('注册成功')
           this.$router.push({
-            path: '/Welcome/sign/login',
+            path: '/welcome/login',
           })
         }
       })

@@ -13,6 +13,7 @@
     "axios": "^0.27.2",
     "core-js": "^3.8.3",
     "element-plus": "^2.2.0",
+    "moment": "^2.29.4",
     "three": "^0.146.0",
     "threejs-toys": "^0.0.8",
     "vue": "^3.2.13",

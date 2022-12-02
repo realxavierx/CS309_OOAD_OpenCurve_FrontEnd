@@ -96,9 +96,9 @@
                 >
                   <el-option
                       v-for="fee in fees"
-                      :key="fee"
-                      :value="fee"
-                      :label="fee">
+                      :key="fee.name"
+                      :value="fee.value"
+                      :label="fee.name">
                   </el-option>
                 </el-select>
               </el-col>
@@ -171,7 +171,13 @@ export default {
       statuses: ['Upcoming', 'Ongoing', 'Ended'],
       courseStatus: '',
       statusSelected: 'process',
-      fees: ['Free', 'Less than ￥10', 'Less than ￥20', 'Less than ￥50'],
+      fees: [
+        {name: 'Free', value: 0},
+        {name: 'Less than ￥10', value: 10},
+        {name: 'Less than ￥20', value: 20},
+        {name: 'Less than ￥50', value: 50},
+        {name: 'Other', value: 51}
+      ],
       courseFee: '',
       feeSelected: 'process'
     }
@@ -325,7 +331,7 @@ export default {
     },
 
     handleSelectFee() {
-      if (this.feeSelected === '') {
+      if (this.courseFee === '') {
         this.feeSelected = 'process'
       } else {
         this.feeSelected = 'success'
@@ -333,7 +339,31 @@ export default {
     },
 
     selectCourses() {
+      this.courses = []
 
+      axios({
+        method: 'GET',
+        url: 'http://localhost:8080/education/course/getCoursesWithConstraints?course_range='
+            + this.courseRange.split(' ')[0] + '&student_id=' + 'lsm@hhh.com' + '&department='
+            + this.courseDepartment + '&teacher=' + this.courseTeacher.split('-')[0] + '&course_type='
+            + this.courseType + '&course_status=' + this.courseStatus + '&course_fee=' + this.courseFee,
+      }).then(response => {
+        console.log(response.data.message)
+        let response_data = response.data.data.courses
+        response_data.forEach((data) => {
+          let course = {
+            courseID: data.id,
+            courseName: data.name,
+            courseDepartment: data.department,
+            courseType: data.course_type,
+            courseCredit: data.credit,
+            courseStatus: data.status,
+            courseFees: data.fees,
+            courseDescription: data.info
+          }
+          this.courses.push(course)
+        })
+      })
     }
   },
 

@@ -78,14 +78,13 @@ export default {
     login() {
       this.axios({
         method: 'GET',
-        url: 'http://10.24.233.83:8080/education/login/user',
+        url: 'http://localhost:8080/education/login/user',
         data: {
           userid: this.userId,
           content: this.content,
           loginType: this.loginType
         },
         transformRequest: [function (data) {
-          console.log(data)
           var str = '';
           for (var key in data) {
             str += encodeURIComponent(key) + '=' + encodeURIComponent(data[key]) + '&';
@@ -100,7 +99,7 @@ export default {
           sessionStorage.setItem('AVATAR', res.avatar)
           //路由跳转
           this.$router.push({
-            path: '/homepage',
+            path: '/userPage',
           })
         }
       })
