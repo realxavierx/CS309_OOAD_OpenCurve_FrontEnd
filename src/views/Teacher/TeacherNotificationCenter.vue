@@ -7,19 +7,38 @@
 
       <el-container>
         <el-aside width="200px">
-          <el-menu mode="vertical" class="side_menu" :default-openeds="Array('1', '2')">
-            <el-sub-menu index="1" >
+          <el-button color="#626aef" plain style="width: 150px; height: 50px; margin-left: 12px; margin-top: 50px"
+                     @click="show_notifications = notifications">
+            展示所有通知
+          </el-button>
+          <el-button color="#626aef" plain style="width: 150px; height: 50px"
+                     @click="show_notifications = notifications.filter(n => !n.course_id.includes('000'))">
+            展示课程通知
+          </el-button>
+          <el-button color="#626aef" plain style="width: 150px; height: 50px; margin-bottom: 20px"
+                     @click="show_notifications = notifications.filter(n => n.course_id.includes('000'))">
+            展示院系通知
+          </el-button>
+
+          <el-menu @select="handleMenuSelect" mode="vertical" class="side_menu" :default-openeds="Array('1', '2')">
+
+
+            <el-sub-menu index="1">
               <template #title>
                 <span>课程通知</span>
               </template>
-              <el-menu-item index="1-1">CS996</el-menu-item>
+              <el-menu-item :index="course.id" :key="course.id" v-for="course in courses">
+                <span>{{ course.id }}</span>
+              </el-menu-item>
             </el-sub-menu>
 
             <el-sub-menu index="2">
               <template #title>
                 <span>院系通知</span>
               </template>
-              <el-menu-item index="2-1">CSE</el-menu-item>
+              <el-menu-item :index="teacherDepartment" :key="teacherDepartment">
+                <span>{{ teacherDepartment }}</span>
+              </el-menu-item>
             </el-sub-menu>
           </el-menu>
         </el-aside>
@@ -31,7 +50,9 @@
             </el-col>
 
             <el-col :span="Number(12)">
-              <el-button style="margin-top: 15px; margin-left: 150px;" size="large" type="primary" @click="form_dialog_visible = true">Add Notification</el-button>
+              <el-button style="margin-top: 15px; margin-left: 150px;" size="large" type="primary"
+                         @click="form_dialog_visible = true">Add Notification
+              </el-button>
             </el-col>
           </el-row>
 
@@ -62,7 +83,7 @@
             </template>
           </el-dialog>
 
-          <div v-for="notification in notifications" v-bind:key="notification">
+          <div v-for="notification in show_notifications" v-bind:key="notification">
             <el-card shadow="always">
 
               <el-card class="info_card" body-style="padding: 2px" shadow="hover">
@@ -72,13 +93,17 @@
 
               <el-card class="info_card" body-style="padding: 2px" shadow="hover">
                 <el-row>
-                  <el-col :span="Number(12)">
+                  <el-col :span="Number(6)">
                     <el-tag class="info_tag">Course</el-tag>
-                    {{ notification.course }}
+                    {{ notification.course_id }}
                   </el-col>
-                  <el-col :span="Number(12)">
+                  <el-col :span="Number(10)">
                     <el-tag class="info_tag">Sender</el-tag>
-                    {{ notification.sender }}
+                    {{ notification.sender_id }}
+                  </el-col>
+                  <el-col :span="Number(8)">
+                    <el-tag class="info_tag">Time</el-tag>
+                    {{ notification.modified_time }}
                   </el-col>
                 </el-row>
               </el-card>
@@ -90,13 +115,16 @@
                       <el-tag class="info_tag">Message</el-tag>
                       <p style="color: #729abb">---> click to show content</p>
                     </template>
-                    {{ notification.message }}
+                    {{ notification.content }}
                   </el-collapse-item>
                 </el-collapse>
               </el-card>
 
             </el-card>
+
+
           </div>
+          <el-empty v-show="notifications_empty" description="No notification"></el-empty>
 
         </el-main>
       </el-container>
@@ -127,29 +155,11 @@ export default {
       form,
       formRef,
       form_dialog_visible: false,
-      notifications: [
-        {
-          course: 'OOAD',
-          title: 'Notification 1',
-          sender: 'AAAAA',
-          time: '2022/09/01',
-          message: 'asasasa'
-        },
-        {
-          course: 'CPP',
-          title: 'Notification 2',
-          sender: 'BBBBBB',
-          time: '2022/09/30',
-          message: 'aaaaaaaa'
-        },
-        {
-          course: 'JAVA',
-          title: 'Notification 3',
-          sender: 'CCCCC',
-          time: '2022/10/15',
-          message: 'asauequequ'
-        }
-      ]
+      teacherDepartment: '',
+      courses: [],
+      notifications: [],
+      show_notifications: [],
+      notifications_empty: true
     }
   },
 
@@ -188,12 +198,61 @@ export default {
             console.log(response.data)
             this.cancelAddNotification()
           })
-    }
+    },
+
+    getTeacherNotification() {
+      axios({
+        method: 'GET',
+        url: 'http://localhost:8080/education/notification/getNotificationByTeacher?teacher_id=' + '1',
+        transformRequest: [function (data) {
+          let str = '';
+          for (let key in data) {
+            str += encodeURIComponent(key) + '=' + encodeURIComponent(data[key]) + '&';
+          }
+          return str;
+        }]
+      })
+          .then(resp => {
+            let response = resp.data.data
+            this.courses = response.courses
+            this.notifications = response.notifications
+            this.teacherDepartment = response.teacherDepartment
+            this.show_notifications = this.notifications
+            this.notifications_empty = (this.show_notifications.length === 0)
+          })
+    },
+
+    handleMenuSelect(key, keyPath) {
+      console.log(key, keyPath)
+      if (keyPath[0] === '2') {
+        this.show_notifications = this.notifications.filter(n => n.course_id.trim() === (key + '000'))
+      } else {
+        this.show_notifications = this.notifications.filter(n => n.course_id === key)
+      }
+
+      this.notifications_empty = (this.show_notifications.length === 0)
+    },
+
+    // handleMenuClose(key, keyPath) {
+    //   console.log(key, keyPath)
+    //   if (key === 'Department') {
+    //     this.show_notifications = this.show_notifications.filter(n => n.course_id.trim() !== (this.teacherDepartment + '000'))
+    //   }
+    //   else if (key === 'Course') {
+    //     for (let course of this.courses) {
+    //       this.show_notifications = this.show_notifications.filter(n => n.course_id !== course.id)
+    //     }
+    //   }
+    //
+    //   this.notifications_empty = (this.show_notifications.length === 0)
+    //
+    // }
   },
 
   mounted() {
     let modified_time = moment().format('L').toString()
     console.log(modified_time)
+    this.getTeacherNotification()
   }
 }
 </script>
