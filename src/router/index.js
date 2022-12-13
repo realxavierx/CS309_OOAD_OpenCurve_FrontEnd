@@ -24,6 +24,7 @@ import Student_upload from "@/views/UserPage/Student_upload";
 import Student_info from "@/views/UserPage/Student_info";
 import Teacher from "@/views/UserPage/Teacher";
 import StudentDetailCourse from "@/views/Student/StudentDetailCourse";
+import StudentDetailAssignment from "@/views/Student/StudentDetailAssignment";
 
 const routes = [
     {
@@ -119,6 +120,11 @@ const routes = [
         path: '/StudentAssignmentCenter',
         name: 'StudentAssignmentCenter',
         component: StudentAssignmentCenter
+    },
+    {
+        path: '/StudentDetailAssignment/:assignment_id',
+        name: 'StudentDetailAssignment',
+        component: StudentDetailAssignment
     },
 
     // Administrator

@@ -10,6 +10,16 @@ import 'vue3-video-play/dist/style.css' // 引入css
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import 'animate.css'
 
+import VueMarkdownEditor from '@kangc/v-md-editor';
+import '@kangc/v-md-editor/lib/style/base-editor.css';
+import vuepressTheme from '@kangc/v-md-editor/lib/theme/vuepress.js';
+import '@kangc/v-md-editor/lib/theme/style/vuepress.css';
+
+import Prism from 'prismjs';
+
+VueMarkdownEditor.use(vuepressTheme, {
+    Prism,
+});
 
 const app = createApp(App)
 
@@ -18,4 +28,5 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 }
 app.use(router).use(VueAxios,axios).use(ElementPlus)
 app.use(vue3videoPlay)
+app.use(VueMarkdownEditor)
 app.mount('#app')
