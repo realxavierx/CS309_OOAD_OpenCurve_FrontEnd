@@ -25,6 +25,7 @@ import Student_info from "@/views/UserPage/Student_info";
 import Teacher from "@/views/UserPage/Teacher";
 import StudentDetailCourse from "@/views/Student/StudentDetailCourse";
 import StudentDetailAssignment from "@/views/Student/StudentDetailAssignment";
+import TeacherDetailAssignment from "@/views/Teacher/TeacherDetailAssignment";
 
 const routes = [
     {
@@ -174,6 +175,11 @@ const routes = [
         path: '/TeacherAssignmentCenter',
         name: 'TeacherAssignmentCenter',
         component: TeacherAssignmentCenter
+    },
+    {
+        path: '/TeacherDetailAssignment/:assignment_id',
+        name: 'TeacherDetailAssignment',
+        component: TeacherDetailAssignment
     }
 ]
 

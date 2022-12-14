@@ -6,10 +6,30 @@
       </el-header>
 
       <el-container>
-        <el-main>
-          <p>Assignment Center</p>
+        <el-aside>
+          <el-menu @select="handleMenuSelect" mode="vertical" class="side_menu" :default-openeds="Array( '1')">
+            <el-sub-menu index="1">
+              <template #title>
+                <span>你的课程</span>
+              </template>
+              <el-menu-item :index="course.id" v-for="course in courses" :key="course.id">
+                <span>{{ course.id }}</span>
+              </el-menu-item>
+            </el-sub-menu>
+          </el-menu>
+        </el-aside>
 
-          <el-button @click="form_dialog_visible = true">Add Assignment</el-button>
+        <el-main>
+          <div>
+            <el-row>
+              <h1>Assignments List</h1>
+              <el-button type="primary" size="large" style="margin-left: 500px; margin-top: 15px"
+                         @click="form_dialog_visible = true">
+                Add Assignment
+              </el-button>
+            </el-row>
+            <el-divider></el-divider>
+          </div>
 
           <el-dialog v-model="form_dialog_visible" title="布置作业" @close="cancelAddAssignment">
             <el-form :model="form" ref="formRef">
@@ -50,12 +70,20 @@
             </template>
           </el-dialog>
 
-          <el-table :data="assignments">
-            <el-table-column label="Course" prop="course"></el-table-column>
-            <el-table-column label="Title" prop="title"></el-table-column>
-            <el-table-column label="Teacher" prop="teacher"></el-table-column>
-            <el-table-column label="Due Date" prop="due_date"></el-table-column>
-          </el-table>
+          <div>
+            <el-table :data="show_assignments" table-layout="fixed" stripe style="width: 100%">
+              <el-table-column prop="title" label="Title"/>
+              <el-table-column prop="course_id" label="Course"/>
+              <el-table-column prop="due_date" label="Due Date"/>
+              <el-table-column label="Operation">
+                <template v-slot="scope">
+                  <el-button @click="jumpToDetailAssignment(scope.row.ID)">查看</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+
+            <el-empty v-show="assignments_empty" description="No assignment"></el-empty>
+          </div>
         </el-main>
       </el-container>
     </el-container>
@@ -66,6 +94,7 @@
 import {reactive, ref} from "vue";
 import TeacherHeader from "@/components/TeacherHeader";
 import axios from "axios";
+import router from "@/router";
 
 export default {
   name: "TeacherAssignmentCenter",
@@ -87,10 +116,68 @@ export default {
       form,
       formRef,
       form_dialog_visible: false,
+      courses: [],
+      assignments: [
+        {
+          id: 1,
+          title: 'Assignment 1',
+          course_id: 'CS996',
+          due_date: '2022/12/12'
+        },
+        {
+          id: 2,
+          title: 'Assignment 1',
+          course_id: 'CS996',
+          due_date: '2022/12/12'
+        },
+        {
+          id: 3,
+          title: 'Assignment 1',
+          course_id: 'CS996',
+          due_date: '2022/12/12'
+        }
+      ],
+      show_assignments: [],
+      assignments_empty: false
     }
   },
 
   methods: {
+
+    getTeacherCourses() {
+      axios({
+        method: 'GET',
+        url: 'http://localhost:8080/education/course/getCourseOfTeacher?teacher_id=' + 'lsm@hhh.com',
+        transformRequest: [function (data) {
+          let str = '';
+          for (let key in data) {
+            str += encodeURIComponent(key) + '=' + encodeURIComponent(data[key]) + '&';
+          }
+          return str;
+        }]
+      })
+          .then(resp => {
+            let response = resp.data.data
+            this.courses = response.courses
+          })
+    },
+
+    handleMenuSelect(key, keyPath) {
+      console.log(key, keyPath)
+      this.show_assignments = this.assignments.filter(n => n.course_id === key)
+      this.assignments_empty = (this.show_assignments.length === 0)
+    },
+
+    jumpToDetailAssignment(index) {
+      let id = this.assignments.at(index).id
+      console.log(id)
+      router.push({
+        name: "TeacherDetailAssignment",
+        params: {
+          assignment_id: id
+        }
+      })
+    },
 
     cancelAddAssignment() {
       this.form.course = ''
@@ -127,7 +214,12 @@ export default {
             console.log(response.data)
             this.cancelAddAssignment()
           })
-    }
+    },
+  },
+
+  mounted() {
+    this.getTeacherCourses()
+    this.show_assignments = this.assignments
   }
 }
 </script>

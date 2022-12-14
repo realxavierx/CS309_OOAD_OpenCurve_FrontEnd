@@ -25,7 +25,6 @@
             <el-divider></el-divider>
           </div>
           <div>
-
             <el-table :data="show_assignments" table-layout="fixed" stripe style="width: 100%">
               <el-table-column prop="title" label="Title"/>
               <el-table-column prop="course_id" label="Course"/>
