@@ -48,16 +48,47 @@
                 <el-col :span="1"></el-col>
 
                 <el-col :span="6" style="background-color: aliceblue">
-                  <el-descriptions title="Session Information" border column="1">
-                    <el-descriptions-item label="Title">{{session_info.title}}</el-descriptions-item> <br>
-                    <el-descriptions-item label="Session">{{session_info.session}}</el-descriptions-item> <br>
-                    <el-descriptions-item label="Description">{{session_info.description}}</el-descriptions-item>
-                  </el-descriptions>
+                  <div>
+                    <el-descriptions title="Session Information" border :column="Number(1)">
+                      <el-descriptions-item label="Title">{{ session_info.title }}</el-descriptions-item>
+                      <br>
+                      <el-descriptions-item label="Session">{{ session_info.session }}</el-descriptions-item>
+                      <br>
+                      <el-descriptions-item label="Description">{{ session_info.description }}</el-descriptions-item>
+                    </el-descriptions>
+                  </div>
+
+                  <div>
+                    <el-button style="margin-left: 10px; margin-right: 10px;"
+                               type="primary"
+                               @click="handleBeginTest">
+                      开始做题
+                    </el-button>
+                  </div>
+
                 </el-col>
               </el-row>
             </div>
 
-
+            <el-drawer v-model="questionsVisible"
+                       direction="rtl"
+                       :before-close="handleCloseQuestions"
+            >
+              <template #title>
+                <h4>Questions</h4>
+              </template>
+              <template #default>
+                <div>
+                  Hello there
+                </div>
+              </template>
+              <template #footer>
+                <div style="flex: auto">
+                  <el-button @click="handleCloseQuestions">Cancel</el-button>
+                  <el-button type="primary" @click="confirmSubmit">Submit</el-button>
+                </div>
+              </template>
+            </el-drawer>
           </el-main>
         </el-container>
       </el-container>
@@ -69,38 +100,13 @@
 import {reactive, ref} from "vue";
 import axios from "axios";
 import StudentHeader from "@/components/StudentHeader";
+import {ElMessageBox} from "element-plus";
 // import {useRoute} from 'vue-router'
 // const route = useRoute()
 
 export default {
   name: "StudentDetailCourse",
   components: {StudentHeader},
-
-  methods: {
-
-    getSessionsCount() {
-      axios({
-        method: 'GET',
-        url: 'http://localhost:8080/education/video/getSessionsCount?course_id=' + this.$route.params.course_id,
-      }).then(response => {
-        this.session_cnt = response.data.data.session_count
-      })
-    },
-
-    getSessionInfo(session) {
-      axios({
-        method: 'GET',
-        url: 'http://localhost:8080/education/video/getSessionInfo?course_id=' + this.$route.params.course_id + '&session=' + session,
-      }).then(response => {
-        let resp = response.data.data.video
-        this.session_info.title = resp.title
-        this.session_info.session = resp.session
-        this.session_info.description = resp.description
-        this.session_info.url = resp.url
-        this.videoOptions.src = resp.url
-      })
-    },
-  },
 
   data() {
     let session_info = reactive({
@@ -142,7 +148,72 @@ export default {
           "fullScreen",
         ], //显示所有按钮,
       }),
+      questionsVisible: false
+    }
+  },
 
+  methods: {
+
+    getSessionsCount() {
+      axios({
+        method: 'GET',
+        url: 'http://localhost:8080/education/video/getSessionsCount?course_id=' + this.$route.params.course_id,
+      }).then(response => {
+        this.session_cnt = response.data.data.session_count
+      })
+    },
+
+    getSessionInfo(session) {
+      axios({
+        method: 'GET',
+        url: 'http://localhost:8080/education/video/getSessionInfo?course_id=' + this.$route.params.course_id + '&session=' + session,
+      }).then(response => {
+        let resp = response.data.data.video
+        this.session_info.title = resp.title
+        this.session_info.session = resp.session
+        this.session_info.description = resp.description
+        this.session_info.url = resp.url
+        this.videoOptions.src = resp.url
+      })
+    },
+
+    handleBeginTest() {
+      ElMessageBox.confirm('Do you want to start the test right now?')
+          .then((value) => {
+            console.log(value)
+            if (value === 'confirm') {
+              this.questionsVisible = true
+            }
+          })
+          .catch(() => {
+            // catch error
+          })
+    },
+
+    handleCloseQuestions() {
+      ElMessageBox.confirm('Are you sure you want to close this without submitting?')
+          .then((value) => {
+            console.log(value)
+            if (value === 'confirm') {
+              this.questionsVisible = false
+            }
+          })
+          .catch(() => {
+            // catch error
+          })
+    },
+
+    confirmSubmit() {
+      ElMessageBox.confirm('Are you sure you want to submit?')
+          .then((value) => {
+            console.log(value)
+            if (value === 'confirm') {
+              this.questionsVisible = false
+            }
+          })
+          .catch(() => {
+            // catch error
+          })
     }
   },
 

@@ -39,7 +39,7 @@
 
           <div>
             <h1>Assignment Text</h1>
-            <v-md-editor v-model="text" height="400px"></v-md-editor>
+            <v-md-editor v-model="submission.text" height="400px"></v-md-editor>
           </div>
 
           <div>
@@ -49,7 +49,7 @@
                 :on-success="handleUploadSuccess"
                 accept="video/mp4,image/jpeg,image/gif,image/png"
                 multiple
-                :file-list="assignment.attachments"
+                :file-list="submission.attachments"
                 :limit="5">
               <el-button size="small" type="primary">点击上传</el-button>
             </el-upload>
@@ -88,10 +88,12 @@ export default {
         accept_resubmission_until: '2023.1.1',
         requirements: 'Hello world! ' +
             'It\'s nice to meet you',
-        additional_resources: 'File 1',
-        attachments: ''
+        additional_resources: 'File 1'
       },
-      text: '',
+      submission: {
+        text: '',
+        attachments: []
+      }
     }
   },
 

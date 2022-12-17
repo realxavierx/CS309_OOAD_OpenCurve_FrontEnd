@@ -39,11 +39,14 @@
 
           <div>
             <h1>Submissions</h1>
-            <el-card v-for="submission in show_submissions">
+            <el-card v-for="submission in show_submissions" :key="submission">
               <el-row>
                 <el-col :span="Number(6)">
                   Student:
-                  <el-tag style="width: 150px; height: 40px; margin-left: 20px" effect="dark">{{ submission.student_id }}</el-tag>
+                  <el-tag style="width: 150px; height: 40px; margin-left: 20px" effect="dark">{{
+                      submission.student_id
+                    }}
+                  </el-tag>
                 </el-col>
 
                 <el-col :span="Number(6)">
@@ -51,19 +54,55 @@
                   <el-tag style="width: 150px; height: 40px; margin-left: 20px">{{ submission.time }}</el-tag>
                 </el-col>
 
-                <el-col :span="Number(6)"></el-col>
+
+                 <el-col :span="Number(6)"></el-col>
 
                 <el-col :span="Number(3)">
-                  <el-button type="primary" @click="show_text(submission.text)">Submission Text</el-button>
+                  <el-button type="primary" @click="show_submission_text(submission.text)">Submission Text</el-button>
                 </el-col>
 
                 <el-col :span="Number(3)">
-                  <el-button type="primary" @click="show_attachments(submission.attachments)">Submission Attachments
+                  <el-button type="primary" @click="show_submission_attachments(submission.attachments)">
+                    Submission Attachments
                   </el-button>
                 </el-col>
               </el-row>
-
             </el-card>
+
+
+            <el-dialog v-model="textVisible" title="Submission Text">
+              <p>{{show_text}}</p>
+            </el-dialog>
+
+            <el-dialog v-model="attachmentsVisible" title="Submission Attachments">
+              <div v-for="attachment in show_attachments" :key="attachment">
+                <el-row>
+                  <el-col>
+                    {{attachment}}
+                  </el-col>
+                  <el-col>
+                    <el-button @click="showAttachmentContent(attachment)">在线预览</el-button>
+                    <el-button @click="downloadAttachment(attachment)">下载</el-button>
+                  </el-col>
+                </el-row>
+              </div>
+            </el-dialog>
+
+            <el-drawer v-model="attachmentContentVisible"
+                       direction="rtl"
+            >
+              <template #title>
+              </template>
+              <template #default>
+                <div>
+                  <p>{{attachmentContent}}</p>
+                </div>
+              </template>
+              <template #footer>
+                <div style="flex: auto">
+                </div>
+              </template>
+            </el-drawer>
           </div>
 
         </el-main>
@@ -81,6 +120,8 @@ export default {
 
   data() {
     return {
+      textVisible: false,
+      attachmentsVisible: false,
       assignment: {
         assignment_id: '',
         title: 'Homework',
@@ -92,7 +133,6 @@ export default {
         requirements: 'Hello world! ' +
             'It\'s nice to meet you',
         additional_resources: 'File 1',
-        attachments: ''
       },
       submissions: [
         {
@@ -114,18 +154,33 @@ export default {
           ]
         },
       ],
-      show_submissions: []
+      show_submissions: [],
+      show_text: '',
+      show_attachments: [],
+      attachmentContentVisible: false,
+      attachmentContent: ''
     }
   },
 
   methods: {
 
-    show_text() {
-
+    show_submission_text(text) {
+      this.textVisible = true
+      this.show_text = text
     },
 
-    show_attachments() {
+    show_submission_attachments(attachments) {
+      this.attachmentsVisible = true
+      this.show_attachments = attachments
+    },
 
+    showAttachmentContent(attachment) {
+      this.attachmentContent = attachment
+      this.attachmentContentVisible = true
+    },
+
+    downloadAttachment(attachment) {
+      console.log(attachment)
     }
   },
 
