@@ -1,10 +1,10 @@
 <template>
   <div id="studentpage">
     <div class="activity">
-      <div @click="toMycourse()" tabindex="1">我的课程</div>
-      <div @click="toHistory()" tabindex="2">历史记录</div>
-      <div @click="toUp()" tabindex="3">我的上传</div>
-      <div @click="toInfo()" tabindex="4">个人信息</div>
+      <div @click="toInfo()" tabindex="1">个人资料</div>
+      <div @click="toSetting()" tabindex="2">账号设置</div>
+      <div @click="toHistory()" tabindex="3">浏览历史</div>
+      <div @click="toVip()" tabindex="4">会员中心</div>
     </div>
     <router-view></router-view>
   </div>
@@ -16,24 +16,24 @@ export default {
         
   },
   methods: {
+    toInfo(){
+      this.$router.push({
+        path: '/userpage/student/information',
+      })
+    },
+    toSetting(){
+      this.$router.push({
+        path: '/userpage/student/setting',
+      })
+    },
     toHistory(){
       this.$router.push({
         path: '/userpage/student/history',
       })
     },
-    toMycourse(){
+    toVip(){
       this.$router.push({
-        path: '/userpage/student/mycourse',
-      })
-    },
-    toUp(){
-      this.$router.push({
-        path: '/userpage/student/upload',
-      })
-    },
-    toInfo(){
-      this.$router.push({
-        path: '/userpage/student/information',
+        path: '/userpage/student/vip',
       })
     },
       

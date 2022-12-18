@@ -13,13 +13,13 @@ export default {
     Nav_u
   },
   mounted() {
-    if (sessionStorage.getItem('type') == 'Student') {
+    if (sessionStorage.getItem('type') == 'Teacher') {
       this.$router.push({
-        path: '/userpage/student/mycourse',
+        path: '/userpage/teacher',
       })
     } else {
       this.$router.push({
-        path: '/userpage/teacher',
+        path: '/userpage/student/information',
       })
     }
   }
@@ -31,8 +31,7 @@ export default {
 #userpage {
     position:absolute;
     width: 100%;
-    height:100%;
-    background-color: #000;
+    background-color: rgb(243,244,246);
 }
 #occupy {
   height: 80px;
