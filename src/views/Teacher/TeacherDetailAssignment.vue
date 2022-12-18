@@ -55,15 +55,21 @@
                 </el-col>
 
 
-                 <el-col :span="Number(6)"></el-col>
+                 <el-col :span="Number(2)"></el-col>
 
                 <el-col :span="Number(3)">
                   <el-button type="primary" @click="show_submission_text(submission.text)">Submission Text</el-button>
                 </el-col>
 
-                <el-col :span="Number(3)">
+                <el-col :span="Number(4)">
                   <el-button type="primary" @click="show_submission_attachments(submission.attachments)">
                     Submission Attachments
+                  </el-button>
+                </el-col>
+
+                <el-col :span="Number(3)">
+                  <el-button type="success" @click="scoreVisible = true; rateSubmission = submission">
+                    Rate Submission
                   </el-button>
                 </el-col>
               </el-row>
@@ -77,15 +83,25 @@
             <el-dialog v-model="attachmentsVisible" title="Submission Attachments">
               <div v-for="attachment in show_attachments" :key="attachment">
                 <el-row>
-                  <el-col>
+                  <el-col :span="Number(6)">
                     {{attachment}}
                   </el-col>
-                  <el-col>
+                  <el-col :span="Number(10)"></el-col>
+                  <el-col :span="Number(8)">
                     <el-button @click="showAttachmentContent(attachment)">在线预览</el-button>
                     <el-button @click="downloadAttachment(attachment)">下载</el-button>
                   </el-col>
                 </el-row>
               </div>
+            </el-dialog>
+
+            <el-dialog v-model="scoreVisible" title="Rate Submission">
+              <h4>Please input the score of this submission: </h4>
+              <el-input-number v-model="submissionScore" :precision="1" :step="0.5" :max="100" />
+              <template #footer>
+                <el-button type="danger" size="large" @click="cancelRate">Cancel</el-button>
+                <el-button type="primary" size="large" @click="confirmRate">Confirm</el-button>
+              </template>
             </el-dialog>
 
             <el-drawer v-model="attachmentContentVisible"
@@ -113,6 +129,7 @@
 
 <script>
 import TeacherHeader from "@/components/TeacherHeader";
+import {ElMessageBox} from "element-plus";
 
 export default {
   name: "TeacherDetailAssignment",
@@ -142,7 +159,8 @@ export default {
           attachments: [
             'File A',
             'File B'
-          ]
+          ],
+          score: 'NaN'
         },
         {
           student_id: 'lsm@hhh.com',
@@ -151,14 +169,18 @@ export default {
           attachments: [
             'File A',
             'File B'
-          ]
+          ],
+          score: 'NaN'
         },
       ],
       show_submissions: [],
       show_text: '',
       show_attachments: [],
       attachmentContentVisible: false,
-      attachmentContent: ''
+      attachmentContent: '',
+      scoreVisible: false,
+      rateSubmission: '',
+      submissionScore: 0,
     }
   },
 
@@ -172,6 +194,17 @@ export default {
     show_submission_attachments(attachments) {
       this.attachmentsVisible = true
       this.show_attachments = attachments
+    },
+
+    cancelRate() {
+      this.submissionScore = 0
+      this.scoreVisible = false
+    },
+
+    confirmRate() {
+      this.rateSubmission.score = this.submissionScore
+      this.submissionScore = 0
+      this.scoreVisible = false
     },
 
     showAttachmentContent(attachment) {

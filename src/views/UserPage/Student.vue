@@ -18,22 +18,22 @@ export default {
   methods: {
     toInfo(){
       this.$router.push({
-        path: '/userpage/student/information',
+        path: '/userPage/student/information',
       })
     },
     toSetting(){
       this.$router.push({
-        path: '/userpage/student/setting',
+        path: '/userPage/student/setting',
       })
     },
     toHistory(){
       this.$router.push({
-        path: '/userpage/student/history',
+        path: '/userPage/student/history',
       })
     },
     toVip(){
       this.$router.push({
-        path: '/userpage/student/vip',
+        path: '/userPage/student/vip',
       })
     },
       

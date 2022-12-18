@@ -1,5 +1,5 @@
 <template>
-  <div id="userpage">
+  <div id="userPage">
     <Nav_u></Nav_u>
     <router-view></router-view>
   </div>
@@ -13,13 +13,13 @@ export default {
     Nav_u
   },
   mounted() {
-    if (sessionStorage.getItem('type') == 'Teacher') {
+    if (sessionStorage.getItem('type') === 'Teacher') {
       this.$router.push({
-        path: '/userpage/teacher',
+        path: '/userPage/teacher',
       })
     } else {
       this.$router.push({
-        path: '/userpage/student/information',
+        path: '/userPage/student/information',
       })
     }
   }
@@ -28,11 +28,12 @@ export default {
 </script>
 
 <style scoped>
-#userpage {
+#userPage {
     position:absolute;
     width: 100%;
     background-color: rgb(243,244,246);
 }
+
 #occupy {
   height: 80px;
 }

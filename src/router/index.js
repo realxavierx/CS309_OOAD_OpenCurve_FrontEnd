@@ -19,13 +19,13 @@ import Welcome from "@/views/Welcome/WelcomePage";
 import Student_history from "@/views/UserPage/Student_history";
 import Student from "@/views/UserPage/Student";
 import Userpage from "@/views/UserPage/Userpage";
-import Student_mycourse from "@/views/UserPage/Student_mycourse";
-import Student_upload from "@/views/UserPage/Student_upload";
 import Student_info from "@/views/UserPage/Student_info";
 import Teacher from "@/views/UserPage/Teacher";
 import StudentDetailCourse from "@/views/Student/StudentDetailCourse";
 import StudentDetailAssignment from "@/views/Student/StudentDetailAssignment";
 import TeacherDetailAssignment from "@/views/Teacher/TeacherDetailAssignment";
+import Student_vip from "@/views/UserPage/Student_vip";
+import Student_setting from "@/views/UserPage/Student_setting";
 
 const routes = [
     {
@@ -34,7 +34,7 @@ const routes = [
         component: HomeView
     },
 
-    // Welcome Page
+    // Welcome
     {
         path: '/welcome',
         component: Welcome,
@@ -65,16 +65,16 @@ const routes = [
                         component: Student_history
                     },
                     {
-                        path: 'mycourse',
-                        component: Student_mycourse
-                    },
-                    {
-                        path: 'upload',
-                        component: Student_upload
-                    },
-                    {
                         path: 'information',
                         component: Student_info
+                    },
+                    {
+                        path: 'vip',
+                        component: Student_vip
+                    },
+                    {
+                        path: 'setting',
+                        component: Student_setting
                     }
                 ]
             },

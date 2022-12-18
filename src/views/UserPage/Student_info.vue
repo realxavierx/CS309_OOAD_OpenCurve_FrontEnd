@@ -2,9 +2,9 @@
     <div class="general-info">
         <div class="general-info-t">
             <div class="general-info-avatar">
-                <img src="../../img/123.jpg" alt="">
+<!--                <img src="../../img/123.jpg" alt="">-->
                 <div class="avatar-hover">
-                    <img src="../../img/avatar-hover.png" alt="">
+<!--                    <img src="../../img/avatar-hover.png" alt="">-->
                 </div>
             </div>
             <div class="general-info-t-info">
@@ -146,20 +146,20 @@ export default {
             return str;
         }]
         }).then(res => {
-            if (res.status == 200) {
-              if (res.nick_name == '###') {
-                  nick_name = res.email.substr(0,8)
+            if (res.status === 200) {
+              if (res.nick_name === '###') {
+                  this.options.nick_name = res.email.substr(0,8)
               }
             }
         })
     },
     toVIP() {
       this.$router.push({
-        path: '/userpage/student/vip',
+        path: '/userPage/student/vip',
       })
     }
   },
-  mounted: {
+  mounted() {
       
     }
   }
