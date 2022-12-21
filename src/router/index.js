@@ -57,70 +57,55 @@ const routes = [
         component: Userpage,
         children: [
             {
-                path: 'student',
+                path: 'StudentMain',
+                component: StudentMain,
+            },
+            {
+                path: 'StudentCourseCenter',
+                component: StudentCourseCenter,
+            },
+            {
+                path: 'StudentNotificationCenter',
+                name: 'StudentNotificationCenter',
+                component: StudentNotificationCenter,
+            },
+            {
+                path: 'StudentAssignmentCenter',
+                name: 'StudentAssignmentCenter',
+                component: StudentAssignmentCenter,
+            },
+            {
+                path: 'StudentSelfCenter',
+                name: 'StudentSelfCenter',
                 component: Student,
                 children: [
                     {
-                        path: 'history',
-                        component: Student_history
-                    },
-                    {
                         path: 'information',
-                        component: Student_info
-                    },
-                    {
-                        path: 'vip',
-                        component: Student_vip
+                        component: Student_info,
                     },
                     {
                         path: 'setting',
-                        component: Student_setting
+                        component: Student_setting,
+                    },
+                    {
+                        path: 'history',
+                        component: Student_history,
+                    },
+                    {
+                        path: 'vip',
+                        component: Student_vip,
                     }
                 ]
             },
-            {
-                path: 'teacher',
-                component: Teacher,
-                children: [
-                    {
-                        path: 'history',
-                    },
-                    {
-                        path: 'upload'
-                    },
-                    {
-                        path: 'information'
-                    }
-                ]
-            }
         ]
     },
 
     // Student
-    {
-        path: '/StudentMain',
-        name: 'StudentMain',
-        component: StudentMain
-    },
+
     {
         path: '/StudentDetailCourse/:course_id',
         name: 'StudentDetailCourse',
         component: StudentDetailCourse
-    },
-    {
-        path: '/StudentCourseCenter',
-        name: 'StudentCourseCenter',
-        component: StudentCourseCenter
-    },
-    {
-        path: '/StudentNotificationCenter',
-        name: 'StudentNotificationCenter',
-        component: StudentNotificationCenter
-    },
-    {
-        path: '/StudentAssignmentCenter',
-        name: 'StudentAssignmentCenter',
-        component: StudentAssignmentCenter
     },
     {
         path: '/StudentDetailAssignment/:assignment_id',
