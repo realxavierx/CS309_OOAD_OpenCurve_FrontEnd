@@ -79,6 +79,7 @@
               </template>
               <template #default>
                 <div>
+                  <p>{{this.timeString}}</p>
                   Hello there
                 </div>
               </template>
@@ -137,6 +138,7 @@ export default {
         lightOff: true, //关灯模式
         volume: 0.3, //默认音量大小
         control: true, //是否显示控制
+        speed: false, // 进度条控制
         controlBtns: [
           "audioTrack",
           "quality",
@@ -148,7 +150,28 @@ export default {
           "fullScreen",
         ], //显示所有按钮,
       }),
-      questionsVisible: false
+      questionsVisible: false,
+      questions: [
+        {
+          course_id: 'CS996',
+          session_id: '1',
+          questionType: 'T/F',
+          title: 'Are you still alive?',
+          choices: ['True', 'False', 'Not Given'],
+          correctAnswer: ''
+        },
+        {
+          course_id: 'CS996',
+          session_id: '1',
+          questionType: 'Choice',
+          title: 'Which grade are you in?',
+          choices: ['1', '2', '3', '4'],
+          correctAnswer: ''
+        }
+      ],
+      timer: '',
+      timeInt: 3600000,
+      timeString: ''
     }
   },
 
@@ -177,12 +200,34 @@ export default {
       })
     },
 
+    startTimer() {
+      this.convertTimeToString()
+      this.timer = setInterval(() => {
+        this.timeInt -= 1000
+        this.convertTimeToString()
+      }, 1000)
+    },
+
+    convertTimeToString() {
+      let hour = Math.floor(this.timeInt / (3600000))
+      let minute = Math.floor((this.timeInt - hour * 3600000) / 60000)
+      let second = Math.floor((this.timeInt - hour * 3600000 - minute * 60000) / 1000)
+      this.timeString = hour + ' Hour ' + minute + ' Minute ' + second + ' Second'
+    },
+
+    resetTimer() {
+      clearInterval(this.timer)
+      this.timeInt = 3600000
+      this.convertTimeToString()
+    },
+
     handleBeginTest() {
       ElMessageBox.confirm('Do you want to start the test right now?')
           .then((value) => {
             console.log(value)
             if (value === 'confirm') {
               this.questionsVisible = true
+              this.startTimer()
             }
           })
           .catch(() => {
@@ -196,6 +241,7 @@ export default {
             console.log(value)
             if (value === 'confirm') {
               this.questionsVisible = false
+              this.resetTimer()
             }
           })
           .catch(() => {
@@ -209,6 +255,7 @@ export default {
             console.log(value)
             if (value === 'confirm') {
               this.questionsVisible = false
+              this.resetTimer()
             }
           })
           .catch(() => {
