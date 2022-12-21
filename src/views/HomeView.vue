@@ -2,7 +2,7 @@
   <div>
     <p>Home</p>
     <el-button>
-      <router-link to="/StudentMain">Student</router-link>
+      <router-link to="/userpage">Student</router-link>
     </el-button>
     <el-button>
       <router-link to="/TeacherMain">Teacher</router-link>
