@@ -1,27 +1,20 @@
 <template>
-  <div>
-    <el-container>
-      <el-header>
-        <StudentHeader></StudentHeader>
-      </el-header>
-      <el-container>
-        <el-main>
-          <h1 align="center">Student Main Page</h1>
-          <el-carousel>
-            <el-carousel-item v-for="course in courses" :key="course">
-              <h2>
-                {{ course.course_id }}
-              </h2>
-            </el-carousel-item>
-          </el-carousel>
-        </el-main>
-      </el-container>
-    </el-container>
+  <div class="background">
+    <div class="mainpage-student">
+      <h1 align="center">Student Main Page</h1>
+        <el-carousel>
+          <el-carousel-item v-for="course in courses" :key="course">
+            <h2>
+              {{ course.course_id }}
+            </h2>
+          </el-carousel-item>
+        </el-carousel>
+    </div>
+    
   </div>
 </template>
 
 <script>
-
 import StudentHeader from "@/components/StudentHeader";
 export default {
   name: "StudentMain",
@@ -43,9 +36,6 @@ export default {
         {
           course_id: 'CS303'
         },
-        {
-          course_id: 'CS309'
-        }
       ]
     }
   },
@@ -55,6 +45,9 @@ export default {
 </script>
 
 <style scoped>
+.background{
+  background-color: rgb(243,244,246);
+}
 .el-carousel__item h2 {
   color: #1e1b1b;
   opacity: 0.75;
@@ -71,4 +64,9 @@ export default {
   background-color: #b2daaf;
 }
 
+.mainpage-student{
+  width:80%;
+  margin:0 auto;
+  background-color: rgb(243,244,246);
+}
 </style>
