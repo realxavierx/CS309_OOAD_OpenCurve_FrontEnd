@@ -3,25 +3,25 @@
     <div class="vip">
       <div class="vip_title">充值余额</div>
       <div class="vip_content">
-        <div class="vip_box" tabindex="1">
+        <div class="vip_box" tabindex="1" @click="get68()">
           <span class="card-tips">赠</span>
           <p class="t1">余额68元</p>
           <p class="t3">68.00</p>
           <div class="card-foot">¥68.00</div>
         </div>
-        <div class="vip_box" tabindex="2">
+        <div class="vip_box" tabindex="2" @click="get128()">
           <span class="card-tips">赠</span>
           <p class="t1">余额128元</p>
           <p class="t3">128.00</p>
           <div class="card-foot">¥128.00</div>
         </div>
-        <div class="vip_box" tabindex="3">
+        <div class="vip_box" tabindex="3" @click="get328()">
           <span class="card-tips">赠</span>
           <p class="t1">余额328元</p>
           <p class="t3">328.00</p>
           <div class="card-foot">¥328.00</div>
         </div>
-        <div class="vip_box last" tabindex="4">
+        <div class="vip_box last" tabindex="4" @click="get648()">
           <span class="card-tips">赠</span>
           <p class="t1">余额648元</p>
           <p class="t3">648.00</p>
@@ -33,7 +33,8 @@
       <div class="pay">
         <div class="pay-box">
           <div class="qr_code">
-            <img :src="qr_code" alt="">
+            <!-- <img :src="qr_code" alt=""> -->
+            <img src="../../img/payCode.png" alt="">
           </div>
           <div class="scan_code">
             <img src="../../img/zfb.png" alt="alipay" class="icon_item" style="width: 20px;">
@@ -44,9 +45,11 @@
         </div>
 
         <div class="price-info">
-          <div class="timing">
-            <el-statistic @finish="hilarity" :value="deadline"   time-indices title="支付倒计时"></el-statistic>
-          </div>
+          <breeding-rhombus-spinner
+        :animation-duration="2000"
+        :size="65"
+        :color="'#ff1d5e'"
+          />
           <div class="price-msg">
             实付：
             <span class="now-price c-red">{{money}}</span>
@@ -62,7 +65,6 @@
         <p style="line-height: 1em;">     1. 余额可以在PC端、Android端和WAP端购买全站付费商品 </p> 
         <p style="line-height: 1em;">     2. 充值成功后，余额可能存在延迟现象，一般1到5分钟内到账，如有问题，请咨询客服；<br> </p>
         <p style="line-height: 1em;">     3. 收益可以转入余额进行消费，但是一旦收益转入余额不可退款； </p>
-        <p style="line-height: 1em;">     4. 充值金额输入值必须是不小于100元不可大于5000元的正整数；满足微信/支付宝的充值方式； </p> 
         <p style="line-height: 1em;">     5. 充值完成后，您可以进入账户充值记录页面进行查看余额充值状态； </p> 
         <p style="line-height: 1em;">     6. 一旦充值成功不可退款。 </p> 
         <p style="line-height: 1em;">     7. 充值赠会员，活动规则说明: </p> 
@@ -76,11 +78,16 @@
 </template>
 
 <script>
+import {BreedingRhombusSpinner} from 'epic-spinners'
 export default {
+  components: {
+    BreedingRhombusSpinner,
+    
+  },
   data() {
     return {
       deadline: Date.now() + 34 * 60 * 30,
-      money: 64,
+      money: 0.0,
       qr_code:"../../img/payCode.png"
     }
   },
@@ -91,6 +98,22 @@ export default {
         message: '支付码失效',
         duration: 0
       });
+    },
+    get68() {
+      this.money = 64
+      this.qr_code = null
+    },
+    get128() {
+      this.money = 128
+      this.qr_code = null
+    },
+    get328() {
+      this.money = 328
+      this.qr_code = null
+    },
+    get648() {
+      this.money = 648
+      this.qr_code = null
     }
   }
 }

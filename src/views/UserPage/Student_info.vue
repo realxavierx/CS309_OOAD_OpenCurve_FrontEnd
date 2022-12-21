@@ -2,18 +2,19 @@
     <div class="general-info">
         <div class="general-info-t">
             <div class="general-info-avatar">
-<!--                <img src="../../img/123.jpg" alt="">-->
+                <!-- <img :src="baseInfo.avatar_url" alt=""> -->
+                <img src="../../img/123.jpg" alt="">
                 <div class="avatar-hover">
-<!--                    <img src="../../img/avatar-hover.png" alt="">-->
+                    <img src="../../img/avatar-hover.png" alt="">
                 </div>
             </div>
             <div class="general-info-t-info">
-                <div class="name">{{nick_name}}</div>
-                <div class="email">注册邮箱:{{email}}</div>
+                <div class="name">{{baseInfo.nick_name}}</div>
+                <div class="email">注册邮箱:{{baseInfo.email}}</div>
             </div>
         </div>
         <div class="general-info-b">
-            <div style="margin-right:10px">我的余额:114514</div>
+            <div style="margin-right:10px">我的余额:{{baseInfo.money}}</div>
             <el-button type="primary" icon="el-icon-shopping-cart-2" @click="toVIP()">去充值</el-button>
         </div>
         <div class="base-info">
@@ -21,17 +22,17 @@
           
             <div class="base-info-content">
               <el-descriptions>
-                <el-descriptions-item label="用户昵称">教父爷爷</el-descriptions-item>
-                <el-descriptions-item label="用户ID">114514</el-descriptions-item>
-                <el-descriptions-item label="出生日期">2001-09-24</el-descriptions-item>
-                <el-descriptions-item label="书院">树仁书院</el-descriptions-item>
-                <el-descriptions-item label="院系">计算机科学与工程</el-descriptions-item>
-                <el-descriptions-item label="性别">男</el-descriptions-item>
-                <el-descriptions-item label="所在地区">广东省-深圳市-南山区</el-descriptions-item>
-                <el-descriptions-item label="配送地址">广东省-深圳市-南山区-桃园街道1088号-南方科技大学</el-descriptions-item>
+                <el-descriptions-item label="用户昵称">{{baseInfo.nick_name}}</el-descriptions-item>
+                <el-descriptions-item label="用户ID">{{baseInfo.email}}</el-descriptions-item>
+                <el-descriptions-item label="出生日期">{{baseInfo.birthday}}</el-descriptions-item>
+                <el-descriptions-item label="书院">{{baseInfo.collage}}</el-descriptions-item>
+                <el-descriptions-item label="院系">{{baseInfo.major}}</el-descriptions-item>
+                <el-descriptions-item label="性别">{{baseInfo.gender}}</el-descriptions-item>
+                <el-descriptions-item label="所在地区">{{baseInfo.region}}</el-descriptions-item>
+                <el-descriptions-item label="配送地址">{{baseInfo.address}}</el-descriptions-item>
                 
                 <el-descriptions-item label="职业">
-                  <el-tag size="small">学生</el-tag>
+                  <el-tag size="small">{{baseInfo.type}}</el-tag>
                 </el-descriptions-item>
               </el-descriptions>
             </div>
@@ -99,8 +100,7 @@
                   <el-input type="textarea" v-model="form.desc" placeholder="主人很懒，还没有简介噢~"></el-input>
                 </el-form-item>
                 <el-form-item>
-                  <el-button type="primary" @click="onSubmit">立即创建</el-button>
-                  <el-button>取消</el-button>
+                  <el-button type="primary" @click="onSubmit">提交修改</el-button>
                 </el-form-item>
               </el-form>
             </div>
@@ -115,20 +115,30 @@ export default {
   data() {
     return {
       options: regionData,
-        nick_name: '陌生人',
+      form: {
+        name: '教父爷爷',
+        birthday:'2001-09-24',
+        collage: '树仁书院',
+        major: '计算机科学与工程',
+        gender: '男',
+        region: ['440000','440300','440305'],
+        address:'广东省-深圳市-南山区-桃园街道1088号-南方科技大学',
+        desc: ''
+      },
+      baseInfo:{
+        nick_name: '教父爷爷',
         email:sessionStorage.getItem(''),
         avatar_url: '',
-        form: {
-          name: '教父爷爷',
-          birthday:'2001-09-24',
-          collage: '树仁书院',
-          major: '计算机科学与工程',
-          gender: '男',
-          region: ['440000','440300','440305'],
-          address:'广东省-深圳市-南山区-桃园街道1088号-南方科技大学',
-          desc: ''
-        }
+        money:114514,
+        birthday:'2001-09-24',
+        collage:'树仁书院',
+        major:'计算机科学与工程',
+        gender:'男',
+        region:'广东省-深圳市-南山区',
+        address:'广东省-深圳市-南山区-桃园街道1088号-南方科技大学',
+        type:'学生'
       }
+    }
   },
   methods: {
     initial() {
@@ -146,16 +156,16 @@ export default {
             return str;
         }]
         }).then(res => {
-            if (res.status === 200) {
-              if (res.nick_name === '###') {
-                  this.options.nick_name = res.email.substr(0,8)
+            if (res.status == 200) {
+              if (res.nick_name == '###') {
+                  nick_name = res.email.substr(0,8)
               }
             }
         })
     },
     toVIP() {
       this.$router.push({
-        path: '/userPage/student/vip',
+        path: '/userpage/student/vip',
       })
     }
   },
