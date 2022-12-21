@@ -12,6 +12,7 @@ export default {
   components: {
     Nav_u
   },
+
   mounted() {
     if (sessionStorage.getItem('type') === 'Teacher') {
       this.$router.push({
@@ -28,6 +29,7 @@ export default {
 </script>
 
 <style scoped>
+
 #userPage {
     position:absolute;
     width: 100%;

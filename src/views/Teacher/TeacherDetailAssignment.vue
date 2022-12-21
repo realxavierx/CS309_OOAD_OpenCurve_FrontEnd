@@ -129,7 +129,6 @@
 
 <script>
 import TeacherHeader from "@/components/TeacherHeader";
-import {ElMessageBox} from "element-plus";
 
 export default {
   name: "TeacherDetailAssignment",
@@ -219,7 +218,8 @@ export default {
 
   mounted() {
     this.show_submissions = this.submissions
-  }
+  },
+
 }
 </script>
 

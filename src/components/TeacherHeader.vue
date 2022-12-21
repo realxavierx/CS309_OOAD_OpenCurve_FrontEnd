@@ -24,7 +24,7 @@
             <router-link to="/TeacherAssignmentCenter">作业中心</router-link>
           </el-menu-item>
           <el-menu-item index="5">
-            <router-link to="/">个人中心</router-link>
+            <router-link to="/userPage">个人中心</router-link>
           </el-menu-item>
         </el-menu>
       </div>
