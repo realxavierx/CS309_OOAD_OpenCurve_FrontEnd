@@ -1,10 +1,10 @@
 <template>
   <div id="nav_u">
-    <img src="../../img/logo.png" alt="" style="height:40px;float:left;margin:20px 0 20px 20px;">
+    <img src="../../img/logo.png" alt="" style="height:40px;float:left;margin:20px 0 20px 20px;" @click="toWelcome()">
     <div class="nav">
         <ul>
        <li>
-        <div>Home</div>
+        <div @click="toHome()">Home</div>
        </li>
        <li class="dropdown">
         <div>About</div>
@@ -28,9 +28,12 @@
     </div>
     <div class="nav_r">
         <ul>
-            <li><div id="avatar"></div></li>
+            <li>
+                <div>
+                    <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
+                </div>
+            </li>
             <li><div id="great">Hi~12012711</div></li>
-            <li><div id="upload">Upload</div></li>
         </ul>
     </div>
     <div class="search_content">
@@ -45,7 +48,18 @@
 
 <script>
 export default {
-
+    methods: {
+        toHome() {
+            this.$router.push({
+            path: '/StudentMain',
+            })
+        },
+        toWelcome() {
+            this.$router.push({
+            path: '/Welcome',
+            })
+        }
+    }
 }
 </script>
 
@@ -84,25 +98,13 @@ export default {
     float: left;
     margin: 0 10px;
 }
-#avatar {
-    width:40px;
-    height: 40px;
-    border-radius: 5px;
-    background: url('../../img/2.jpg');
-    background-size:cover;
-    
-}
-#upload {
-    height: 40px;
-    width: 60px;
-    line-height: 40px;
-    border-radius: 5px;
-    background-color: rgb(249, 93, 231);
-}
 #great {
     height: 40px;
     color:#fff;
     
     line-height: 40px;
+}
+img:hover{
+    cursor:pointer;
 }
 </style>

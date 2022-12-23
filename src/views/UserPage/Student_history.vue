@@ -39,7 +39,7 @@ export default {
   },
   methods: {
     getHistory() {
-      
+      //TODO:从数据库中获取历史记录
     }
   },
   mounted() {

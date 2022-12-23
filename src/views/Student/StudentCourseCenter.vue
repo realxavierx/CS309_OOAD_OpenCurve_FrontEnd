@@ -1,146 +1,140 @@
 <template>
-  <div>
-    <el-container>
-      <el-header>
-        <StudentHeader></StudentHeader>
-      </el-header>
-
-      <el-container>
-        <el-main>
-          <div class="selection">
-            <el-row>
-              <el-col :span="Number(4)">
-                <!-- 课程范围 -->
-                <el-radio-group v-model="courseRange" size="large">
-                  <el-radio-button label="My Courses" @click="getStudentCourses"/>
-                  <el-radio-button label="All Courses" @click="getAllCourses"/>
-                </el-radio-group>
-              </el-col>
+  <div class="background">
+    <h1 align="center">Student Course Center</h1>
+    <div class="course-center-stu">
+      <div class="selection">
+        <el-row>
+          <el-col :span="Number(4)">
+            <!-- 课程范围 -->
+            <el-radio-group v-model="courseRange" size="large">
+              <el-radio-button label="My Courses" @click="getStudentCourses"/>
+              <el-radio-button label="All Courses" @click="getAllCourses"/>
+            </el-radio-group>
+          </el-col>
 
 
-              <el-col :span="Number(4)">
-                <!-- 课程院系 -->
-                <el-select
-                    v-model="courseDepartment"
-                    placeholder="Any Department"
-                    clearable
-                    @change="handleSelectDepartment"
-                >
-                  <el-option
-                      v-for="department in departments"
-                      :key="department"
-                      :label="department"
-                      :value="department"
-                  />
-                </el-select>
-              </el-col>
+          <el-col :span="Number(4)">
+            <!-- 课程院系 -->
+            <el-select
+                v-model="courseDepartment"
+                placeholder="Any Department"
+                clearable
+                @change="handleSelectDepartment"
+            >
+              <el-option
+                  v-for="department in departments"
+                  :key="department"
+                  :label="department"
+                  :value="department"
+              />
+            </el-select>
+          </el-col>
 
-              <el-col :span="Number(4)">
-                <!-- 课程老师 自动补全-->
-                <el-autocomplete
-                    v-model="courseTeacher"
-                    :fetch-suggestions="searchTeacher"
-                    clearable
-                    placeholder="Any Teacher"
-                    @change="teacherSelected = 'process'"
-                    @select="handleSelectTeacher"
-                >
-                  <template #default="{ item }">
-                    <div class="value">{{ item.teacherName }} - {{ item.teacherDepartment }}</div>
-                    <!--                  <span class="link">{{ item.link }}</span>-->
-                  </template>
-                </el-autocomplete>
-              </el-col>
-
-              <el-col :span="Number(4)">
-                <!-- 课程类型 -->
-                <el-select
-                    v-model="courseType"
-                    placeholder="Any Type"
-                    clearable
-                    @change="handleSelectType"
-                >
-                  <el-option
-                      v-for="type in types"
-                      :key="type"
-                      :value="type"
-                      :label="type">
-                  </el-option>
-                </el-select>
-              </el-col>
-
-              <el-col :span="Number(4)">
-                <!-- 课程状态 -->
-                <el-select
-                    v-model="courseStatus"
-                    placeholder="Any Status"
-                    clearable
-                    @change="handleSelectStatus"
-                >
-                  <el-option
-                      v-for="status in statuses"
-                      :key="status"
-                      :value="status"
-                      :label="status">
-                  </el-option>
-                </el-select>
-              </el-col>
-
-              <el-col :span="Number(4)">
-                <!-- 课程费用 -->
-                <el-select
-                    v-model="courseFee"
-                    placeholder="Any Fee"
-                    clearable
-                    @change="handleSelectFee"
-                >
-                  <el-option
-                      v-for="fee in fees"
-                      :key="fee.name"
-                      :value="fee.value"
-                      :label="fee.name">
-                  </el-option>
-                </el-select>
-              </el-col>
-
-            </el-row>
-
-            <el-row style="margin-top: 30px; margin-left: 150px">
-              <el-steps style="margin-right: 50px; width: 1000px" space="16%" align-center>
-                <el-step status="success" title="Course Range"/>
-                <el-step :status="departmentSelected" title="Department"/>
-                <el-step :status="teacherSelected" title="Teacher"/>
-                <el-step :status="typeSelected" title="Course Type"/>
-                <el-step :status="statusSelected" title="Status"/>
-                <el-step :status="feeSelected" title="Course Fee"/>
-              </el-steps>
-
-              <el-button type="primary" size="large" @click="selectCourses">Select</el-button>
-            </el-row>
-          </div>
-
-          <el-divider style="margin:40px">
-            <el-icon>
-              <StarFilled/>
-            </el-icon>
-          </el-divider>
-
-          <div v-for="course in courses" :key="course.courseID" style="margin: 20px">
-            <el-descriptions title="Course Information" border>
-              <template #extra>
-                <el-button type="primary" @click="jumpToCourseDetail(course.courseID)">课程详情</el-button>
+          <el-col :span="Number(4)">
+            <!-- 课程老师 自动补全-->
+            <el-autocomplete
+                v-model="courseTeacher"
+                :fetch-suggestions="searchTeacher"
+                clearable
+                placeholder="Any Teacher"
+                @change="teacherSelected = 'process'"
+                @select="handleSelectTeacher"
+            >
+              <template #default="{ item }">
+                <div class="value">{{ item.teacherName }} - {{ item.teacherDepartment }}</div>
+                <!--                  <span class="link">{{ item.link }}</span>-->
               </template>
-              <el-descriptions-item label="ID">{{ course.courseID }}</el-descriptions-item>
-              <el-descriptions-item label="Name">{{ course.courseName }}</el-descriptions-item>
-              <el-descriptions-item label="Teacher">{{ course.courseTeacher }}</el-descriptions-item>
-              <el-descriptions-item label="Type">{{ course.courseType }}</el-descriptions-item>
-              <el-descriptions-item label="Credit">{{ course.courseCredit }}</el-descriptions-item>
-              <el-descriptions-item label="Description">{{ course.courseDescription }}</el-descriptions-item>
-            </el-descriptions>
-          </div>
-        </el-main>
-      </el-container>
-    </el-container>
+            </el-autocomplete>
+          </el-col>
+
+          <el-col :span="Number(4)">
+            <!-- 课程类型 -->
+            <el-select
+                v-model="courseType"
+                placeholder="Any Type"
+                clearable
+                @change="handleSelectType"
+            >
+              <el-option
+                  v-for="type in types"
+                  :key="type"
+                  :value="type"
+                  :label="type">
+              </el-option>
+            </el-select>
+          </el-col>
+
+          <el-col :span="Number(4)">
+            <!-- 课程状态 -->
+            <el-select
+                v-model="courseStatus"
+                placeholder="Any Status"
+                clearable
+                @change="handleSelectStatus"
+            >
+              <el-option
+                  v-for="status in statuses"
+                  :key="status"
+                  :value="status"
+                  :label="status">
+              </el-option>
+            </el-select>
+          </el-col>
+
+          <el-col :span="Number(4)">
+            <!-- 课程费用 -->
+            <el-select
+                v-model="courseFee"
+                placeholder="Any Fee"
+                clearable
+                @change="handleSelectFee"
+            >
+              <el-option
+                  v-for="fee in fees"
+                  :key="fee.name"
+                  :value="fee.value"
+                  :label="fee.name">
+              </el-option>
+            </el-select>
+          </el-col>
+
+        </el-row>
+
+        <el-row style="margin-top: 30px; margin-left: 150px">
+          <el-steps style="margin-right: 50px; width: 1000px" space="16%" align-center>
+            <el-step status="success" title="Course Range"/>
+            <el-step :status="departmentSelected" title="Department"/>
+            <el-step :status="teacherSelected" title="Teacher"/>
+            <el-step :status="typeSelected" title="Course Type"/>
+            <el-step :status="statusSelected" title="Status"/>
+            <el-step :status="feeSelected" title="Course Fee"/>
+          </el-steps>
+
+          <el-button type="primary" size="large" @click="selectCourses">Select</el-button>
+        </el-row>
+      </div>
+
+      <el-divider style="margin:40px">
+        <el-icon>
+          <StarFilled/>
+        </el-icon>
+      </el-divider>
+
+      <div v-for="course in courses" :key="course.courseID" style="margin: 20px">
+        <el-descriptions title="Course Information" border>
+          <template #extra>
+            <el-button type="primary" @click="jumpToCourseDetail(course.courseID)">课程详情</el-button>
+          </template>
+          <el-descriptions-item label="ID">{{ course.courseID }}</el-descriptions-item>
+          <el-descriptions-item label="Name">{{ course.courseName }}</el-descriptions-item>
+          <el-descriptions-item label="Teacher">{{ course.courseTeacher }}</el-descriptions-item>
+          <el-descriptions-item label="Type">{{ course.courseType }}</el-descriptions-item>
+          <el-descriptions-item label="Credit">{{ course.courseCredit }}</el-descriptions-item>
+          <el-descriptions-item label="Description">{{ course.courseDescription }}</el-descriptions-item>
+        </el-descriptions>
+      </div>
+    </div>
+    
   </div>
 </template>
 
@@ -377,5 +371,12 @@ export default {
 </script>
 
 <style scoped>
-
+.background{
+  background-color: rgb(243,244,246);
+}
+.course-center-stu{
+  width:80%;
+  margin:0 auto;
+  background-color: #fff;
+}
 </style>
