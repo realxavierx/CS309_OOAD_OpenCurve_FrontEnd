@@ -1,27 +1,25 @@
 <template>
-  <div>
-    <el-container>
-      <el-header>
-        <AdminHeader></AdminHeader>
-      </el-header>
+  <div class="bg">
+    <div class="adminMain">
+      <p>Administrator Main</p>
+    </div>
 
-      <el-container>
-        <el-main>
-          <p>Administrator Main</p>
-        </el-main>
-      </el-container>
-    </el-container>
   </div>
 </template>
 
 <script>
-import AdminHeader from "@/components/AdminHeader";
 export default {
-  name: "AdminMain",
-  components: {AdminHeader}
+  name: "AdminMain"
 }
 </script>
 
 <style scoped>
-
+.bg {
+  background-color: rgb(243,244,246);
+}
+.adminMain{
+  width:80%;
+  margin:0 auto;
+  background-color: rgb(243,244,246);
+}
 </style>

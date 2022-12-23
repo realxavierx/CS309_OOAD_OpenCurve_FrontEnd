@@ -52,24 +52,26 @@
           />
           <div class="price-msg">
             实付：
-            <span class="now-price c-red">{{money}}</span>
-            <span class="c-red" >元 </span>
+            <span class="now-price c-red">{{ money }}</span>
+            <span class="c-red">元 </span>
           </div>
         </div>
       </div>
     </div>
     <div class="vip">
       <div class="vip_title">余额使用规则</div>
-      <div class="vip_rule" >
-        <p style="line-height: 1em;">购买即同意<a href="https://www.bilibili.com/video/BV1GJ411x7h7/?spm_id_from=333.337.search-card.all.click&vd_source=5d0d94a002e978dbc6eefa991bcaf90a" target="_self">《OpenCurve余额充值协议》</a> </p>
-        <p style="line-height: 1em;">     1. 余额可以在PC端、Android端和WAP端购买全站付费商品 </p>
-        <p style="line-height: 1em;">     2. 充值成功后，余额可能存在延迟现象，一般1到5分钟内到账，如有问题，请咨询客服；<br> </p>
-        <p style="line-height: 1em;">     3. 收益可以转入余额进行消费，但是一旦收益转入余额不可退款； </p>
-        <p style="line-height: 1em;">     5. 充值完成后，您可以进入账户充值记录页面进行查看余额充值状态； </p>
-        <p style="line-height: 1em;">     6. 一旦充值成功不可退款。 </p>
-        <p style="line-height: 1em;">     7. 充值赠会员，活动规则说明: </p>
-        <p style="line-height: 1em;">     &nbsp;&nbsp;&nbsp;&nbsp;（1）一旦充值成功不可退款 </p>
-        <p style="line-height: 1em;">     &nbsp;&nbsp;&nbsp;&nbsp;（2）此活动最终解释权归OpenCurve官方所有 </p>
+      <div class="vip_rule">
+        <p style="line-height: 1em;">购买即同意<a
+            href="https://www.bilibili.com/video/BV1GJ411x7h7/?spm_id_from=333.337.search-card.all.click&vd_source=5d0d94a002e978dbc6eefa991bcaf90a"
+            target="_self">《OpenCurve余额充值协议》</a></p>
+        <p style="line-height: 1em;"> 1. 余额可以在PC端、Android端和WAP端购买全站付费商品 </p>
+        <p style="line-height: 1em;"> 2. 充值成功后，余额可能存在延迟现象，一般1到5分钟内到账，如有问题，请咨询客服；<br></p>
+        <p style="line-height: 1em;"> 3. 收益可以转入余额进行消费，但是一旦收益转入余额不可退款； </p>
+        <p style="line-height: 1em;"> 5. 充值完成后，您可以进入账户充值记录页面进行查看余额充值状态； </p>
+        <p style="line-height: 1em;"> 6. 一旦充值成功不可退款。 </p>
+        <p style="line-height: 1em;"> 7. 充值赠会员，活动规则说明: </p>
+        <p style="line-height: 1em;"> &nbsp;&nbsp;&nbsp;&nbsp;（1）一旦充值成功不可退款 </p>
+        <p style="line-height: 1em;"> &nbsp;&nbsp;&nbsp;&nbsp;（2）此活动最终解释权归OpenCurve官方所有 </p>
       </div>
 
     </div>
@@ -79,6 +81,7 @@
 
 <script>
 import {BreedingRhombusSpinner} from 'epic-spinners'
+
 export default {
   components: {
     BreedingRhombusSpinner,
@@ -88,7 +91,7 @@ export default {
     return {
       deadline: Date.now() + 34 * 60 * 30,
       money: 0.0,
-      qr_code:"../../img/payCode.png"
+      qr_code: "../../img/payCode.png"
     }
   },
   methods: {
@@ -120,15 +123,17 @@ export default {
 </script>
 
 <style>
-.general-vip{
-  width:80%;
+.general-vip {
+  width: 80%;
   color: #000;
-  margin:0 auto;
+  margin: 0 auto;
 }
+
 .vip {
   width: 100%;
   background-color: #fff;
 }
+
 .vip_title {
   height: 48px;
   line-height: 48px;
@@ -141,34 +146,40 @@ export default {
   margin-bottom: 10px;
   border-bottom: 1px solid #f0f0f2;
 }
+
 .vip_content {
   width: 90%;
   margin: 0 auto;
   text-align: center;
 }
+
 .vip_box {
-  position:relative;
+  position: relative;
   display: inline-block;
   width: 150px;
   height: 100px;
   border-radius: 8px;
   border: 2px solid #fae8d0;
   text-align: center;
-  cursor:pointer;
+  cursor: pointer;
   margin: 0 20px;
 }
+
 .vip_box:hover {
   border-color: #b87100;
   background-color: #fff9f1;
 }
+
 .vip_box:focus {
   border-color: #b87100;
   background-color: #fff9f1;
 }
+
 .last {
   margin-right: 0;
 }
-.card-tips{
+
+.card-tips {
   position: absolute;
   padding: 0 4px;
   height: 24px;
@@ -176,7 +187,7 @@ export default {
   line-height: 24px;
   border-radius: 6px 0 8px 0;
   background: linear-gradient(90deg, #fc5531, #fc1944);
-  color:#fff;
+  color: #fff;
   left: -2px;
   top: -2px;
 }
@@ -187,12 +198,12 @@ export default {
   line-height: 22px;
   color: #222226;
   font-weight: 700;
-  margin:24px 0 12px;
-  position:relative;
+  margin: 24px 0 12px;
+  position: relative;
   z-index: 2;
 }
 
-.t3{
+.t3 {
   font-size: 24px;
   font-weight: 700;
   line-height: 32px;
@@ -213,44 +224,51 @@ export default {
   border-radius: 0 0 6px 6px;
   overflow: hidden;
 }
+
 .pay {
   width: 80%;
   margin: 0 auto;
 }
-.pay-box{
+
+.pay-box {
   display: inline-block;
   margin-right: 20px;
 }
+
 .qr_code img {
   width: 165px;
   height: 165px;
   border-radius: 4px;
   background: #f0f0f0;
 }
-.price-info{
+
+.price-info {
   height: 100%;
   display: inline-block;
 }
+
 .price-msg {
   font-size: 12px;
   height: 37px;
   margin: 106px 0 12px;
 }
-.now-price{
+
+.now-price {
   line-height: 48px;
   font-weight: 700;
   font-size: 32px;
-  font-family: DINCondensed-Bold,DINCondensed;
+  font-family: DINCondensed-Bold, DINCondensed;
 }
 
 .c-red {
-  color:#fc5531;
+  color: #fc5531;
 }
+
 .vip_rule {
-  font-size: 14px!important;
+  font-size: 14px !important;
   min-height: 80px;
   line-height: 0;
   padding: 18px 10px 0;
-  background: transparent!important;
+  background: transparent !important;
 }
 </style>

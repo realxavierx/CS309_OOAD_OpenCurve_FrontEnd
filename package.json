@@ -15,6 +15,7 @@
     "core-js": "^3.8.3",
     "element-china-area-data": "^5.0.2",
     "element-plus": "^2.2.0",
+    "epic-spinners": "^2.0.0",
     "github-markdown-css": "^5.1.0",
     "marked": "^4.2.4",
     "mavon-editor": "^2.10.4",

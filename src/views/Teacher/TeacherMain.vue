@@ -1,32 +1,25 @@
 <template>
-  <div>
-    <el-container>
-      <el-header>
-        <TeacherHeader></TeacherHeader>
-      </el-header>
+  <div class="background">
+    <div class="te">
+      <el-main>
+        <h1 align="center">Teacher Main Page</h1>
+        <el-carousel>
+          <el-carousel-item v-for="course in courses" :key="course">
+            <h2>
+              {{ course.course_id }}
+            </h2>
+          </el-carousel-item>
+        </el-carousel>
+      </el-main>
+    </div>
 
-      <el-container>
-        <el-main>
-          <h1 align="center">Teacher Main Page</h1>
-          <el-carousel>
-            <el-carousel-item v-for="course in courses" :key="course">
-              <h2>
-                {{ course.course_id }}
-              </h2>
-            </el-carousel-item>
-          </el-carousel>
-        </el-main>
-      </el-container>
-    </el-container>
   </div>
 </template>
 
 <script>
-import TeacherHeader from "@/components/TeacherHeader";
 
 export default {
   name: "TeacherMain",
-  components: {TeacherHeader},
 
   data() {
 
@@ -56,7 +49,14 @@ export default {
 </script>
 
 <style scoped>
-
+.background {
+  background-color: rgb(243,244,246);
+}
+.te{
+  width:80%;
+  margin:0 auto;
+  background-color: #fff;
+}
 .el-carousel__item h2 {
   color: #1e1b1b;
   opacity: 0.75;
