@@ -38,6 +38,8 @@
 </template>
 
 <script>
+import router from "@/router";
+
 export default {
   name: "StudentHeader",
 
@@ -51,52 +53,39 @@ export default {
   },
   methods: {
     toMain() {
-      this.$router.push({
-        path: '/userPage/StudentMain',
-      })
+      if (sessionStorage.getItem('type') === 'Teacher') {
+        router.push('/userPage/TeacherMain')
+      }
+      else {
+        router.push('/userPage/StudentMain')
+      }
     },
     toCourseCenter() {
-      if (sessionStorage.getItem('type') == 'Teacher') {
-        this.$router.push({
-          path: '/userPage/TeacherCourseCenter',
-        })
+      if (sessionStorage.getItem('type') === 'Teacher') {
+        router.push('/userPage/TeacherCourseCenter')
       } else {
-        this.$router.push({
-          path: '/userPage/StudentCourseCenter',
-        })
+        router.push('/userPage/StudentCourseCenter')
       }
     },
     toNotificationCenter() {
-      if (sessionStorage.getItem('type') == 'Teacher') {
-        this.$router.push({
-          path: '/userPage/TeacherNotificationCenter',
-        })
+      if (sessionStorage.getItem('type') === 'Teacher') {
+        router.push('/userPage/TeacherNotificationCenter')
       } else {
-        this.$router.push({
-          path: '/userPage/StudentNotificationCenter',
-        })
+        router.push('/userPage/StudentNotificationCenter')
       }
     },
     toAssignmentCenter() {
-      if (sessionStorage.getItem('type') == 'Teacher') {
-        this.$router.push({
-          path: '/userPage/TeacherAssignmentCenter',
-        })
+      if (sessionStorage.getItem('type') === 'Teacher') {
+        router.push('/userPage/TeacherAssignmentCenter')
       } else {
-        this.$router.push({
-          path: '/userPage/StudentAssignmentCenter',
-        })
+        router.push('/userPage/StudentAssignmentCenter')
       }
     },
     toSelfCenter() {
-      if (sessionStorage.getItem('type') == 'Teacher') {
-        this.$router.push({
-          path: '/userPage/TeacherSelfCenter/information',
-        })
+      if (sessionStorage.getItem('type') === 'Teacher') {
+        router.push('/userPage/TeacherSelfCenter/information')
       } else {
-        this.$router.push({
-          path: '/userPage/StudentSelfCenter/information',
-        })
+        router.push('/userPage/StudentSelfCenter/information')
       }
     }
   }

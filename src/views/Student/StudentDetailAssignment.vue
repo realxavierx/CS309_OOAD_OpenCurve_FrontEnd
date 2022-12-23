@@ -1,10 +1,6 @@
 <template>
   <div>
     <el-container>
-      <el-header>
-        <StudentHeader></StudentHeader>
-      </el-header>
-
       <el-container>
         <el-main>
           <h1>Assignment</h1>
@@ -70,11 +66,9 @@
 </template>
 
 <script>
-import StudentHeader from "@/components/StudentHeader";
 
 export default {
   name: "StudentDetailAssignment",
-  components: {StudentHeader},
 
   data() {
     return {

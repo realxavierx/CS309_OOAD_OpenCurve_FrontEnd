@@ -41,7 +41,6 @@
 </template>
 
 <script>
-import StudentHeader from "@/components/StudentHeader";
 import "github-markdown-css"
 // import {ref} from "vue";
 import {marked} from "marked"
