@@ -1,104 +1,97 @@
 <template>
-  <div>
-    <el-container>
-      <el-header>
-        <TeacherHeader></TeacherHeader>
-      </el-header>
+  <div class="background">
+    <div class="assignmentCenter_teacher">
+      <el-aside>
+        <el-menu @select="handleMenuSelect" mode="vertical" class="side_menu" :default-openeds="Array( '1')">
+          <el-sub-menu index="1">
+            <template #title>
+              <span>你的课程</span>
+            </template>
+            <el-menu-item :index="course.id" v-for="course in courses" :key="course.id">
+              <span>{{ course.id }}</span>
+            </el-menu-item>
+          </el-sub-menu>
+        </el-menu>
+      </el-aside>
 
-      <el-container>
-        <el-aside>
-          <el-menu @select="handleMenuSelect" mode="vertical" class="side_menu" :default-openeds="Array( '1')">
-            <el-sub-menu index="1">
-              <template #title>
-                <span>你的课程</span>
-              </template>
-              <el-menu-item :index="course.id" v-for="course in courses" :key="course.id">
-                <span>{{ course.id }}</span>
-              </el-menu-item>
-            </el-sub-menu>
-          </el-menu>
-        </el-aside>
+      <el-main>
+        <div>
+          <el-row>
+            <h1>Assignments List</h1>
+            <el-button type="primary" size="large" style="margin-left: 500px; margin-top: 15px"
+                       @click="form_dialog_visible = true">
+              Add Assignment
+            </el-button>
+          </el-row>
+          <el-divider></el-divider>
+        </div>
 
-        <el-main>
-          <div>
-            <el-row>
-              <h1>Assignments List</h1>
-              <el-button type="primary" size="large" style="margin-left: 500px; margin-top: 15px"
-                         @click="form_dialog_visible = true">
-                Add Assignment
-              </el-button>
-            </el-row>
-            <el-divider></el-divider>
-          </div>
+        <el-dialog v-model="form_dialog_visible" title="布置作业" @close="cancelAddAssignment">
+          <el-form :model="form" ref="formRef">
+            <el-form-item label="Course">
+              <el-input v-model="form.course"/>
+            </el-form-item>
 
-          <el-dialog v-model="form_dialog_visible" title="布置作业" @close="cancelAddAssignment">
-            <el-form :model="form" ref="formRef">
-              <el-form-item label="Course">
-                <el-input v-model="form.course"/>
-              </el-form-item>
+            <el-form-item label="Title">
+              <el-input v-model="form.title"/>
+            </el-form-item>
 
-              <el-form-item label="Title">
-                <el-input v-model="form.title"/>
-              </el-form-item>
+            <el-form-item label="Teacher">
+              <el-input v-model="form.teacher"/>
+            </el-form-item>
 
-              <el-form-item label="Teacher">
-                <el-input v-model="form.teacher"/>
-              </el-form-item>
+            <el-form-item label="Due Date">
+              <el-input v-model="form.due_date"/>
+            </el-form-item>
 
-              <el-form-item label="Due Date">
-                <el-input v-model="form.due_date"/>
-              </el-form-item>
+            <el-form-item label="Resubmission Allowed">
+              <el-input v-model="form.resubmission_allowed"/>
+            </el-form-item>
 
-              <el-form-item label="Resubmission Allowed">
-                <el-input v-model="form.resubmission_allowed"/>
-              </el-form-item>
+            <el-form-item label="Accept Resubmission Until">
+              <el-input v-model="form.accept_resubmission_until"/>
+            </el-form-item>
 
-              <el-form-item label="Accept Resubmission Until">
-                <el-input v-model="form.accept_resubmission_until"/>
-              </el-form-item>
+            <el-form-item label="Requirements">
+              <el-input v-model="form.requirements"/>
+            </el-form-item>
+          </el-form>
 
-              <el-form-item label="Requirements">
-                <el-input v-model="form.requirements"/>
-              </el-form-item>
-            </el-form>
-
-            <template #footer>
+          <template #footer>
                   <span class="dialog_footer">
                     <el-button type="primary" @click="confirmAddAssignment">Submit</el-button>
                     <el-button @click="cancelAddAssignment">Cancel</el-button>
                   </span>
-            </template>
-          </el-dialog>
+          </template>
+        </el-dialog>
 
-          <div>
-            <el-table :data="show_assignments" table-layout="fixed" stripe style="width: 100%">
-              <el-table-column prop="title" label="Title"/>
-              <el-table-column prop="course_id" label="Course"/>
-              <el-table-column prop="due_date" label="Due Date"/>
-              <el-table-column label="Operation">
-                <template v-slot="scope">
-                  <el-button @click="jumpToDetailAssignment(scope.row.ID)">查看</el-button>
-                </template>
-              </el-table-column>
-            </el-table>
+        <div>
+          <el-table :data="show_assignments" table-layout="fixed" stripe style="width: 100%">
+            <el-table-column prop="title" label="Title"/>
+            <el-table-column prop="course_id" label="Course"/>
+            <el-table-column prop="due_date" label="Due Date"/>
+            <el-table-column label="Operation">
+              <template v-slot="scope">
+                <el-button @click="jumpToDetailAssignment(scope.row.ID)">查看</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
 
-            <el-empty v-show="assignments_empty" description="No assignment"></el-empty>
-          </div>
-        </el-main>
-      </el-container>
-    </el-container>
+          <el-empty v-show="assignments_empty" description="No assignment"></el-empty>
+        </div>
+      </el-main>
+      <router-view></router-view>
+    </div>
   </div>
 </template>
 
 <script>
 import {reactive, ref} from "vue";
-import TeacherHeader from "@/components/TeacherHeader";
 import axios from "axios";
 import router from "@/router";
 
 export default {
   name: "TeacherAssignmentCenter",
-  components: {TeacherHeader},
 
   data() {
     let formRef = reactive(ref(null))
@@ -225,5 +218,13 @@ export default {
 </script>
 
 <style scoped>
+.background {
+  background-color: rgb(243, 244, 246);
+}
 
+.assignmentCenter_teacher {
+  width: 80%;
+  margin: 0 auto;
+  background-color: #fff;
+}
 </style>

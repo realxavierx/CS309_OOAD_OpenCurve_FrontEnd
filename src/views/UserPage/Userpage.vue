@@ -1,42 +1,48 @@
 <template>
-  <div id="userPage">
-    <Nav_u></Nav_u>
-    <router-view></router-view>
+  <div id="userpage">
+    <UserHeader v-if="!admin"></UserHeader>
+    <AdminHeader v-if="admin"></AdminHeader>
   </div>
 </template>
 
 <script>
-import Nav_u from '../../components/Header/Nav_u.vue'
-
+import UserHeader from '../../components/UserHeader.vue';
+import AdminHeader from '../../components/AdminHeader.vue'
 export default {
   components: {
-    Nav_u
+    UserHeader,
+    AdminHeader
   },
-
+  data() {
+    return {
+      admin: false,
+    }
+  },
   mounted() {
     if (sessionStorage.getItem('type') === 'Teacher') {
       this.$router.push({
-        path: '/userPage/teacher',
+        path: '/userPage/TeacherMain',
       })
+    } else if (sessionStorage.getItem('type') === 'Admin') {
+      this.admin = true,
+          this.$router.push({
+            path: '/userPage/AdminMain',
+          })
     } else {
       this.$router.push({
-        path: '/userPage/student/information',
+        path: '/userPage/StudentMain',
       })
     }
-  }
+  },
+
 }
 
 </script>
 
 <style scoped>
-
-#userPage {
-    position:absolute;
-    width: 100%;
-    background-color: rgb(243,244,246);
-}
-
-#occupy {
-  height: 80px;
+#userpage {
+  position:absolute;
+  width: 100%;
+  background-color: rgb(243,244,246);
 }
 </style>

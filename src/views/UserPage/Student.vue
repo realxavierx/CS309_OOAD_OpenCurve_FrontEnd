@@ -12,35 +12,40 @@
 
 <script>
 export default {
-    components: {
-        
+  components: {
+
   },
   methods: {
     toInfo(){
       this.$router.push({
-        path: '/userPage/student/information',
+        path: '/userPage/StudentSelfCenter/information',
       })
     },
     toSetting(){
       this.$router.push({
-        path: '/userPage/student/setting',
+        path: '/userPage/StudentSelfCenter/setting',
       })
     },
     toHistory(){
       this.$router.push({
-        path: '/userPage/student/history',
+        path: '/userPage/StudentSelfCenter/history',
       })
     },
     toVip(){
       this.$router.push({
-        path: '/userPage/student/vip',
+        path: '/userPage/StudentSelfCenter/vip',
       })
     },
-      
-    }
+
+  },
+  mounted() {
+    this.$router.push({
+      path: '/userPage/StudentSelfCenter/information',
+    })
+  }
 }
 </script>
 
 <style scoped>
-  @import '../../lib/userpage_video_nav.css'
+@import '../../lib/userpage_video_nav.css'
 </style>

@@ -26,6 +26,9 @@ import StudentDetailAssignment from "@/views/Student/StudentDetailAssignment";
 import TeacherDetailAssignment from "@/views/Teacher/TeacherDetailAssignment";
 import Student_vip from "@/views/UserPage/Student_vip";
 import Student_setting from "@/views/UserPage/Student_setting";
+import Teacher_info from "@/views/UserPage/Teacher_info.vue"
+import Teacher_setting from "@/views/UserPage/Teacher_setting.vue"
+import Teacher_vip from "@/views/UserPage/Teacher_vip.vue"
 
 const routes = [
     {
@@ -56,131 +59,139 @@ const routes = [
         path: '/userPage',
         component: Userpage,
         children: [
+            // Student
             {
-                path: 'student',
+                path: 'StudentMain',
+                component: StudentMain,
+            },
+            {
+                path: 'StudentCourseCenter',
+                component: StudentCourseCenter,
+                children: [
+                    {
+                        path: 'StudentDetailCourse/:course_id',
+                        name: 'StudentDetailCourse',
+                        component: StudentDetailCourse
+                    },
+                ]
+            },
+            {
+                path: 'StudentNotificationCenter',
+                name: 'StudentNotificationCenter',
+                component: StudentNotificationCenter,
+            },
+            {
+                path: 'StudentAssignmentCenter',
+                name: 'StudentAssignmentCenter',
+                component: StudentAssignmentCenter,
+                children: [
+                    {
+                        path: 'StudentDetailAssignment/:assignment_id',
+                        name: 'StudentDetailAssignment',
+                        component: StudentDetailAssignment
+                    },
+                ]
+            },
+            {
+                path: 'StudentSelfCenter',
+                name: 'StudentSelfCenter',
                 component: Student,
                 children: [
                     {
-                        path: 'history',
-                        component: Student_history
-                    },
-                    {
                         path: 'information',
-                        component: Student_info
-                    },
-                    {
-                        path: 'vip',
-                        component: Student_vip
+                        component: Student_info,
                     },
                     {
                         path: 'setting',
-                        component: Student_setting
+                        component: Student_setting,
+                    },
+                    {
+                        path: 'history',
+                        component: Student_history,
+                    },
+                    {
+                        path: 'vip',
+                        component: Student_vip,
+                    }
+                ]
+            },
+            //Teacher
+            {
+                path: 'TeacherMain',
+                name: 'TeacherMain',
+                component: TeacherMain
+            },
+            {
+                path: 'TeacherCourseCenter',
+                name: 'TeacherCourseCenter',
+                component: TeacherCourseCenter,
+                children: [
+                    {
+                        path: 'TeacherDetailCourse/:course_id',
+                        name: 'TeacherDetailCourse',
+                        component: TeacherDetailCourse
+                    },
+                ]
+            },
+            {
+                path: 'TeacherNotificationCenter',
+                name: 'TeacherNotificationCenter',
+                component: TeacherNotificationCenter,
+            },
+            {
+                path: 'TeacherAssignmentCenter',
+                name: 'TeacherAssignmentCenter',
+                component: TeacherAssignmentCenter,
+                children: [
+                    {
+                        path: 'TeacherDetailAssignment/:assignment_id',
+                        name: 'TeacherDetailAssignment',
+                        component: TeacherDetailAssignment
                     }
                 ]
             },
             {
-                path: 'teacher',
+                path: 'TeacherSelfCenter',
+                name: 'TeacherSelfCenter',
                 component: Teacher,
                 children: [
                     {
-                        path: 'history',
+                        path: 'information',
+                        component: Teacher_info,
                     },
                     {
-                        path: 'upload'
+                        path: 'setting',
+                        component: Teacher_setting,
                     },
                     {
-                        path: 'information'
+                        path: 'vip',
+                        component: Teacher_vip,
                     }
                 ]
-            }
+            },
+            //Administrator
+            {
+                path: 'AdminMain',
+                name: 'AdminMain',
+                component: AdminMain
+            },
+            {
+                path: 'AdminCourseCenter',
+                name: 'AdminCourseCenter',
+                component: AdminCourseCenter
+            },
+            {
+                path: 'AdminUserCenter',
+                name: 'AdminUserCenter',
+                component: AdminUserCenter
+            },
+            {
+                path: 'AdminNotificationCenter',
+                name: 'AdminNotificationCenter',
+                component: AdminNotificationCenter
+            },
         ]
     },
-
-    // Student
-    {
-        path: '/StudentMain',
-        name: 'StudentMain',
-        component: StudentMain
-    },
-    {
-        path: '/StudentDetailCourse/:course_id',
-        name: 'StudentDetailCourse',
-        component: StudentDetailCourse
-    },
-    {
-        path: '/StudentCourseCenter',
-        name: 'StudentCourseCenter',
-        component: StudentCourseCenter
-    },
-    {
-        path: '/StudentNotificationCenter',
-        name: 'StudentNotificationCenter',
-        component: StudentNotificationCenter
-    },
-    {
-        path: '/StudentAssignmentCenter',
-        name: 'StudentAssignmentCenter',
-        component: StudentAssignmentCenter
-    },
-    {
-        path: '/StudentDetailAssignment/:assignment_id',
-        name: 'StudentDetailAssignment',
-        component: StudentDetailAssignment
-    },
-
-    // Administrator
-    {
-        path: '/AdminMain',
-        name: 'AdminMain',
-        component: AdminMain
-    },
-    {
-        path: '/AdminCourseCenter',
-        name: 'AdminCourseCenter',
-        component: AdminCourseCenter
-    },
-    {
-        path: '/AdminUserCenter',
-        name: 'AdminUserCenter',
-        component: AdminUserCenter
-    },
-    {
-        path: '/AdminNotificationCenter',
-        name: 'AdminNotificationCenter',
-        component: AdminNotificationCenter
-    },
-
-    // Teacher
-    {
-        path: '/TeacherMain',
-        name: 'TeacherMain',
-        component: TeacherMain
-    },
-    {
-        path: '/TeacherCourseCenter',
-        name: 'TeacherCourseCenter',
-        component: TeacherCourseCenter
-    },
-    {
-        path: '/TeacherDetailCourse/:course_id',
-        name: 'TeacherDetailCourse',
-        component: TeacherDetailCourse
-    },
-    {
-        path: '/TeacherNotificationCenter',
-        name: 'TeacherNotificationCenter',
-        component: TeacherNotificationCenter
-    },
-    {
-        path: '/TeacherAssignmentCenter',
-        name: 'TeacherAssignmentCenter',
-        component: TeacherAssignmentCenter
-    },
-    {
-        path: '/TeacherDetailAssignment/:assignment_id',
-        name: 'TeacherDetailAssignment',
-        component: TeacherDetailAssignment
-    }
 ]
 
 const router = createRouter({

@@ -1,11 +1,7 @@
 <template>
-  <div>
-    <el-container>
-      <el-header>
-        <StudentHeader></StudentHeader>
-      </el-header>
-
-      <el-container>
+  <div class="background">
+    <h1 align="center">Student Assignment Center</h1>
+    <div class="assignment-center-stu">
         <el-aside>
           <el-menu @select="handleMenuSelect" mode="vertical" class="side_menu" :default-openeds="Array( '1')">
             <el-sub-menu index="1">
@@ -39,8 +35,8 @@
             <el-empty v-show="assignments_empty" description="No assignment"></el-empty>
           </div>
         </el-main>
-      </el-container>
-    </el-container>
+      <router-view></router-view>
+    </div>
   </div>
 </template>
 
@@ -55,7 +51,6 @@ import axios from "axios";
 
 export default {
   name: "StudentAssignmentCenter",
-  components: {StudentHeader},
 
   data() {
     return {

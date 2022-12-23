@@ -1,11 +1,7 @@
 <template>
-  <div>
-    <el-container>
-      <el-header>
-        <StudentHeader></StudentHeader>
-      </el-header>
-
-      <el-container>
+  <div class="background">
+    <h1 align="center">Notification Center</h1>
+    <div class="notification-center-stu">
         <el-aside width="200px">
           <el-button color="#626aef" plain style="width: 150px; height: 50px; margin-left: 12px; margin-top: 50px"
                      @click="show_notifications = notifications">
@@ -42,10 +38,6 @@
         </el-aside>
 
         <el-main>
-          <el-row>
-            <h1>Notification Center</h1>
-          </el-row>
-
           <div v-for="notification in show_notifications" v-bind:key="notification">
             <el-card shadow="always">
 
@@ -90,8 +82,7 @@
           <el-empty v-show="notifications_empty" description="No notification"></el-empty>
 
         </el-main>
-      </el-container>
-    </el-container>
+      </div>
   </div>
 </template>
 
@@ -101,7 +92,6 @@ import axios from "axios";
 
 export default {
   name: "StudentNotificationCenter",
-  components: {StudentHeader},
 
   data() {
 
@@ -158,6 +148,16 @@ export default {
 </script>
 
 <style scoped>
+
+.background{
+  background-color: rgb(243,244,246);
+}
+
+.notification-center-stu{
+  width:80%;
+  margin:0 auto;
+  background-color: #fff;
+}
 
 .info_card {
   padding: 5px;

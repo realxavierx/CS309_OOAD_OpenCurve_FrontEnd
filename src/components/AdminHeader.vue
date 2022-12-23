@@ -1,125 +1,114 @@
 <template>
-
-  <div class="header">
-    <div class="logo">
-      <router-link to="/">OpenCurve</router-link>
+  <div id="nav_u">
+    <img src="../img/logo.png" alt="" style="height:40px;float:left;margin:20px 0 20px 20px;">
+    <div class="nav">
+      <ul>
+        <li class="dropdown">
+          <div class="route-box" @click="toMain()">主页</div>
+        </li>
+        <li class="dropdown">
+          <div class="route-box" @click="toCourseManage()">课程管理中心</div>
+        </li>
+        <li class="dropdown">
+          <div class="route-box" @click="toUserManage()">用户管理中心</div>
+        </li>
+        <li class="dropdown">
+          <div class="route-box" @click="toNotificationManage()">通知中心</div>
+        </li>
+        <li class="dropdown">
+          <router-link to="/" style="color:white">view</router-link>
+        </li>
+      </ul>
     </div>
-    <!-- 水平一级菜单 -->
-    <div style="float: left;">
-      <el-menu
-          mode="horizontal"
-          :default-active="false"
-          :ellipsis="false"
-          text-color="#000000"
-          active-text-color="#3989fa">
-        <el-menu-item index="1">
-          <router-link to="/AdminMain">主页</router-link>
-        </el-menu-item>
-        <el-menu-item index="2">
-          <router-link to="/AdminCourseCenter">课程管理中心</router-link>
-        </el-menu-item>
-        <el-menu-item index="3">
-          <router-link to="/AdminUserCenter">用户管理中心</router-link>
-        </el-menu-item>
-        <el-menu-item index="4">
-          <router-link to="/AdminNotificationCenter">通知中心</router-link>
-        </el-menu-item>
-        <el-menu-item index="5">
-          <router-link to="/userPage">个人中心</router-link>
-        </el-menu-item>
-      </el-menu>
-    </div>
-
-    <div class="header-right">
-      <div class="header-user-space">
-        <!-- 用户头像 -->
-        <div class="user-avatar">
-          <img src="../assets/logo.png">
-        </div>
-        <!-- 用户名下拉菜单 -->
-        <el-dropdown class="user-name" trigger="click">
-          <span class="el-dropdown-link"> user <i class="el-icon-caret-bottom"></i></span>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item>个人资料</el-dropdown-item>
-              <el-dropdown-item>修改密码</el-dropdown-item>
-              <el-dropdown-item>退出登录</el-dropdown-item>
-              <!--                <el-dropdown-item disabled>Action 4</el-dropdown-item>-->
-              <!--                <el-dropdown-item divided>Action 5</el-dropdown-item>-->
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
-      </div>
+    <div class="nav_r">
+      <ul>
+        <li>
+          <div>
+            <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
+          </div>
+        </li>
+        <li><div id="great">Hi~12012711</div></li>
+      </ul>
     </div>
   </div>
-
+  <router-view v-loading="loading"></router-view>
 </template>
 
 <script>
 export default {
-  name: "AdminHeader"
+  name: "AdminHeader",
+  methods: {
+    toMain() {
+      this.$router.push({
+        path: '/userPage/AdminMain',
+      })
+    },
+    toCourseManage() {
+      this.$router.push({
+        path: '/userPage/AdminCourseCenter',
+      })
+    },
+    toUserManage() {
+      this.$router.push({
+        path: '/userPage/AdminUserCenter',
+      })
+    },
+    toNotificationManage() {
+      this.$router.push({
+        path: '/userPage/AdminNotificationCenter',
+      })
+    }
+  }
 }
 </script>
 
 <style scoped>
-.header {
-  position: relative;
-  box-sizing: border-box;
+#nav_u {
+  height: 80px;
   width: 100%;
-  height: 70px;
-  font-size: 22px;
+  background-color: rgb(37,40,48);
 }
 
-.header .logo {
+@import '../lib/nav.css';
+.nav {
   float: left;
-  margin-left: 60px;
-  margin-top: 17px;
-  height: 29px;
-  width: 160px;
-  vertical-align: middle;
+  line-height: 80px;
+}
+.nav li div{
+  color:#fff;
 }
 
+@import '../lib/search.css';
 
-/* --------------- 水平一级菜单栏的样式--------------------- */
-.el-menu.el-menu--horizontal {
-
-  float: left;
-  margin-left: 50px;
-  background: transparent;
-}
-
-.el-menu--horizontal > .el-menu-item.is-active {
-  /* border-bottom: 2px solid #3989fa;
-  color: #3989fa; */
-  font-weight: bold;
-}
-
-.el-menu--horizontal > .el-menu-item {
-  font-size: 16px;
-  margin: 0 15px;
-}
-
-/* --------------- 用户头像区域的样式 ---------------- */
-.header-right {
+.nav_r{
   float: right;
-  padding-right: 50px;
+  margin:20px 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 600;
 }
 
-.header-user-space {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 70px;
+.nav_r>ul {
+  float: left;
+  position: relative;
+  margin: 0;
 }
-
-.user-avatar {
-  margin-left: 20px;
+.nav_r li{
+  list-style: none;
+  float: left;
+  margin: 0 10px;
 }
-
-.user-avatar img {
-  display: block;
-  width: 40px;
+#great {
   height: 40px;
-  border-radius: 50%;
+  color:#fff;
+
+  line-height: 40px;
+}
+.route-box{
+  color:#fff;
+}
+.route-box:hover {
+  color: #FFF;
+  text-shadow: 0 0 5px #ffffff, 0 0 20px #000, 0 0 30px #000;
+  background-color: rgba(59, 59, 59, 0.3);
 }
 </style>
