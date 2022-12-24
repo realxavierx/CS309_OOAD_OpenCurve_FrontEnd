@@ -1,86 +1,79 @@
 <template>
-  <div>
-    <el-container>
-      <el-header>
-        <TeacherHeader></TeacherHeader>
-      </el-header>
+  <div class="background">
+    <h1 align="center">Teacher Course Center</h1>
+    <div class="course-center">
 
-      <el-container>
-        <el-main>
-          <div class="Courses">
-            <p>课程列表</p>
-            <div v-for="course in courses" :key="course.courseID" style="margin: 20px">
-              <el-descriptions title="Course Information" border>
-                <template #extra>
-                  <el-button type="primary" @click="jumpToCourseDetail(course.courseID)">课程详情</el-button>
-                </template>
-                <el-descriptions-item label="ID">{{ course.courseID }}</el-descriptions-item>
-                <el-descriptions-item label="Name">{{ course.courseName }}</el-descriptions-item>
-                <el-descriptions-item label="Department">{{ course.courseDepartment }}</el-descriptions-item>
-                <el-descriptions-item label="Type">{{ course.courseType }}</el-descriptions-item>
-                <el-descriptions-item label="Credit">{{ course.courseCredit }}</el-descriptions-item>
-                <el-descriptions-item label="Status"> {{ course.courseStatus }}</el-descriptions-item>
-                <el-descriptions-item label="Fee"> {{ course.courseFee }}</el-descriptions-item>
-                <el-descriptions-item label="Description">{{ course.courseDescription }}</el-descriptions-item>
-              </el-descriptions>
-            </div>
-          </div>
+      <div class="Courses">
+        <div v-for="course in courses" :key="course.courseID" style="margin: 20px">
+          <el-descriptions title="Course Information" border>
+            <template #extra>
+              <el-button type="primary" @click="jumpToCourseDetail(course.courseID)">课程详情</el-button>
+            </template>
+            <el-descriptions-item label="ID">{{ course.courseID }}</el-descriptions-item>
+            <el-descriptions-item label="Name">{{ course.courseName }}</el-descriptions-item>
+            <el-descriptions-item label="Department">{{ course.courseDepartment }}</el-descriptions-item>
+            <el-descriptions-item label="Type">{{ course.courseType }}</el-descriptions-item>
+            <el-descriptions-item label="Credit">{{ course.courseCredit }}</el-descriptions-item>
+            <el-descriptions-item label="Status"> {{ course.courseStatus }}</el-descriptions-item>
+            <el-descriptions-item label="Fee"> {{ course.courseFee }}</el-descriptions-item>
+            <el-descriptions-item label="Description">{{ course.courseDescription }}</el-descriptions-item>
+          </el-descriptions>
+        </div>
+      </div>
 
-          <el-divider style="margin:40px">
-            <el-icon>
-              <StarFilled/>
-            </el-icon>
-          </el-divider>
+      <el-divider style="margin:40px">
+        <el-icon>
+          <StarFilled/>
+        </el-icon>
+      </el-divider>
 
-          <div>
-            <el-button type="primary" @click="form_dialog_visible = true">Create new Course</el-button>
+      <div>
+        <el-button type="primary" @click="form_dialog_visible = true">Create new Course</el-button>
 
-            <el-dialog v-model="form_dialog_visible" title="添加课程" @close="cancelAddCourse">
-              <el-form :model="form" ref="formRef">
-                <el-form-item label="Course ID">
-                  <el-input v-model="form.courseID"/>
-                </el-form-item>
+        <el-dialog v-model="form_dialog_visible" title="添加课程" @close="cancelAddCourse">
+          <el-form :model="form" ref="formRef">
+            <el-form-item label="Course ID">
+              <el-input v-model="form.courseID"/>
+            </el-form-item>
 
-                <el-form-item label="Course Name">
-                  <el-input v-model="form.courseName"/>
-                </el-form-item>
+            <el-form-item label="Course Name">
+              <el-input v-model="form.courseName"/>
+            </el-form-item>
 
-                <el-form-item label="Course Department">
-                  <el-input v-model="form.courseDepartment"/>
-                </el-form-item>
+            <el-form-item label="Course Department">
+              <el-input v-model="form.courseDepartment"/>
+            </el-form-item>
 
-                <el-form-item label="Course Type">
-                  <el-input v-model="form.courseType"/>
-                </el-form-item>
+            <el-form-item label="Course Type">
+              <el-input v-model="form.courseType"/>
+            </el-form-item>
 
-                <el-form-item label="Course Credit">
-                  <el-input v-model="form.courseCredit"/>
-                </el-form-item>
+            <el-form-item label="Course Credit">
+              <el-input v-model="form.courseCredit"/>
+            </el-form-item>
 
-                <el-form-item label="Course Status">
-                  <el-input v-model="form.courseStatus"/>
-                </el-form-item>
+            <el-form-item label="Course Status">
+              <el-input v-model="form.courseStatus"/>
+            </el-form-item>
 
-                <el-form-item label="Course Fee">
-                  <el-input v-model="form.courseFee"/>
-                </el-form-item>
+            <el-form-item label="Course Fee">
+              <el-input v-model="form.courseFee"/>
+            </el-form-item>
 
-                <el-form-item label="Description">
-                  <el-input v-model="form.courseDescription"/>
-                </el-form-item>
-              </el-form>
+            <el-form-item label="Description">
+              <el-input v-model="form.courseDescription"/>
+            </el-form-item>
+          </el-form>
 
-              <template #footer>
+          <template #footer>
                   <span class="dialog_footer">
                     <el-button type="primary" @click="confirmAddCourse">Submit</el-button>
                     <el-button @click="cancelAddCourse">Cancel</el-button>
                   </span>
-              </template>
-            </el-dialog>
-          </div>
-        </el-main>
-      </el-container>
-    </el-container>
+          </template>
+        </el-dialog>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -202,5 +195,13 @@ export default {
 </script>
 
 <style scoped>
+.background {
+  background-color: rgb(243, 244, 246);
+}
 
+.course-center {
+  width: 80%;
+  margin: 0 auto;
+  background-color: #fff;
+}
 </style>
