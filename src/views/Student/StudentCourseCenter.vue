@@ -101,7 +101,7 @@
         </el-row>
 
         <el-row style="margin-top: 30px; margin-left: 150px">
-          <el-steps style="margin-right: 50px; width: 1000px" space="16%" align-center>
+          <el-steps style="margin-right: 50px; width: 900px" space="16%" align-center>
             <el-step status="success" title="Course Range"/>
             <el-step :status="departmentSelected" title="Department"/>
             <el-step :status="teacherSelected" title="Teacher"/>
@@ -114,7 +114,7 @@
         </el-row>
       </div>
 
-      <el-divider style="margin:40px">
+      <el-divider style="margin: 40px auto">
         <el-icon>
           <StarFilled/>
         </el-icon>
@@ -134,7 +134,7 @@
         </el-descriptions>
       </div>
     </div>
-    
+
   </div>
 </template>
 
@@ -145,7 +145,6 @@ import router from "@/router";
 
 export default {
   name: "StudentCourseCenter",
-  components: {StudentHeader},
 
   data() {
 
@@ -374,6 +373,7 @@ export default {
 .background{
   background-color: rgb(243,244,246);
 }
+
 .course-center-stu{
   width:80%;
   margin:0 auto;

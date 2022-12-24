@@ -3,7 +3,7 @@
     <div id="login_bg" class="animate__animated animate__bounceInDown">
       <div id="form">
         <h1>Login</h1>
-        <el-radio-group v-model="LoginWay" style="margin-bottom: 10px" size="Large">
+        <el-radio-group v-model="loginWay" style="margin-bottom: 10px" size="Large">
           <el-radio-button label="Password"/>
           <el-radio-button label="Verification Code" @click="getVertiCode"/>
         </el-radio-group>
@@ -15,19 +15,18 @@
           <div class="input-text">
             <input type="password" v-model="content" id="inputPassword" placeholder="Code / Password">
           </div>
-          <div>
+          <div style="margin: 15px">
             You are:
             <input type="radio" v-model="loginType" value="Student">Student
             <input type="radio" v-model="loginType" value="Teacher">Teacher
+            <input type="radio" v-model="loginType" value="Admin">Admin
           </div>
           <el-button class="submitBtn" type="primary" @click="login">Login</el-button>
-          <br>
-          <div class="sign-up" style="margin-top: 15px">
+          <div class="sign-up" style="margin: 10px">
             还没账户？
             <el-button type="primary" @click="this.$router.push({path: '/welcome/register'})">立即注册</el-button>
           </div>
-          <br>
-          <el-button type="danger" style="margin-top: 20px" @click="this.$router.push({path: '/welcome'})">暂不登录</el-button>
+          <el-button type="danger" style="margin: 10px" @click="this.$router.push({path: '/welcome'})">暂不登录</el-button>
         </div>
       </div>
     </div>
@@ -37,6 +36,7 @@
 
 <script>
 import axios from "axios";
+import router from "@/router";
 
 export default {
   data() {
@@ -45,7 +45,7 @@ export default {
       content: '',
       loginType: '',
       holder: '',
-      LoginWay: 'Password'
+      loginWay: 'Password'
     }
   },
   methods: {
@@ -82,7 +82,7 @@ export default {
         data: {
           userid: this.userId,
           content: this.content,
-          loginType: this.loginType
+          loginType: this.loginWay
         },
         transformRequest: [function (data) {
           var str = '';
@@ -96,11 +96,18 @@ export default {
         if (res.status === 200) {
           //res中需要包含uid，头像url，以及会话密钥，来让浏览器知道用户已经处于登录状态
           sessionStorage.setItem('SESSION_KEY', res.session_key)
+          sessionStorage.setItem('ID', res.user.id)
+          sessionStorage.setItem('LOGIN_TYPE', this.loginType)
           sessionStorage.setItem('AVATAR', res.avatar)
           //路由跳转
-          this.$router.push({
-            path: '/userPage',
-          })
+          if (this.loginType === 'Teacher') {
+            router.push('/userPage/TeacherMain')
+          } else if (this.loginType === 'Admin') {
+            this.admin = true
+            router.push('/userPage/AdminMain')
+          } else {
+            router.push('/userPage/StudentMain')
+          }
         }
       })
       // sessionStorage.removeItem('SESSION_KEY')

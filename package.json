@@ -13,6 +13,7 @@
     "animate.css": "^4.1.1",
     "axios": "^0.27.2",
     "core-js": "^3.8.3",
+    "dayjs": "^1.11.7",
     "element-china-area-data": "^5.0.2",
     "element-plus": "^2.2.0",
     "epic-spinners": "^2.0.0",
