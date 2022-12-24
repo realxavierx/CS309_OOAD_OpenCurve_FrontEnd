@@ -1,35 +1,13 @@
 <template>
-  <div>
-    <div>
+  <div class="detail_course">
       <!-- 页面头部 -->
-      <el-container>
-        <el-header>
-          <TeacherHeader></TeacherHeader>
-        </el-header>
-
         <el-container>
-          <el-aside width="230px" style="background-color: #95c5ef">
-            <el-button type="primary" style="width: 100%; height: 80px" @click="form_dialog_visible = true">添加章节
-            </el-button>
-
-            <el-menu>
-              <el-sub-menu index="1">
-                <template #title>
-                  <slot>章节</slot>
-                </template>
-
-                <el-menu-item v-for="index in this.session_cnt" :key="index" @click="getSessionInfo(index)">
-                  Chapter {{ index }}
-                </el-menu-item>
-              </el-sub-menu>
-            </el-menu>
-          </el-aside>
 
           <el-main>
             <h3>video room</h3>
             <div class="live-room">
-              <el-row>
-                <el-col :span="17" style="background-color: #fff8c3">
+              <el-row :gutter="Number(30)">
+                <el-col :span="18" style="background-color: #fff8c3">
                   <div class="video-title">
                     {{ videoOptions.title }}
                   </div>
@@ -47,9 +25,22 @@
                   </div>
                 </el-col>
 
-                <el-col :span="1"></el-col>
-
                 <el-col :span="6" style="background-color: aliceblue">
+                  <div>
+                    <el-row>
+                      <h4>Playlist</h4>
+                      <el-button style="margin-left: 105px; margin-top: 15px" type="primary" @click="form_dialog_visible = true">
+                        添加章节
+                      </el-button>
+                    </el-row>
+                    <el-scrollbar style="height: 150px">
+                      <el-card class="card_item" v-for="index in this.session_cnt" :key="index"
+                               @click="getSessionInfo(index)">
+                        <span class="card_content">Chapter {{ index }}</span>
+                      </el-card>
+                    </el-scrollbar>
+                  </div>
+
                   <div>
                     <el-descriptions title="Session Information" border :column="Number(1)">
                       <el-descriptions-item label="Title">{{ session_info.title }}</el-descriptions-item>
@@ -131,8 +122,6 @@
 
           </el-main>
         </el-container>
-      </el-container>
-    </div>
   </div>
 </template>
 
@@ -319,5 +308,19 @@ export default {
 </script>
 
 <style scoped>
+.detail_course {
+  width: 80%;
+  margin: 0 auto;
+  background-color: #fff;
+}
 
+.card_item {
+  padding: 5px;
+  height: 30px;
+  font-size: 10px;
+}
+
+.card_content {
+
+}
 </style>

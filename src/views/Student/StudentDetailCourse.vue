@@ -1,28 +1,12 @@
 <template>
-  <div>
-    <div>
+    <div class="detail_course">
       <!-- 页面头部 -->
-      <el-container>
-        <el-aside width="230px" style="background-color: #95c5ef">
-
-          <el-menu>
-            <el-sub-menu index="1">
-              <template #title>
-                <slot>章节</slot>
-              </template>
-
-              <el-menu-item v-for="index in this.session_cnt" :key="index" @click="getSessionInfo(index)">
-                Chapter {{ index }}
-              </el-menu-item>
-            </el-sub-menu>
-          </el-menu>
-        </el-aside>
 
         <el-main>
           <h3>video room</h3>
           <div class="live-room">
-            <el-row>
-              <el-col :span="17" style="background-color: #fff8c3">
+            <el-row :gutter="Number(30)">
+              <el-col :span="18" style="background-color: #fff8c3">
                 <div class="video-title">
                   {{ videoOptions.title }}
                 </div>
@@ -40,9 +24,17 @@
                 </div>
               </el-col>
 
-              <el-col :span="1"></el-col>
-
               <el-col :span="6" style="background-color: aliceblue">
+                <div>
+                  <h4>Playlist</h4>
+                  <el-scrollbar style="height: 150px">
+                    <el-card class="card_item" v-for="index in this.session_cnt" :key="index"
+                             @click="getSessionInfo(index)">
+                      <span class="card_content">Chapter {{ index }}</span>
+                    </el-card>
+                  </el-scrollbar>
+                </div>
+
                 <div>
                   <el-descriptions title="Session Information" border :column="Number(1)">
                     <el-descriptions-item label="Title">{{ session_info.title }}</el-descriptions-item>
@@ -60,7 +52,6 @@
                     开始做题
                   </el-button>
                 </div>
-
               </el-col>
             </el-row>
           </div>
@@ -87,8 +78,8 @@
           </el-drawer>
 
           <el-dialog v-model="afkDialogVisible" title="AFK Checking" width="30%">
-              <h3>Are you still watching the video?</h3>
-              <span>Countdown: {{afkTimeString}}</span>
+            <h3>Are you still watching the video?</h3>
+            <span>Countdown: {{ afkTimeString }}</span>
             <template #footer>
               <span class="dialog-footer">
                 <el-button type="primary" @click="() => {
@@ -102,9 +93,8 @@
             </template>
           </el-dialog>
         </el-main>
-      </el-container>
     </div>
-  </div>
+
 </template>
 
 <script>
@@ -385,5 +375,19 @@ export default {
 </script>
 
 <style scoped>
+.detail_course {
+  width: 80%;
+  margin: 0 auto;
+  background-color: #fff;
+}
 
+.card_item {
+  padding: 5px;
+  height: 30px;
+  font-size: 10px;
+}
+
+.card_content {
+
+}
 </style>

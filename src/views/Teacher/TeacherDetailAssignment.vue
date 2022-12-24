@@ -1,8 +1,5 @@
 <template>
-  <div>
-    <el-container>
-
-      <el-container>
+  <div class="detail_assignment">
         <el-main>
           <h1>Assignment Information</h1>
 
@@ -10,7 +7,7 @@
             <template #header>
               <div class="assignment-title">
                 <span>
-                  <h1>{{ assignment.title }}</h1>
+                  <h2>{{ assignment.title }}</h2>
                 </span>
               </div>
             </template>
@@ -35,24 +32,22 @@
           </el-card>
 
           <div>
-            <h1>Submissions</h1>
-            <el-card v-for="submission in show_submissions" :key="submission">
-              <el-row>
+            <h2>Submissions</h2>
+            <el-card class="card_item" v-for="submission in show_submissions" :key="submission">
+              <el-row style="margin: 17px 10px">
                 <el-col :span="Number(6)">
                   Student:
-                  <el-tag style="width: 150px; height: 40px; margin-left: 20px" effect="dark">{{
-                      submission.student_id
-                    }}
+                  <el-tag style="width: 120px; height: 40px; margin-left: 20px" effect="dark">
+                    {{submission.student_id}}
                   </el-tag>
                 </el-col>
 
                 <el-col :span="Number(6)">
                   Submission Time:
-                  <el-tag style="width: 150px; height: 40px; margin-left: 20px">{{ submission.time }}</el-tag>
+                  <el-tag style="width: 120px; height: 40px; margin-left: 20px">{{ submission.time }}</el-tag>
                 </el-col>
 
-
-                 <el-col :span="Number(2)"></el-col>
+                <el-col :span="Number(2)"></el-col>
 
                 <el-col :span="Number(3)">
                   <el-button type="primary" @click="show_submission_text(submission.text)">Submission Text</el-button>
@@ -119,8 +114,6 @@
           </div>
 
         </el-main>
-      </el-container>
-    </el-container>
   </div>
 </template>
 
@@ -219,5 +212,15 @@ export default {
 </script>
 
 <style scoped>
+.detail_assignment{
+  width:80%;
+  margin:0 auto;
+  background-color: #fff;
+}
 
+.card_item {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  height: 70px;
+}
 </style>
