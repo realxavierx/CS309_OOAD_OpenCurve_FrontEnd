@@ -41,7 +41,7 @@
 import router from "@/router";
 
 export default {
-  name: "StudentHeader",
+  name: "UserHeader",
 
   data() {
     return {

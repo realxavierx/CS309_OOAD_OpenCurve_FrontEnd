@@ -1,5 +1,5 @@
 <template>
-  <div id="userpage">
+  <div id="userPage">
     <UserHeader v-if="!admin"></UserHeader>
     <AdminHeader v-if="admin"></AdminHeader>
   </div>
@@ -8,6 +8,8 @@
 <script>
 import UserHeader from '../../components/UserHeader.vue';
 import AdminHeader from '../../components/AdminHeader.vue'
+import router from "@/router";
+
 export default {
   components: {
     UserHeader,
@@ -20,18 +22,12 @@ export default {
   },
   mounted() {
     if (sessionStorage.getItem('type') === 'Teacher') {
-      this.$router.push({
-        path: '/userPage/TeacherMain',
-      })
+      router.push('/userPage/TeacherMain')
     } else if (sessionStorage.getItem('type') === 'Admin') {
-      this.admin = true,
-          this.$router.push({
-            path: '/userPage/AdminMain',
-          })
+      this.admin = true
+      router.push('/userPage/AdminMain')
     } else {
-      this.$router.push({
-        path: '/userPage/StudentMain',
-      })
+      router.push('/userPage/StudentMain')
     }
   },
 
@@ -40,9 +36,9 @@ export default {
 </script>
 
 <style scoped>
-#userpage {
-  position:absolute;
+#userPage {
+  position: absolute;
   width: 100%;
-  background-color: rgb(243,244,246);
+  background-color: rgb(243, 244, 246);
 }
 </style>

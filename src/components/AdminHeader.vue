@@ -35,28 +35,22 @@
 </template>
 
 <script>
+import router from "@/router";
+
 export default {
   name: "AdminHeader",
   methods: {
     toMain() {
-      this.$router.push({
-        path: '/userPage/AdminMain',
-      })
+      router.push('/userPage/AdminMain')
     },
     toCourseManage() {
-      this.$router.push({
-        path: '/userPage/AdminCourseCenter',
-      })
+      router.push('/userPage/AdminCourseCenter')
     },
     toUserManage() {
-      this.$router.push({
-        path: '/userPage/AdminUserCenter',
-      })
+      router.push('/userPage/AdminUserCenter')
     },
     toNotificationManage() {
-      this.$router.push({
-        path: '/userPage/AdminNotificationCenter',
-      })
+      router.push('/userPage/AdminNotificationCenter')
     }
   }
 }
