@@ -2,6 +2,7 @@
   <div class="background">
     <h1 align="center">Notification Center</h1>
     <div class="notification-center-stu">
+      <el-container>
         <el-aside width="200px">
           <el-button color="#626aef" plain style="width: 150px; height: 50px; margin-left: 12px; margin-top: 50px"
                      @click="show_notifications = notifications">
@@ -82,7 +83,8 @@
           <el-empty v-show="notifications_empty" description="No notification"></el-empty>
 
         </el-main>
-      </div>
+      </el-container>
+    </div>
   </div>
 </template>
 
@@ -165,9 +167,9 @@ export default {
 }
 
 .info_tag {
-  width: 150px;
+  width: 100px;
   height: 35px;
-  margin-right: 10px;
+  margin-right: 5px;
   font-weight: bold;
   font-size: large;
   font-style: oblique;

@@ -1,99 +1,95 @@
 <template>
-    <div class="detail_course">
-      <!-- 页面头部 -->
+  <div class="detail_course">
+    <!-- 页面头部 -->
 
-        <el-main>
-          <h3>video room</h3>
-          <div class="live-room">
-            <el-row :gutter="Number(30)">
-              <el-col :span="18" style="background-color: #fff8c3">
-                <div class="video-title">
-                  {{ videoOptions.title }}
-                </div>
-                <div class="video-content">
-                  <vue3-video-play id='videoPlayer' v-bind="videoOptions"></vue3-video-play>
-                </div>
-                <div class="student-functions">
-                  <el-button-group>
-                    <el-button type="primary" plain>举手</el-button>
-                    <el-button type="primary" plain>提问</el-button>
-                    <el-button type="primary" plain>录屏</el-button>
-                    <el-button type="primary" plain>弹幕</el-button>
-                  </el-button-group>
+    <el-main>
+      <h3>video room</h3>
+      <div class="live-room">
+        <el-row :gutter="Number(30)">
+          <el-col :span="18" style="background-color: #fff8c3">
+            <div class="video-title">
+              {{ videoOptions.title }}
+            </div>
+            <div class="video-content">
+              <vue3-video-play id='videoPlayer' v-bind="videoOptions"></vue3-video-play>
+            </div>
+            <div class="student-functions">
+              <el-button-group>
+                <el-button type="primary" plain>举手</el-button>
+                <el-button type="primary" plain>提问</el-button>
+                <el-button type="primary" plain>录屏</el-button>
+                <el-button type="primary" plain>弹幕</el-button>
+              </el-button-group>
 
-                </div>
-              </el-col>
+            </div>
+          </el-col>
 
-              <el-col :span="6" style="background-color: aliceblue">
-                <div>
-                  <h4>Playlist</h4>
-                  <el-scrollbar style="height: 150px">
-                    <el-card class="card_item" v-for="index in this.session_cnt" :key="index"
-                             @click="getSessionInfo(index)">
-                      <span class="card_content">Chapter {{ index }}</span>
-                    </el-card>
-                  </el-scrollbar>
-                </div>
+          <el-col :span="6" style="background-color: aliceblue">
+            <div>
+              <h4>Playlist</h4>
+              <el-scrollbar style="height: 150px">
+                <el-card class="card_item" v-for="index in this.session_cnt" :key="index"
+                         @click="getSessionInfo(index)">
+                  <span class="card_content">Chapter {{ index }}</span>
+                </el-card>
+              </el-scrollbar>
+            </div>
 
-                <div>
-                  <el-descriptions title="Session Information" border :column="Number(1)">
-                    <el-descriptions-item label="Title">{{ session_info.title }}</el-descriptions-item>
-                    <br>
-                    <el-descriptions-item label="Session">{{ session_info.session }}</el-descriptions-item>
-                    <br>
-                    <el-descriptions-item label="Description">{{ session_info.description }}</el-descriptions-item>
-                  </el-descriptions>
-                </div>
+            <div>
+              <el-descriptions title="Session Information" border :column="Number(1)">
+                <el-descriptions-item label="Title">{{ session_info.title }}</el-descriptions-item>
+                <br>
+                <el-descriptions-item label="Session">{{ session_info.session }}</el-descriptions-item>
+                <br>
+                <el-descriptions-item label="Description">{{ session_info.description }}</el-descriptions-item>
+              </el-descriptions>
+            </div>
 
-                <div>
-                  <el-button style="margin-left: 10px; margin-right: 10px;"
-                             type="primary"
-                             @click="handleBeginQuestions">
-                    开始做题
-                  </el-button>
-                </div>
-              </el-col>
-            </el-row>
+            <div>
+              <el-button style="margin-left: 10px; margin-right: 10px;"
+                         type="primary"
+                         @click="handleBeginQuestions">
+                开始做题
+              </el-button>
+            </div>
+          </el-col>
+        </el-row>
+      </div>
+
+      <el-drawer v-model="questionsVisible"
+                 direction="rtl"
+                 :before-close="handleCloseQuestions"
+      >
+        <template #title>
+          <h4>Questions</h4>
+        </template>
+        <template #default>
+          <div>
+            <p>{{ this.questionTimeString }}</p>
+            Hello there
           </div>
+        </template>
+        <template #footer>
+          <div style="flex: auto">
+            <el-button @click="handleCloseQuestions">Cancel</el-button>
+            <el-button type="primary" @click="confirmSubmit">Submit</el-button>
+          </div>
+        </template>
+      </el-drawer>
 
-          <el-drawer v-model="questionsVisible"
-                     direction="rtl"
-                     :before-close="handleCloseQuestions"
-          >
-            <template #title>
-              <h4>Questions</h4>
-            </template>
-            <template #default>
-              <div>
-                <p>{{ this.questionTimeString }}</p>
-                Hello there
-              </div>
-            </template>
-            <template #footer>
-              <div style="flex: auto">
-                <el-button @click="handleCloseQuestions">Cancel</el-button>
-                <el-button type="primary" @click="confirmSubmit">Submit</el-button>
-              </div>
-            </template>
-          </el-drawer>
-
-          <el-dialog v-model="afkDialogVisible" title="AFK Checking" width="30%">
-            <h3>Are you still watching the video?</h3>
-            <span>Countdown: {{ afkTimeString }}</span>
-            <template #footer>
+      <el-dialog v-model="afkDialogVisible" title="AFK Checking" @close="passAfkCheck" width="30%">
+        <h3>Are you still watching the video?</h3>
+        <span>Countdown: {{ afkTimeString }}</span>
+        <template #footer>
               <span class="dialog-footer">
-                <el-button type="primary" @click="() => {
-                  this.resetAfkTimer();
-                  let video = document.getElementById('videoPlayer')
-                  video.play()
-                }">
+                <el-button type="primary" @click="passAfkCheck">
                   Yes
                 </el-button>
               </span>
-            </template>
-          </el-dialog>
-        </el-main>
-    </div>
+        </template>
+      </el-dialog>
+    </el-main>
+  </div>
 
 </template>
 
@@ -123,7 +119,9 @@ export default {
       uploadActionUrl: 'http://localhost:8081/cloud_storage/file/uploading',
       form_dialog_visible: false,
       videoUrl: '',
-      videoStartTime: 0,
+      lastStartTime: 0,
+      lastUpdateTime: 0,
+      videoWatchTime: [],
       videoOptions: reactive({
         width: "100%", //播放器高度
         height: "550px", //播放器高度
@@ -139,7 +137,7 @@ export default {
         lightOff: true, //关灯模式
         volume: 0.3, //默认音量大小
         control: true, //是否显示控制
-        speed: false, // 进度条控制
+        speed: true, // 进度条控制
         controlBtns: [
           "audioTrack",
           "quality",
@@ -173,7 +171,7 @@ export default {
       questionTimer: '',
       questionTimeInt: 3600000,
       questionTimeString: '',
-      afkTimer: '',
+      afkTimer: null,
       afkTimeInt: 90000,
       afkTimeString: '',
       afkDialogVisible: false,
@@ -202,6 +200,7 @@ export default {
         this.session_info.description = resp.description
         this.session_info.url = resp.url
         this.videoOptions.src = resp.url
+        setTimeout(this.monitorVideoStatus, 100)
       })
     },
 
@@ -327,22 +326,44 @@ export default {
       this.afkDialogVisible = true
     },
 
+    passAfkCheck() {
+      this.afkDialogVisible = false
+      this.resetAfkTimer()
+      let video = document.getElementById('videoPlayer')
+      video.play()
+    },
+
     monitorVideoStatus() {
       let _this = this
       let video = document.getElementById('videoPlayer')
+      video.pause()
+      _this.resetAfkTimer()
+      _this.lastStartTime = Math.floor(video.currentTime)
+      _this.lastUpdateTime = 0
+      _this.videoWatchTime = new Array(Math.floor(video.duration)).fill(0)
+
       video.addEventListener(
           "timeupdate",
           function () {
             let totalTime;
-            let currentTime;
             let duration;
-            // 用秒数来显示当前播放进度
+            let currentTime;
+            // 当前播放进度对应的秒数
             currentTime = Math.floor(video.currentTime)
-            duration = currentTime - _this.videoStartTime;
+
+            _this.videoWatchTime[currentTime] = 1
+            if (Math.abs(currentTime - _this.lastUpdateTime) > 1) {
+              _this.lastStartTime = currentTime
+            }
+
+            console.log(_this.lastStartTime)
+            _this.lastUpdateTime = currentTime
+            duration = currentTime - _this.lastStartTime;
+
             totalTime = Math.floor(video.duration);
-            if (duration > Math.ceil(totalTime / 3)) {
+            if (duration === Math.ceil(totalTime / 3)) {
               video.pause()
-              _this.videoStartTime = currentTime
+              _this.lastStartTime = currentTime
               _this.checkAFK()
             }
           },
@@ -350,12 +371,17 @@ export default {
       )
 
       video.addEventListener("play", function () {
-        //监听  视频播放
-        _this.videoStartTime = Math.floor(video.currentTime)
+        // 监听  视频播放
+        _this.lastStartTime = Math.floor(video.currentTime)
       })
 
       video.addEventListener("pause", function () {
-        //监听  视频暂停
+        // 监听  视频暂停
+      })
+
+      video.addEventListener("ended", function () {
+        // 监听  视频结束
+        console.log(_this.videoWatchTime)
       })
     }
   },
@@ -363,10 +389,12 @@ export default {
   mounted() {
     this.checkCheating()
     this.getSessionsCount()
-    this.monitorVideoStatus()
   },
 
   unmounted() {
+    if (this.afkTimer !== null) {
+      clearInterval(this.afkTimer)
+    }
     let videoCnt = localStorage.getItem('VIDEO_CNT')
     videoCnt = (parseInt(videoCnt) - 1).toString()
     localStorage.setItem('VIDEO_CNT', videoCnt)

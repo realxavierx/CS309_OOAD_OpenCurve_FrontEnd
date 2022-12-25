@@ -1,8 +1,9 @@
 <template>
   <div class="background">
     <h1 align="center">Student Assignment Center</h1>
-    <div class="assignment-center-stu">
-        <el-aside>
+    <div class="assignment-center">
+      <el-container>
+        <el-aside style="width: 200px">
           <el-menu @select="handleMenuSelect" mode="vertical" class="side_menu" :default-openeds="Array( '1')">
             <el-sub-menu index="1">
               <template #title>
@@ -35,7 +36,7 @@
             <el-empty v-show="assignments_empty" description="No assignment"></el-empty>
           </div>
         </el-main>
-      <router-view></router-view>
+      </el-container>
     </div>
   </div>
 </template>
@@ -129,6 +130,16 @@ export default {
 </script>
 
 <style scoped>
+.background{
+  background-color: rgb(243,244,246);
+}
+
+.assignment-center{
+  width:80%;
+  margin:0 auto;
+  background-color: #fff;
+}
+
 .markdown-body {
   box-sizing: border-box;
   min-width: 200px;

@@ -1,119 +1,119 @@
 <template>
-  <div class="detail_assignment">
-        <el-main>
-          <h1>Assignment Information</h1>
+  <div class="background">
+    <div class="detail_assignment">
 
-          <el-card shadow="always">
-            <template #header>
-              <div class="assignment-title">
+      <h1>Assignment Information</h1>
+
+      <el-card shadow="always">
+        <template #header>
+          <div class="assignment-title">
                 <span>
                   <h2>{{ assignment.title }}</h2>
                 </span>
-              </div>
-            </template>
-
-            <div class="assignment-info">
-              <div> {{ 'Course: ' + assignment.course_id }}</div>
-              <div>{{ 'Teacher: ' + assignment.teacher_id }}</div>
-              <div> {{ 'Due Date: ' + assignment.due_date }}</div>
-              <div>{{ 'Resubmission allowed: ' + assignment.resubmission_allowed }}</div>
-              <div>{{ 'Accept resubmission until: ' + assignment.accept_resubmission_until }}</div>
-            </div>
-
-            <div class="assignment-require">
-              <h3>Requirements</h3>
-              <p>{{ assignment.requirements }}</p>
-            </div>
-
-            <div class="assignment-resource">
-              <h3>Additional resources</h3>
-              <p>{{ assignment.additional_resources }}</p>
-            </div>
-          </el-card>
-
-          <div>
-            <h2>Submissions</h2>
-            <el-card class="card_item" v-for="submission in show_submissions" :key="submission">
-              <el-row style="margin: 17px 10px">
-                <el-col :span="Number(6)">
-                  Student:
-                  <el-tag style="width: 120px; height: 40px; margin-left: 20px" effect="dark">
-                    {{submission.student_id}}
-                  </el-tag>
-                </el-col>
-
-                <el-col :span="Number(6)">
-                  Submission Time:
-                  <el-tag style="width: 120px; height: 40px; margin-left: 20px">{{ submission.time }}</el-tag>
-                </el-col>
-
-                <el-col :span="Number(2)"></el-col>
-
-                <el-col :span="Number(3)">
-                  <el-button type="primary" @click="show_submission_text(submission.text)">Submission Text</el-button>
-                </el-col>
-
-                <el-col :span="Number(4)">
-                  <el-button type="primary" @click="show_submission_attachments(submission.attachments)">
-                    Submission Attachments
-                  </el-button>
-                </el-col>
-
-                <el-col :span="Number(3)">
-                  <el-button type="success" @click="scoreVisible = true; rateSubmission = submission">
-                    Rate Submission
-                  </el-button>
-                </el-col>
-              </el-row>
-            </el-card>
-
-
-            <el-dialog v-model="textVisible" title="Submission Text">
-              <p>{{show_text}}</p>
-            </el-dialog>
-
-            <el-dialog v-model="attachmentsVisible" title="Submission Attachments">
-              <div v-for="attachment in show_attachments" :key="attachment">
-                <el-row>
-                  <el-col :span="Number(6)">
-                    {{attachment}}
-                  </el-col>
-                  <el-col :span="Number(10)"></el-col>
-                  <el-col :span="Number(8)">
-                    <el-button @click="showAttachmentContent(attachment)">在线预览</el-button>
-                    <el-button @click="downloadAttachment(attachment)">下载</el-button>
-                  </el-col>
-                </el-row>
-              </div>
-            </el-dialog>
-
-            <el-dialog v-model="scoreVisible" title="Rate Submission">
-              <h4>Please input the score of this submission: </h4>
-              <el-input-number v-model="submissionScore" :precision="1" :step="0.5" :max="100" />
-              <template #footer>
-                <el-button type="danger" size="large" @click="cancelRate">Cancel</el-button>
-                <el-button type="primary" size="large" @click="confirmRate">Confirm</el-button>
-              </template>
-            </el-dialog>
-
-            <el-drawer v-model="attachmentContentVisible"
-                       direction="rtl"
-            >
-              <template #title>
-              </template>
-              <template #default>
-                <div>
-                  <p>{{attachmentContent}}</p>
-                </div>
-              </template>
-              <template #footer>
-                <div style="flex: auto">
-                </div>
-              </template>
-            </el-drawer>
           </div>
+        </template>
 
-        </el-main>
+        <div class="assignment-info">
+          <div> {{ 'Course: ' + assignment.course_id }}</div>
+          <div>{{ 'Teacher: ' + assignment.teacher_id }}</div>
+          <div> {{ 'Due Date: ' + assignment.due_date }}</div>
+          <div>{{ 'Resubmission allowed: ' + assignment.resubmission_allowed }}</div>
+          <div>{{ 'Accept resubmission until: ' + assignment.accept_resubmission_until }}</div>
+        </div>
+
+        <div class="assignment-require">
+          <h3>Requirements</h3>
+          <p>{{ assignment.requirements }}</p>
+        </div>
+
+        <div class="assignment-resource">
+          <h3>Additional resources</h3>
+          <p>{{ assignment.additional_resources }}</p>
+        </div>
+      </el-card>
+
+      <div>
+        <h2>Submissions</h2>
+        <el-card class="card_item" v-for="submission in show_submissions" :key="submission">
+          <el-row>
+            <el-col :span="Number(6)">
+              Student:
+              <el-tag style="width: 120px; height: 40px; margin-left: 20px" effect="dark">
+                {{ submission.student_id }}
+              </el-tag>
+            </el-col>
+
+            <el-col :span="Number(6)">
+              Submission Time:
+              <el-tag style="width: 120px; height: 40px; margin-left: 20px">{{ submission.time }}</el-tag>
+            </el-col>
+
+            <el-col :span="Number(2)"></el-col>
+
+            <el-col :span="Number(3)">
+              <el-button type="primary" @click="show_submission_text(submission.text)">Submission Text</el-button>
+            </el-col>
+
+            <el-col :span="Number(4)">
+              <el-button type="primary" @click="show_submission_attachments(submission.attachments)">
+                Submission Attachments
+              </el-button>
+            </el-col>
+
+            <el-col :span="Number(3)">
+              <el-button type="success" @click="scoreVisible = true; rateSubmission = submission">
+                Rate Submission
+              </el-button>
+            </el-col>
+          </el-row>
+        </el-card>
+
+
+        <el-dialog v-model="textVisible" title="Submission Text">
+          <p>{{ show_text }}</p>
+        </el-dialog>
+
+        <el-dialog v-model="attachmentsVisible" title="Submission Attachments">
+          <div v-for="attachment in show_attachments" :key="attachment">
+            <el-row>
+              <el-col :span="Number(6)">
+                {{ attachment }}
+              </el-col>
+              <el-col :span="Number(10)"></el-col>
+              <el-col :span="Number(8)">
+                <el-button @click="showAttachmentContent(attachment)">在线预览</el-button>
+                <el-button @click="downloadAttachment(attachment)">下载</el-button>
+              </el-col>
+            </el-row>
+          </div>
+        </el-dialog>
+
+        <el-dialog v-model="scoreVisible" title="Rate Submission">
+          <h4>Please input the score of this submission: </h4>
+          <el-input-number v-model="submissionScore" :precision="1" :step="0.5" :max="100"/>
+          <template #footer>
+            <el-button type="danger" size="large" @click="cancelRate">Cancel</el-button>
+            <el-button type="primary" size="large" @click="confirmRate">Confirm</el-button>
+          </template>
+        </el-dialog>
+
+        <el-drawer v-model="attachmentContentVisible"
+                   direction="rtl"
+        >
+          <template #title>
+          </template>
+          <template #default>
+            <div>
+              <p>{{ attachmentContent }}</p>
+            </div>
+          </template>
+          <template #footer>
+            <div style="flex: auto">
+            </div>
+          </template>
+        </el-drawer>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -212,9 +212,14 @@ export default {
 </script>
 
 <style scoped>
-.detail_assignment{
-  width:80%;
-  margin:0 auto;
+
+.background{
+  background-color: rgb(243,244,246);
+}
+
+.detail_assignment {
+  width: 80%;
+  margin: 0 auto;
   background-color: #fff;
 }
 

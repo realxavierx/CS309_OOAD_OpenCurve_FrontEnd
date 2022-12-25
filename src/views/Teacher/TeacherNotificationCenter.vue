@@ -1,11 +1,9 @@
 <template>
-  <div>
-    <el-container>
-      <el-header>
-        <TeacherHeader></TeacherHeader>
-      </el-header>
-
+  <div class="background">
+    <h1 align="center">Notification Center</h1>
+    <div class="notification-center">
       <el-container>
+
         <el-aside width="200px">
           <el-button color="#626aef" plain style="width: 150px; height: 50px; margin-left: 12px; margin-top: 50px"
                      @click="show_notifications = notifications">
@@ -128,7 +126,7 @@
 
         </el-main>
       </el-container>
-    </el-container>
+    </div>
   </div>
 </template>
 
@@ -140,7 +138,6 @@ import moment from "moment";
 
 export default {
   name: "TeacherNotificationCenter",
-  components: {TeacherHeader},
 
   data() {
     let formRef = reactive(ref(null))
@@ -258,6 +255,15 @@ export default {
 </script>
 
 <style scoped>
+.background{
+  background-color: rgb(243,244,246);
+}
+
+.notification-center{
+  width:80%;
+  margin:0 auto;
+  background-color: #fff;
+}
 
 .info_card {
   padding: 5px;
@@ -265,9 +271,9 @@ export default {
 }
 
 .info_tag {
-  width: 150px;
+  width: 100px;
   height: 35px;
-  margin-right: 50px;
+  margin-right: 5px;
   font-weight: bold;
   font-size: large;
   font-style: oblique;
