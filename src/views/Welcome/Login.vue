@@ -4,8 +4,8 @@
       <div id="form">
         <h1>Login</h1>
         <el-radio-group v-model="loginWay" style="margin-bottom: 10px" size="Large">
-          <el-radio-button label="Password"/>
-          <el-radio-button label="Verification Code" @click="getVertiCode"/>
+          <el-radio-button label="Password" @click="vertiMode = false"/>
+          <el-radio-button label="Verification Code" @click="vertiMode = true"/>
         </el-radio-group>
 
         <div id="input-box" class="animate__animated animate__lightSpeedInRight">
@@ -15,7 +15,18 @@
           <div class="input-text">
             <input type="password" v-model="content" id="inputPassword" placeholder="Code / Password">
           </div>
-          <div style="margin: 15px">
+
+          <el-button
+              v-show="vertiMode"
+              type="primary"
+              style="margin-top: 10px"
+              size="small"
+              @click="getVertiCode"
+          >
+            获取验证码
+          </el-button>
+
+          <div style="margin: 10px">
             You are:
             <input type="radio" v-model="loginType" value="Student">Student
             <input type="radio" v-model="loginType" value="Teacher">Teacher
@@ -41,6 +52,7 @@ import router from "@/router";
 export default {
   data() {
     return {
+      vertiMode: false,
       userId: '',
       content: '',
       loginType: '',
@@ -52,6 +64,10 @@ export default {
 
     getVertiCode() {
       console.log("sending register information --- wait for response")
+
+      if (!this.userId.includes('@')) {
+        alert('Please input correct email address!')
+      }
 
       axios({
         method: 'POST',
@@ -76,13 +92,28 @@ export default {
     },
 
     login() {
+      if (this.loginWay === 'Password') {
+        this.loginWithPassword()
+      }
+      else if (this.loginWay === 'Verification Code') {
+        if (this.content === this.vertiCodeFromEnd) {
+          this.loginWithPassword()
+        }
+        else {
+          alert("Your verification code is wrong!")
+        }
+      }
+    },
+
+    loginWithPassword() {
       this.axios({
         method: 'GET',
         url: 'http://localhost:8080/education/login/user',
         data: {
           userid: this.userId,
           content: this.content,
-          loginType: this.loginWay
+          loginType: this.loginType,
+          loginWay: this.loginWay
         },
         transformRequest: [function (data) {
           var str = '';
@@ -112,8 +143,8 @@ export default {
       })
       // sessionStorage.removeItem('SESSION_KEY')
       // sessionStorage.getItem('SESSION_KEY')
+    },
 
-    }
   }
 }
 </script>
@@ -132,7 +163,7 @@ export default {
 #form {
   position: relative;
   width: 400px;
-  height: 350px;
+  height: 370px;
   top: 50%;
   left: 50%;
   margin-top: -250px;

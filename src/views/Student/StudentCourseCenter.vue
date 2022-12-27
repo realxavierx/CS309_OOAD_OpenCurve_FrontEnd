@@ -6,10 +6,14 @@
         <el-row>
           <el-col :span="Number(4)">
             <!-- 课程范围 -->
-            <el-radio-group v-model="courseRange" size="large">
-              <el-radio-button label="My Courses" @click="getStudentCourses"/>
-              <el-radio-button label="All Courses" @click="getAllCourses"/>
-            </el-radio-group>
+            <el-select
+              v-model="courseRange"
+              placeholder="CourseRange"
+              @change="handleSelectRange"
+              >
+              <el-option label="My Courses" value="My Courses"></el-option>
+              <el-option label="All Courses" value="All Courses"></el-option>
+            </el-select>
           </el-col>
 
 
@@ -33,6 +37,7 @@
           <el-col :span="Number(4)">
             <!-- 课程老师 自动补全-->
             <el-autocomplete
+                style="width: 100%;"
                 v-model="courseTeacher"
                 :fetch-suggestions="searchTeacher"
                 clearable
@@ -188,13 +193,7 @@ export default {
     },
 
     getAllCourses() {
-      if (this.duplicate === true) {
-        this.duplicate = false
-        return
-      }
-
       this.courses = []
-      this.duplicate = true
 
       axios({
         method: 'GET',
@@ -219,13 +218,7 @@ export default {
     },
 
     getStudentCourses() {
-      if (this.duplicate === true) {
-        this.duplicate = false
-        return
-      }
-
       this.courses = []
-      this.duplicate = true
 
       axios({
         method: 'GET',
@@ -247,6 +240,15 @@ export default {
           this.courses.push(course)
         })
       })
+    },
+
+    handleSelectRange() {
+      if (this.courseRange === 'My Courses') {
+        this.getStudentCourses()
+      }
+      else if (this.courseRange === 'All Courses') {
+        this.getAllCourses()
+      }
     },
 
     getAllTeachers() {

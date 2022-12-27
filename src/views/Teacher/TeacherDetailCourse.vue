@@ -1,127 +1,124 @@
 <template>
   <div class="detail_course">
-      <!-- 页面头部 -->
-        <el-container>
+    <!-- 页面头部 -->
 
-          <el-main>
-            <h3>video room</h3>
-            <div class="live-room">
-              <el-row :gutter="Number(30)">
-                <el-col :span="18" style="background-color: #fff8c3">
-                  <div class="video-title">
-                    {{ videoOptions.title }}
-                  </div>
-                  <div class="video-content">
-                    <vue3-video-play v-bind="videoOptions"></vue3-video-play>
-                  </div>
-                  <div class="student-functions">
-                    <el-button-group>
-                      <el-button type="primary" plain>举手</el-button>
-                      <el-button type="primary" plain>提问</el-button>
-                      <el-button type="primary" plain>录屏</el-button>
-                      <el-button type="primary" plain>弹幕</el-button>
-                    </el-button-group>
+    <h3>video room</h3>
+    <div class="live-room">
+      <el-row>
+        <el-col :span="18" style="background-color: #fff8c3">
+          <div class="video-title">
+            {{ videoOptions.title }}
+          </div>
+          <div class="video-content">
+            <vue3-video-play v-bind="videoOptions"></vue3-video-play>
+          </div>
+          <div class="student-functions">
+            <el-button-group>
+              <el-button type="primary" plain>举手</el-button>
+              <el-button type="primary" plain>提问</el-button>
+              <el-button type="primary" plain>录屏</el-button>
+              <el-button type="primary" plain>弹幕</el-button>
+            </el-button-group>
 
-                  </div>
-                </el-col>
+          </div>
+        </el-col>
 
-                <el-col :span="6" style="background-color: aliceblue">
-                  <div>
-                    <el-row>
-                      <h4>Playlist</h4>
-                      <el-button style="margin-left: 105px; margin-top: 15px" type="primary" @click="form_dialog_visible = true">
-                        添加章节
-                      </el-button>
-                    </el-row>
-                    <el-scrollbar style="height: 150px">
-                      <el-card class="card_item" v-for="index in this.session_cnt" :key="index"
-                               @click="getSessionInfo(index)">
-                        <span class="card_content">Chapter {{ index }}</span>
-                      </el-card>
-                    </el-scrollbar>
-                  </div>
+        <el-col :span="6" style="background-color: aliceblue">
+          <div>
+            <el-row>
+              <h4>Playlist</h4>
+              <el-button style="margin-left: 105px; margin-top: 15px" type="primary"
+                         @click="form_dialog_visible = true">
+                添加章节
+              </el-button>
+            </el-row>
+            <el-scrollbar style="height: 150px">
+              <el-card class="card_item" v-for="index in this.session_cnt" :key="index"
+                       @click="getSessionInfo(index)">
+                <span class="card_content">Chapter {{ index }}</span>
+              </el-card>
+            </el-scrollbar>
+          </div>
 
-                  <div>
-                    <el-descriptions title="Session Information" border :column="Number(1)">
-                      <el-descriptions-item label="Title">{{ session_info.title }}</el-descriptions-item>
-                      <br>
-                      <el-descriptions-item label="Session">{{ session_info.session }}</el-descriptions-item>
-                      <br>
-                      <el-descriptions-item label="Description">{{ session_info.description }}</el-descriptions-item>
-                    </el-descriptions>
-                  </div>
+          <div>
+            <el-descriptions title="Session Information" border :column="Number(1)">
+              <el-descriptions-item label="Title">{{ session_info.title }}</el-descriptions-item>
+              <br>
+              <el-descriptions-item label="Session">{{ session_info.session }}</el-descriptions-item>
+              <br>
+              <el-descriptions-item label="Description">{{ session_info.description }}</el-descriptions-item>
+            </el-descriptions>
+          </div>
 
-                  <div style="margin-top: 20px">
-                    <el-button style="margin-left: 10px; margin-right: 10px;"
-                               type="primary"
-                               @click="questionsVisible = true">
-                      查看题目
-                    </el-button>
-                    <el-button type="primary">布置题目</el-button>
-                  </div>
-                </el-col>
-              </el-row>
+          <div style="margin-top: 20px">
+            <el-button style="margin-left: 10px; margin-right: 10px;"
+                       type="primary"
+                       @click="questionsVisible = true">
+              查看题目
+            </el-button>
+            <el-button type="primary">布置题目</el-button>
+          </div>
+        </el-col>
+      </el-row>
 
-              <el-dialog v-model="form_dialog_visible" title="添加课程章节" @close="cancelAddChapter">
-                <el-form :model="form" ref="formRef">
-                  <el-form-item label="Title">
-                    <el-input v-model="form.title"/>
-                  </el-form-item>
+      <el-dialog v-model="form_dialog_visible" title="添加课程章节" @close="cancelAddChapter">
+        <el-form :model="form" ref="formRef">
+          <el-form-item label="Title">
+            <el-input v-model="form.title"/>
+          </el-form-item>
 
-                  <el-form-item label="Session">
-                    <el-input v-model="form.session"/>
-                  </el-form-item>
+          <el-form-item label="Session">
+            <el-input v-model="form.session"/>
+          </el-form-item>
 
-                  <el-form-item label="description">
-                    <el-input v-model="form.description"/>
-                  </el-form-item>
+          <el-form-item label="description">
+            <el-input v-model="form.description"/>
+          </el-form-item>
 
-                  <el-form-item label="Video">
-                    <el-upload
-                        :action="uploadActionUrl"
-                        :on-success="handleSuccess"
-                        accept="video/mp4,image/jpeg,image/gif,image/png"
-                        multiple
-                        :file-list="form.uploadVideo"
-                        :limit="1">
-                      <el-button size="small" type="primary">点击上传</el-button>
-                    </el-upload>
-                  </el-form-item>
-                </el-form>
+          <el-form-item label="Video">
+            <el-upload
+                :action="uploadActionUrl"
+                :on-success="handleSuccess"
+                accept="video/mp4,image/jpeg,image/gif,image/png"
+                multiple
+                :file-list="form.uploadVideo"
+                :limit="1">
+              <el-button size="small" type="primary">点击上传</el-button>
+            </el-upload>
+          </el-form-item>
+        </el-form>
 
-                <template #footer>
+        <template #footer>
                   <span class="dialog_footer">
                     <el-button type="primary" @click="confirmAddChapter()">Submit</el-button>
                     <el-button @click="cancelAddChapter()">Cancel</el-button>
                   </span>
-                </template>
-              </el-dialog>
+        </template>
+      </el-dialog>
 
-              <el-drawer v-model="questionsVisible"
-                         direction="rtl"
-                         :before-close="handleCloseQuestions"
-              >
-                <template #title>
-                  <h4>Questions</h4>
-                </template>
-                <template #default>
-                  <div>
-                    <div id="questionArea" v-for="question in questions" :key="question">
-                      <h3>{{question.title}}</h3>
-                    </div>
-                  </div>
-                </template>
-                <template #footer>
-                  <div style="flex: auto">
-                    <el-button @click="handleCloseQuestions">Cancel</el-button>
-                    <el-button type="primary" @click="confirmSave">Save</el-button>
-                  </div>
-                </template>
-              </el-drawer>
+      <el-drawer v-model="questionsVisible"
+                 direction="rtl"
+                 :before-close="handleCloseQuestions"
+      >
+        <template #title>
+          <h4>Questions</h4>
+        </template>
+        <template #default>
+          <div>
+            <div id="questionArea" v-for="question in questions" :key="question">
+              <h3>{{ question.title }}</h3>
             </div>
+          </div>
+        </template>
+        <template #footer>
+          <div style="flex: auto">
+            <el-button @click="handleCloseQuestions">Cancel</el-button>
+            <el-button type="primary" @click="confirmSave">Save</el-button>
+          </div>
+        </template>
+      </el-drawer>
+    </div>
 
-          </el-main>
-        </el-container>
   </div>
 </template>
 

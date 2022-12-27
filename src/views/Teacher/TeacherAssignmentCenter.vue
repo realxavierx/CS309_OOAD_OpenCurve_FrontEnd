@@ -4,6 +4,10 @@
     <div class="assignmentCenter_teacher">
       <el-container>
         <el-aside style="width: 200px">
+          <el-button color="#626aef" plain style="width: 150px; height: 50px; margin-left: 12px; margin-top: 50px"
+                     @click="show_assignments = assignments">
+            展示所有课程作业
+          </el-button>
           <el-menu @select="handleMenuSelect" mode="vertical" class="side_menu" :default-openeds="Array( '1')">
             <el-sub-menu index="1">
               <template #title>
@@ -116,13 +120,13 @@ export default {
         {
           id: 1,
           title: 'Assignment 1',
-          course_id: 'CS996',
+          course_id: 'CS102',
           due_date: '2022/12/12'
         },
         {
           id: 2,
           title: 'Assignment 1',
-          course_id: 'CS996',
+          course_id: 'CS201',
           due_date: '2022/12/12'
         },
         {
@@ -142,7 +146,7 @@ export default {
     getTeacherCourses() {
       axios({
         method: 'GET',
-        url: 'http://localhost:8080/education/course/getCourseOfTeacher?teacher_id=' + 'lsm@hhh.com',
+        url: 'http://localhost:8080/education/course/getCoursesOfTeacher?teacher_id=' + 'lsm@hhh.com',
         transformRequest: [function (data) {
           let str = '';
           for (let key in data) {
@@ -158,8 +162,8 @@ export default {
     },
 
     handleMenuSelect(key, keyPath) {
-      console.log(key, keyPath)
-      this.show_assignments = this.assignments.filter(n => n.course_id === key)
+      // console.log(key, keyPath)
+      this.show_assignments = this.assignments.filter(n => n.course_id === key.trim())
       this.assignments_empty = (this.show_assignments.length === 0)
     },
 

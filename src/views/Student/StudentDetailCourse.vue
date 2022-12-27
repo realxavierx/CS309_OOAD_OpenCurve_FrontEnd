@@ -35,7 +35,7 @@
               </el-scrollbar>
             </div>
 
-            <div>
+            <div class="session-info">
               <el-descriptions title="Session Information" border :column="Number(1)">
                 <el-descriptions-item label="Title">{{ session_info.title }}</el-descriptions-item>
                 <br>
@@ -43,6 +43,41 @@
                 <br>
                 <el-descriptions-item label="Description">{{ session_info.description }}</el-descriptions-item>
               </el-descriptions>
+            </div>
+
+            <div class="session-stats">
+              <el-row>
+                <el-col :span="Number(12)">
+                  <el-tag style="margin-top: 40px; width: 110px; height: 40px; font-size: 14px;"
+                          color="#FFFFFF"
+                  >
+                    观看进度
+                  </el-tag>
+                </el-col>
+                <el-col :span="Number(12)">
+                  <el-progress type="dashboard" :percentage="100">
+                    <template #default="{ percentage }">
+                      <span class="percentage-value">{{ percentage }}%</span>
+                      <span class="percentage-label">{{ progressStatus }}</span>
+                    </template>
+                  </el-progress>
+                </el-col>
+              </el-row>
+
+              <el-row>
+                <el-col :span="Number(12)">
+                  <el-tag style="width: 110px; height: 40px; font-size: 14px;"
+                          color="#FFFFFF"
+                  >
+                    章节分数
+                  </el-tag>
+                </el-col>
+
+                <el-col :span="Number(12)">
+                  <p>100/100</p>
+                </el-col>
+              </el-row>
+
             </div>
 
             <div>
@@ -175,6 +210,8 @@ export default {
       afkTimeInt: 90000,
       afkTimeString: '',
       afkDialogVisible: false,
+
+      progressStatus: 'processing'
     }
   },
 
@@ -340,7 +377,14 @@ export default {
       _this.resetAfkTimer()
       _this.lastStartTime = Math.floor(video.currentTime)
       _this.lastUpdateTime = 0
-      _this.videoWatchTime = new Array(Math.floor(video.duration)).fill(0)
+
+      video.addEventListener(
+          'loadedmetadata',
+          function () {
+            console.log(video.duration)
+            _this.videoWatchTime = new Array(Math.floor(video.duration)).fill(0)
+          }
+      )
 
       video.addEventListener(
           "timeupdate",
@@ -383,7 +427,11 @@ export default {
         // 监听  视频结束
         console.log(_this.videoWatchTime)
       })
-    }
+    },
+
+    updateVideoScore() {
+
+    },
   },
 
   mounted() {
@@ -417,5 +465,16 @@ export default {
 
 .card_content {
 
+}
+
+.percentage-value {
+  display: block;
+  margin-top: 10px;
+  font-size: 26px;
+}
+.percentage-label {
+  display: block;
+  margin-top: 10px;
+  font-size: 14px;
 }
 </style>
