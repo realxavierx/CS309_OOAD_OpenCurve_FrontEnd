@@ -71,6 +71,7 @@ export default {
         path: '/welcome/login',
       })
     },
+
     toUserCenter() {
       this.$router.push({
         path: '/userPage',

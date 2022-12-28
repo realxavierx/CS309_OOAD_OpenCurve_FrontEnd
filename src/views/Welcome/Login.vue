@@ -28,9 +28,11 @@
 
           <div style="margin: 10px">
             You are:
-            <input type="radio" v-model="loginType" value="Student">Student
-            <input type="radio" v-model="loginType" value="Teacher">Teacher
-            <input type="radio" v-model="loginType" value="Admin">Admin
+            <el-radio-group v-model="userType">
+              <el-radio label="Student">Student</el-radio>
+              <el-radio label="Teacher">Teacher</el-radio>
+              <el-radio label="Admin">Admin</el-radio>
+            </el-radio-group>
           </div>
           <el-button class="submitBtn" type="primary" @click="login">Login</el-button>
           <div class="sign-up" style="margin: 10px">
@@ -55,7 +57,7 @@ export default {
       vertiMode: false,
       userId: '',
       content: '',
-      loginType: '',
+      userType: '',
       holder: '',
       loginWay: 'Password'
     }
@@ -92,53 +94,37 @@ export default {
     },
 
     login() {
-      if (this.loginWay === 'Password') {
-        this.loginWithPassword()
+      if (this.loginWay === 'Verification Code' && this.content !== this.vertiCodeFromEnd) {
+        alert("Your verification code is wrong!")
       }
-      else if (this.loginWay === 'Verification Code') {
-        if (this.content === this.vertiCodeFromEnd) {
-          this.loginWithPassword()
-        }
-        else {
-          alert("Your verification code is wrong!")
-        }
+      else {
+        this.loginWithPassword()
       }
     },
 
     loginWithPassword() {
       this.axios({
         method: 'GET',
-        url: 'http://localhost:8080/education/login/user',
-        data: {
-          userid: this.userId,
-          content: this.content,
-          loginType: this.loginType,
-          loginWay: this.loginWay
-        },
-        transformRequest: [function (data) {
-          var str = '';
-          for (var key in data) {
-            str += encodeURIComponent(key) + '=' + encodeURIComponent(data[key]) + '&';
-          }
-          return str;
-        }]
+        url: 'http://localhost:8080/education/login/user?userId='
+            + this.userId + '&content=' + this.content + '&userType=' + this.userType + '&loginWay=' + this.loginWay
       }).then(res => {
-        console.log(res.data)
-        if (res.status === 200) {
+        if (res.data.code === 200) {
           //res中需要包含uid，头像url，以及会话密钥，来让浏览器知道用户已经处于登录状态
-          sessionStorage.setItem('SESSION_KEY', res.session_key)
-          sessionStorage.setItem('ID', res.user.id)
-          sessionStorage.setItem('LOGIN_TYPE', this.loginType)
-          sessionStorage.setItem('AVATAR', res.avatar)
+          // sessionStorage.setItem('SESSION_KEY', res.session_key)
+          localStorage.setItem('USER_ID', res.data.data.user.id)
+          localStorage.setItem('type', this.userType)
+          // sessionStorage.setItem('AVATAR', res.avatar)
           //路由跳转
-          if (this.loginType === 'Teacher') {
+          if (this.userType === 'Teacher') {
             router.push('/userPage/TeacherMain')
-          } else if (this.loginType === 'Admin') {
-            this.admin = true
+          } else if (this.userType === 'Admin') {
             router.push('/userPage/AdminMain')
           } else {
             router.push('/userPage/StudentMain')
           }
+        }
+        else if (res.data.code === 2001) {
+          alert(res.data.message)
         }
       })
       // sessionStorage.removeItem('SESSION_KEY')

@@ -55,7 +55,7 @@
                   </el-tag>
                 </el-col>
                 <el-col :span="Number(12)">
-                  <el-progress type="dashboard" :percentage="100">
+                  <el-progress type="dashboard" :percentage="watchPercentage">
                     <template #default="{ percentage }">
                       <span class="percentage-value">{{ percentage }}%</span>
                       <span class="percentage-label">{{ progressStatus }}</span>
@@ -74,7 +74,7 @@
                 </el-col>
 
                 <el-col :span="Number(12)">
-                  <p>100/100</p>
+                  <p>{{ this.videoScore + this.testScore}} / {{this.session_info.score}}</p>
                 </el-col>
               </el-row>
 
@@ -145,12 +145,17 @@ export default {
       title: '',
       session: '',
       description: '',
-      url: ''
+      url: '',
+      score: ''
     })
 
     return {
       session_cnt: 0,
       session_info,
+      currentSession: 1,
+      watchPercentage: 0,
+      videoScore: 0,
+      testScore: 0,
       uploadActionUrl: 'http://localhost:8081/cloud_storage/file/uploading',
       form_dialog_visible: false,
       videoUrl: '',
@@ -227,6 +232,7 @@ export default {
     },
 
     getSessionInfo(session) {
+      this.currentSession = session
       axios({
         method: 'GET',
         url: 'http://localhost:8080/education/video/getSessionInfo?course_id=' + this.$route.params.course_id + '&session=' + session,
@@ -236,6 +242,7 @@ export default {
         this.session_info.session = resp.session
         this.session_info.description = resp.description
         this.session_info.url = resp.url
+        this.session_info.score = resp.score
         this.videoOptions.src = resp.url
         setTimeout(this.monitorVideoStatus, 100)
       })
@@ -268,6 +275,8 @@ export default {
     },
 
     handleBeginQuestions() {
+      let video = document.getElementById("videoPlayer")
+      video.pause()
       ElMessageBox.confirm('Do you want to start the test right now?')
           .then((value) => {
             console.log(value)
@@ -300,6 +309,7 @@ export default {
           .then((value) => {
             console.log(value)
             if (value === 'confirm') {
+              this.updateTestScore()
               this.questionsVisible = false
               this.resetQuestionTimer()
             }
@@ -367,6 +377,7 @@ export default {
       this.afkDialogVisible = false
       this.resetAfkTimer()
       let video = document.getElementById('videoPlayer')
+      this.updateVideoScore()
       video.play()
     },
 
@@ -381,7 +392,6 @@ export default {
       video.addEventListener(
           'loadedmetadata',
           function () {
-            console.log(video.duration)
             _this.videoWatchTime = new Array(Math.floor(video.duration)).fill(0)
           }
       )
@@ -427,19 +437,93 @@ export default {
         // 监听  视频结束
         console.log(_this.videoWatchTime)
       })
+
+      this.getVideoScore()
+    },
+
+    getVideoScore() {
+      axios({
+        method: 'GET',
+        url: 'http://localhost:8080/education/video/getScore?course_id='
+            + this.$route.params.course_id.trim() + '&session=' + this.currentSession + '&user=' + 'lsm@hhh.com'
+      }).then(response => {
+        console.log(response.data.data)
+        this.videoScore = response.data.data.video_score
+        this.testScore = response.data.data.test_score
+        this.watchPercentage = (this.videoScore / (this.session_info.score - this.questions.length)).toFixed(2) * 100
+      })
     },
 
     updateVideoScore() {
+      let curVideoScore = 0
 
+      for (let i = 0; i < this.videoWatchTime.length; i++) {
+        curVideoScore += this.videoWatchTime[i]
+      }
+
+      if (curVideoScore >= this.videoWatchTime.length * 0.85) {
+        curVideoScore = this.session_info.score - this.questions.length
+      }
+
+      this.videoScore = curVideoScore
+
+      axios({
+        method: 'POST',
+        url: 'http://localhost:8080/education/video/updateVideoScore',
+        data: {
+          course_id: this.$route.params.course_id,
+          session: this.currentSession,
+          score: curVideoScore,
+          user: 'lsm@hhh.com'
+        },
+        transformRequest: [function (data) {
+          let str = '';
+          for (let key in data) {
+            str += encodeURIComponent(key) + '=' + encodeURIComponent(data[key]) + '&';
+          }
+          return str;
+        }]
+      })
+          .then(response => {
+            console.log(response.data.message)
+          })
     },
+
+    updateTestScore() {
+      let testScore = this.testScore
+
+      axios({
+        method: 'POST',
+        url: 'http://localhost:8080/education/video/updateTestScore',
+        data: {
+          course_id: this.$route.params.course_id,
+          session: this.currentSession,
+          score: testScore,
+          user: 'lsm@hhh.com'
+        },
+        transformRequest: [function (data) {
+          let str = '';
+          for (let key in data) {
+            str += encodeURIComponent(key) + '=' + encodeURIComponent(data[key]) + '&';
+          }
+          return str;
+        }]
+      })
+          .then(response => {
+            console.log(response.data.message)
+          })
+    }
   },
 
   mounted() {
     this.checkCheating()
     this.getSessionsCount()
+    this.getSessionInfo(1)
+    this.getVideoScore()
   },
 
   unmounted() {
+    this.updateVideoScore()
     if (this.afkTimer !== null) {
       clearInterval(this.afkTimer)
     }
