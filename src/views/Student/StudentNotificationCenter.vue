@@ -98,6 +98,7 @@ export default {
   data() {
 
     return {
+      user_id: '',
       courses: [],
       notifications: [],
       show_notifications: [],
@@ -112,7 +113,7 @@ export default {
     getNotificationByStudent() {
       axios({
         method: 'GET',
-        url: 'http://localhost:8080/education/notification/getNotificationByStudent?student_id=' + 'lsm@hhh.com',
+        url: 'http://localhost:8080/education/notification/getNotificationByStudent?student_id=' + this.user_id,
         transformRequest: [function (data) {
           let str = '';
           for (let key in data) {
@@ -144,6 +145,7 @@ export default {
   },
 
   mounted() {
+    this.user_id = localStorage.getItem('USER_ID')
     this.getNotificationByStudent();
   }
 }

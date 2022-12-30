@@ -154,6 +154,7 @@ export default {
   data() {
 
     return {
+      user_id: '',
       courses: [],
       courseRange: 'My Courses',
       duplicate: false,
@@ -222,7 +223,7 @@ export default {
 
       axios({
         method: 'GET',
-        url: 'http://localhost:8080/education/course/getCoursesOfStudent?student_id=' + 'lsm@hhh.com',
+        url: 'http://localhost:8080/education/course/getCoursesOfStudent?student_id=' + this.user_id,
       }).then(response => {
         console.log(response.data.message)
         let response_data = response.data.data.courses
@@ -339,7 +340,7 @@ export default {
       axios({
         method: 'GET',
         url: 'http://localhost:8080/education/course/getCoursesWithConstraints?course_range='
-            + this.courseRange.split(' ')[0] + '&student_id=' + 'lsm@hhh.com' + '&department='
+            + this.courseRange.split(' ')[0] + '&student_id=' + this.user_id + '&department='
             + this.courseDepartment + '&teacher=' + this.courseTeacher.split('-')[0] + '&course_type='
             + this.courseType + '&course_status=' + this.courseStatus + '&course_fee=' + this.courseFee,
       }).then(response => {
@@ -363,10 +364,10 @@ export default {
   },
 
   mounted() {
+    this.user_id = localStorage.getItem('USER_ID')
     this.getStudentCourses()
     this.getAllTeachers()
     this.getAllDepartments()
-    this.duplicate = false
   }
 }
 </script>

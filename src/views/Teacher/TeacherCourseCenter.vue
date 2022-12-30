@@ -4,19 +4,19 @@
     <div class="course-center">
 
       <div class="Courses">
-        <div v-for="course in courses" :key="course.courseID" style="margin: 20px">
+        <div v-for="course in courses" :key="course.id" style="margin: 20px">
           <el-descriptions title="Course Information" border>
             <template #extra>
-              <el-button type="primary" @click="jumpToCourseDetail(course.courseID)">课程详情</el-button>
+              <el-button type="primary" @click="jumpToCourseDetail(course.id)">课程详情</el-button>
             </template>
-            <el-descriptions-item label="ID">{{ course.courseID }}</el-descriptions-item>
-            <el-descriptions-item label="Name">{{ course.courseName }}</el-descriptions-item>
-            <el-descriptions-item label="Department">{{ course.courseDepartment }}</el-descriptions-item>
-            <el-descriptions-item label="Type">{{ course.courseType }}</el-descriptions-item>
-            <el-descriptions-item label="Credit">{{ course.courseCredit }}</el-descriptions-item>
-            <el-descriptions-item label="Status"> {{ course.courseStatus }}</el-descriptions-item>
-            <el-descriptions-item label="Fee"> {{ course.courseFee }}</el-descriptions-item>
-            <el-descriptions-item label="Description">{{ course.courseDescription }}</el-descriptions-item>
+            <el-descriptions-item label="ID">{{ course.id }}</el-descriptions-item>
+            <el-descriptions-item label="Name">{{ course.name }}</el-descriptions-item>
+            <el-descriptions-item label="Department">{{ course.department }}</el-descriptions-item>
+            <el-descriptions-item label="Type">{{ course.course_type }}</el-descriptions-item>
+            <el-descriptions-item label="Credit">{{ course.credit }}</el-descriptions-item>
+            <el-descriptions-item label="Status"> {{ course.status }}</el-descriptions-item>
+            <el-descriptions-item label="Fee"> {{ course.fee }}</el-descriptions-item>
+            <el-descriptions-item label="Description">{{ course.info }}</el-descriptions-item>
           </el-descriptions>
         </div>
       </div>
@@ -85,7 +85,6 @@ import axios from "axios";
 
 export default {
   name: "TeacherCourseCenter",
-  components: {TeacherHeader},
 
   data() {
     let formRef = reactive(ref(null))
@@ -105,6 +104,7 @@ export default {
       formRef,
       form,
       form_dialog_visible: false,
+      user_id: '',
       courses: []
     }
   },
@@ -128,7 +128,7 @@ export default {
         data: {
           course_id: this.form.courseID,
           course_name: this.form.courseName,
-          course_teacher: '1',
+          course_teacher: this.user_id,
           course_department: this.form.courseDepartment,
           course_credit: this.form.courseCredit,
           course_type: this.form.courseType,
@@ -167,28 +167,18 @@ export default {
     getTeacherCourses() {
       axios({
         method: 'GET',
-        url: 'http://localhost:8080/education/course/getCoursesOfTeacher?teacher_id=' + '1',
-      }).then(response => {
-        console.log(response.data.message)
-        let response_data = response.data.data.courses
-        response_data.forEach((data) => {
-          let course = {
-            courseID: data.id,
-            courseName: data.name,
-            courseDepartment: data.department,
-            courseType: data.course_type,
-            courseCredit: data.credit,
-            courseStatus: data.status,
-            courseFee: data.fee,
-            courseDescription: data.info
-          }
-          this.courses.push(course)
-        })
+        url: 'http://localhost:8080/education/course/getCoursesOfTeacher?teacher_id=' + this.user_id,
+      }).then(resp => {
+        console.log(resp.data.message)
+        let response = resp.data.data
+        console.log(response)
+        this.courses = response.courses
       })
     },
   },
 
-  created() {
+  mounted() {
+    this.user_id = localStorage.getItem('USER_ID')
     this.getTeacherCourses()
   }
 }

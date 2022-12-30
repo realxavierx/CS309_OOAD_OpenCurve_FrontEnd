@@ -26,7 +26,7 @@
             <el-divider></el-divider>
           </div>
           <div>
-            <el-table :data="show_assignments" table-layout="fixed" stripe style="width: 100%">
+            <el-table v-if="show_assignments.length !== 0" :data="show_assignments" table-layout="fixed" stripe style="width: 100%">
               <el-table-column prop="title" label="Title"/>
               <el-table-column prop="course_id" label="Course"/>
               <el-table-column prop="due_date" label="Due Date"/>
@@ -37,7 +37,7 @@
               </el-table-column>
             </el-table>
 
-            <el-empty v-show="assignments_empty" description="No assignment"></el-empty>
+            <el-empty v-show="show_assignments.length === 0" description="No assignment"></el-empty>
           </div>
         </el-main>
       </el-container>
@@ -48,7 +48,6 @@
 <script>
 import "github-markdown-css"
 // import {ref} from "vue";
-import {marked} from "marked"
 import 'mavon-editor/dist/css/index.css'
 import router from "@/router";
 import axios from "axios";
@@ -58,65 +57,36 @@ export default {
 
   data() {
     return {
+      user_id: '',
       courses: [],
-      assignments: [
-        {
-          id: 1,
-          title: 'Assignment 1',
-          course_id: 'CS102',
-          due_date: '2022/12/12'
-        },
-        {
-          id: 2,
-          title: 'Assignment 1',
-          course_id: 'CS201',
-          due_date: '2022/12/12'
-        },
-        {
-          id: 3,
-          title: 'Assignment 1',
-          course_id: 'CS996',
-          due_date: '2022/12/12'
-        }
-      ],
+      assignments: [],
       show_assignments: [],
-      assignments_empty: false
     }
   },
 
   methods: {
-    getStudentCourses() {
+
+    getStudentAssignments() {
       axios({
         method: 'GET',
-        url: 'http://localhost:8080/education/course/getCoursesOfStudent?student_id=' + 'lsm@hhh.com',
-        transformRequest: [function (data) {
-          let str = '';
-          for (let key in data) {
-            str += encodeURIComponent(key) + '=' + encodeURIComponent(data[key]) + '&';
-          }
-          return str;
-        }]
+        url: 'http://localhost:8080/education/assignment/getStudentAssignments?student_id=' + this.user_id,
       })
           .then(resp => {
             let response = resp.data.data
             this.courses = response.courses
-            console.log(this.courses)
+            this.assignments = response.assignments
+            this.show_assignments = this.assignments
           })
     },
 
     handleMenuSelect(key, keyPath) {
       // console.log(key, keyPath)
-      this.show_assignments = this.assignments.filter(n => n.course_id === key.trim())
-      this.assignments_empty = (this.show_assignments.length === 0)
-    },
-
-    async md2html(mdStr) {
-      return marked.parse(mdStr);
+      this.show_assignments = this.assignments.filter(n => n.course_id === key)
     },
 
     jumpToDetailAssignment(index) {
-      let id = this.assignments.at(index).id
-      console.log(id)
+      let id = this.show_assignments.at(index).id
+
       router.push({
         name: "StudentDetailAssignment",
         params: {
@@ -127,8 +97,8 @@ export default {
   },
 
   mounted() {
-    this.getStudentCourses()
-    this.show_assignments = this.assignments
+    this.user_id = localStorage.getItem('USER_ID')
+    this.getStudentAssignments()
   }
 }
 

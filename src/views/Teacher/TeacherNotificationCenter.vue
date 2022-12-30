@@ -57,7 +57,7 @@
           <el-dialog v-model="form_dialog_visible" title="添加通知" @close="cancelAddNotification">
             <el-form :model="form" ref="formRef">
               <el-form-item label="Course">
-                <el-input v-model="form.course"/>
+                <el-input v-model="form.course_id"/>
               </el-form-item>
 
               <el-form-item label="Title">
@@ -65,11 +65,20 @@
               </el-form-item>
 
               <el-form-item label="Sender">
-                <el-input v-model="form.sender"/>
+                <el-input disabled v-model="form.sender"/>
               </el-form-item>
 
               <el-form-item label="Message">
-                <el-input v-model="form.message"/>
+                <el-input v-model="form.content"
+                          :autosize="{ minRows: 2, maxRows: 4 }"
+                          type="textarea"/>
+              </el-form-item>
+
+              <el-form-item label="Send Mail">
+                <el-radio-group v-model="form.sendMail">
+                  <el-radio :label="true">Yes</el-radio>
+                  <el-radio :label="false">No</el-radio>
+                </el-radio-group>
               </el-form-item>
             </el-form>
 
@@ -85,8 +94,19 @@
             <el-card shadow="always">
 
               <el-card class="info_card" body-style="padding: 2px" shadow="hover">
-                <el-tag class="info_tag">Title</el-tag>
-                {{ notification.title }}
+                <el-row>
+                  <el-col :span="Number(18)">
+                    <el-tag class="info_tag">Title</el-tag>
+                    {{ notification.title }}
+                  </el-col>
+                  <el-col v-if="!notification.course_id.includes('000 ')" :span="Number(6)">
+                    <el-button type="primary"
+                               @click="sendMailToStudents(notification.course_id, notification.title, notification.content)">
+                      Send Mail
+                    </el-button>
+                  </el-col>
+                </el-row>
+
               </el-card>
 
               <el-card class="info_card" body-style="padding: 2px" shadow="hover">
@@ -101,7 +121,7 @@
                   </el-col>
                   <el-col :span="Number(8)">
                     <el-tag class="info_tag">Time</el-tag>
-                    {{ notification.modified_time }}
+                    {{ notification.modified_date }}
                   </el-col>
                 </el-row>
               </el-card>
@@ -117,12 +137,9 @@
                   </el-collapse-item>
                 </el-collapse>
               </el-card>
-
             </el-card>
-
-
           </div>
-          <el-empty v-show="notifications_empty" description="No notification"></el-empty>
+          <el-empty v-show="this.show_notifications.length === 0" description="No notification"></el-empty>
 
         </el-main>
       </el-container>
@@ -131,10 +148,9 @@
 </template>
 
 <script>
-import TeacherHeader from "@/components/TeacherHeader";
 import {reactive, ref} from "vue";
 import axios from "axios";
-import moment from "moment";
+import dayjs from "dayjs";
 
 export default {
   name: "TeacherNotificationCenter",
@@ -142,13 +158,15 @@ export default {
   data() {
     let formRef = reactive(ref(null))
     let form = reactive({
-      course: '',
+      course_id: '',
       title: '',
       sender: '',
-      message: ''
+      content: '',
+      sendMail: true
     })
 
     return {
+      user_id: '',
       form,
       formRef,
       form_dialog_visible: false,
@@ -163,25 +181,25 @@ export default {
   methods: {
 
     cancelAddNotification() {
-      this.form.course = ''
+      this.form.course_id = ''
       this.form.title = ''
-      this.form.sender = ''
-      this.form.message = ''
+      this.form.sender = this.user_id
+      this.form.content = ''
+      this.form.sendMail = true
       this.$refs.formRef.resetFields()
       this.form_dialog_visible = false
     },
 
     confirmAddNotification() {
-      let modified_time = moment().format('L').toString()
-      console.log(modified_time)
       axios({
         method: 'POST',
         url: 'http://localhost:8080/education/notification/addNotification',
         data: {
-          course: this.form.course,
+          course_id: this.form.course_id,
           title: this.form.title,
-          sender: this.form.sender,
-          message: this.form.message
+          teacher_id: this.form.sender,
+          content: this.form.content,
+          modified_date: dayjs().format('YYYY/MM/DD')
         },
         transformRequest: [function (data) {
           let str = '';
@@ -192,15 +210,23 @@ export default {
         }]
       })
           .then(response => {
-            console.log(response.data)
+            console.log(response)
+            if (this.form.sendMail) {
+              this.sendMailToStudents(this.form.course_id, this.form.title, this.form.content)
+            }
             this.cancelAddNotification()
           })
     },
 
-    getTeacherNotification() {
+    sendMailToStudents(course_id, title, content) {
       axios({
-        method: 'GET',
-        url: 'http://localhost:8080/education/notification/getNotificationByTeacher?teacher_id=' + '1',
+        method: 'POST',
+        url: 'http://localhost:8080/education/notification/sendMailToStudents',
+        data: {
+          course_id: course_id,
+          title: title,
+          content: content
+        },
         transformRequest: [function (data) {
           let str = '';
           for (let key in data) {
@@ -209,13 +235,22 @@ export default {
           return str;
         }]
       })
+          .then(response => {
+            console.log(response)
+          })
+    },
+
+    getTeacherNotification() {
+      axios({
+        method: 'GET',
+        url: 'http://localhost:8080/education/notification/getNotificationByTeacher?teacher_id=' + this.user_id,
+      })
           .then(resp => {
             let response = resp.data.data
             this.courses = response.courses
             this.notifications = response.notifications
             this.teacherDepartment = response.teacherDepartment
             this.show_notifications = this.notifications
-            this.notifications_empty = (this.show_notifications.length === 0)
           })
     },
 
@@ -230,25 +265,11 @@ export default {
       this.notifications_empty = (this.show_notifications.length === 0)
     },
 
-    // handleMenuClose(key, keyPath) {
-    //   console.log(key, keyPath)
-    //   if (key === 'Department') {
-    //     this.show_notifications = this.show_notifications.filter(n => n.course_id.trim() !== (this.teacherDepartment + '000'))
-    //   }
-    //   else if (key === 'Course') {
-    //     for (let course of this.courses) {
-    //       this.show_notifications = this.show_notifications.filter(n => n.course_id !== course.id)
-    //     }
-    //   }
-    //
-    //   this.notifications_empty = (this.show_notifications.length === 0)
-    //
-    // }
   },
 
   mounted() {
-    let modified_time = moment().format('L').toString()
-    console.log(modified_time)
+    this.user_id = localStorage.getItem('USER_ID')
+    this.form.sender = this.user_id
     this.getTeacherNotification()
   }
 }

@@ -28,7 +28,11 @@
 
         <div class="assignment-resource">
           <h3>Additional resources</h3>
-          <p>{{ assignment.additional_resources }}</p>
+          <el-row v-for="resource in assignment.attachment" :key="resource">
+            <el-link :href="resource" target="_blank" type="primary">
+              {{ resource.slice(resource.lastIndexOf('/') + 1) }}
+            </el-link>
+          </el-row>
         </div>
       </el-card>
 
@@ -36,56 +40,47 @@
         <h2>Submissions</h2>
         <el-card class="card_item" v-for="submission in show_submissions" :key="submission">
           <el-row>
-            <el-col :span="Number(6)">
+            <el-col :span="Number(8)">
               Student:
-              <el-tag style="width: 120px; height: 40px; margin-left: 20px" effect="dark">
+              <el-tag style="width: 240px; height: 40px; margin-left: 20px" effect="dark">
                 {{ submission.student_id }}
               </el-tag>
             </el-col>
 
             <el-col :span="Number(6)">
               Submission Time:
-              <el-tag style="width: 120px; height: 40px; margin-left: 20px">{{ submission.time }}</el-tag>
+              <el-tag style="width: 100px; height: 40px; margin-left: 20px">{{ submission.submission_date }}</el-tag>
             </el-col>
 
-            <el-col :span="Number(2)"></el-col>
-
             <el-col :span="Number(3)">
-              <el-button type="primary" @click="show_submission_text(submission.text)">Submission Text</el-button>
+              <el-button type="primary" @click="show_submission_text(submission)">Submission Text</el-button>
             </el-col>
 
             <el-col :span="Number(4)">
-              <el-button type="primary" @click="show_submission_attachments(submission.attachments)">
-                Submission Attachments
-              </el-button>
+
+              <el-popover placement="top" :width="200" trigger="click">
+                <template #reference>
+                  <el-button type="primary" style="margin-right: 16px">Submission Attachments</el-button>
+                </template>
+                <el-row v-for="file in submission.content_url" :key="file">
+                  <el-link style="margin: 0 auto" :href="file" target="_blank" type="primary">
+                    {{ file.slice(file.lastIndexOf('/') + 1) }}
+                  </el-link>
+                </el-row>
+              </el-popover>
             </el-col>
 
             <el-col :span="Number(3)">
-              <el-button type="success" @click="scoreVisible = true; rateSubmission = submission">
+              <el-button type="success"
+                         @click="ratingSubmission(submission)">
                 Rate Submission
               </el-button>
             </el-col>
           </el-row>
         </el-card>
 
-
         <el-dialog v-model="textVisible" title="Submission Text">
-          <p>{{ show_text }}</p>
-        </el-dialog>
-
-        <el-dialog v-model="attachmentsVisible" title="Submission Attachments">
-          <div v-for="attachment in show_attachments" :key="attachment">
-            <el-row>
-              <el-col :span="Number(6)">
-                {{ attachment }}
-              </el-col>
-              <el-col :span="Number(10)"></el-col>
-              <el-col :span="Number(8)">
-                <el-button @click="showAttachmentContent(attachment)">在线预览</el-button>
-                <el-button @click="downloadAttachment(attachment)">下载</el-button>
-              </el-col>
-            </el-row>
-          </div>
+          <p>{{ submission_text }}</p>
         </el-dialog>
 
         <el-dialog v-model="scoreVisible" title="Rate Submission">
@@ -97,21 +92,6 @@
           </template>
         </el-dialog>
 
-        <el-drawer v-model="attachmentContentVisible"
-                   direction="rtl"
-        >
-          <template #title>
-          </template>
-          <template #default>
-            <div>
-              <p>{{ attachmentContent }}</p>
-            </div>
-          </template>
-          <template #footer>
-            <div style="flex: auto">
-            </div>
-          </template>
-        </el-drawer>
       </div>
     </div>
   </div>
@@ -119,68 +99,78 @@
 
 <script>
 
+import axios from "axios";
+import {
+  // Check,
+  // Delete,
+  // Edit,
+  // Message,
+  Search,
+  // Star,
+} from '@element-plus/icons-vue'
+
 export default {
   name: "TeacherDetailAssignment",
 
   data() {
     return {
+      assignment_id: '',
       textVisible: false,
       attachmentsVisible: false,
-      assignment: {
-        assignment_id: '',
-        title: 'Homework',
-        course_id: 'CS996',
-        teacher_id: '1',
-        due_date: '2022.12.31',
-        resubmission_allowed: '10',
-        accept_resubmission_until: '2023.1.1',
-        requirements: 'Hello world! ' +
-            'It\'s nice to meet you',
-        additional_resources: 'File 1',
-      },
-      submissions: [
-        {
-          student_id: 'lsm@hhh.com',
-          time: '2022/12/10',
-          text: 'hello world',
-          attachments: [
-            'File A',
-            'File B'
-          ],
-          score: 'NaN'
-        },
-        {
-          student_id: 'lsm@hhh.com',
-          time: '2022/12/12',
-          text: 'hello world',
-          attachments: [
-            'File A',
-            'File B'
-          ],
-          score: 'NaN'
-        },
-      ],
+      assignment: '',
+      submissions: [],
       show_submissions: [],
-      show_text: '',
+      submission_text: '',
       show_attachments: [],
       attachmentContentVisible: false,
       attachmentContent: '',
       scoreVisible: false,
       rateSubmission: '',
       submissionScore: 0,
+      iconSearch: Search,
     }
   },
 
   methods: {
 
-    show_submission_text(text) {
-      this.textVisible = true
-      this.show_text = text
+    getAssignment() {
+      axios({
+        method: 'GET',
+        url: 'http://localhost:8080/education/assignment/getAssignmentById?assignment_id=' + this.assignment_id,
+      })
+          .then(resp => {
+            let response = resp.data.data
+            this.assignment = response.assignment
+            this.assignment.attachment = this.assignment.attachment.split(',')
+          })
     },
 
-    show_submission_attachments(attachments) {
-      this.attachmentsVisible = true
-      this.show_attachments = attachments
+    getSubmissions() {
+      axios({
+        method: 'GET',
+        url: 'http://localhost:8080/education/assignment/getSubmissionsOfAssignment?assignment_id=' + this.assignment_id,
+      })
+          .then(resp => {
+            let response = resp.data.data
+            this.submissions = response.submissions
+            for (let submission of this.submissions) {
+              submission.content_url = submission.content_url.split(',')
+            }
+            this.show_submissions = this.submissions
+          })
+    },
+
+    show_submission_text(submission) {
+      this.textVisible = true
+      this.submission_text = submission.text
+    },
+
+    ratingSubmission(submission) {
+      this.scoreVisible = true
+      this.rateSubmission = submission
+      if (submission.score !== null) {
+        this.submissionScore = submission.score
+      }
     },
 
     cancelRate() {
@@ -189,32 +179,46 @@ export default {
     },
 
     confirmRate() {
-      this.rateSubmission.score = this.submissionScore
-      this.submissionScore = 0
-      this.scoreVisible = false
+      axios({
+        method: 'POST',
+        url: 'http://localhost:8080/education/assignment/gradeSubmission',
+        data: {
+          assignment_id: this.assignment_id,
+          student_id: this.rateSubmission.student_id,
+          score: this.submissionScore
+        },
+        transformRequest: [function (data) {
+          let str = '';
+          for (let key in data) {
+            str += encodeURIComponent(key) + '=' + encodeURIComponent(data[key]) + '&';
+          }
+          return str;
+        }]
+      })
+          .then(response => {
+            console.log(response.data)
+            this.rateSubmission.score = this.submissionScore
+            this.cancelRate()
+          })
     },
 
-    showAttachmentContent(attachment) {
-      this.attachmentContent = attachment
-      this.attachmentContentVisible = true
-    },
-
-    downloadAttachment(attachment) {
-      console.log(attachment)
-    }
-  },
+  }
+  ,
 
   mounted() {
-    this.show_submissions = this.submissions
-  },
+    this.assignment_id = this.$route.params.assignment_id
+    this.getAssignment()
+    this.getSubmissions()
+  }
+  ,
 
 }
 </script>
 
 <style scoped>
 
-.background{
-  background-color: rgb(243,244,246);
+.background {
+  background-color: rgb(243, 244, 246);
 }
 
 .detail_assignment {

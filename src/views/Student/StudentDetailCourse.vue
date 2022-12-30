@@ -74,7 +74,7 @@
                 </el-col>
 
                 <el-col :span="Number(12)">
-                  <p>{{ this.videoScore + this.testScore}} / {{this.session_info.score}}</p>
+                  <p>{{ this.videoScore + this.testScore }} / {{ this.session_info.score }}</p>
                 </el-col>
               </el-row>
 
@@ -100,8 +100,14 @@
         </template>
         <template #default>
           <div>
+            <p>Your Highest Score: {{ this.testScore }}</p>
             <p>{{ this.questionTimeString }}</p>
-            Hello there
+            <div class="question-area" v-for="question in questions" :key="question">
+              <h3>{{ question.title }}</h3>
+              <el-radio-group v-model="question.answer">
+                <el-radio v-for="choice in question.choices" :key="choice" :label="choice">{{ choice }}</el-radio>
+              </el-radio-group>
+            </div>
           </div>
         </template>
         <template #footer>
@@ -131,9 +137,8 @@
 <script>
 import {reactive, ref} from "vue";
 import axios from "axios";
-import {ElAlert, ElMessage, ElMessageBox} from "element-plus";
+import {ElMessage, ElMessageBox} from "element-plus";
 import router from "@/router";
-import dayjs from "dayjs";
 // import {useRoute} from 'vue-router'
 // const route = useRoute()
 
@@ -150,6 +155,8 @@ export default {
     })
 
     return {
+      course_id: '',
+      user_id: '',
       session_cnt: 0,
       session_info,
       currentSession: 1,
@@ -190,24 +197,7 @@ export default {
         ], //显示所有按钮,
       }),
       questionsVisible: false,
-      questions: [
-        {
-          course_id: 'CS996',
-          session_id: '1',
-          questionType: 'T/F',
-          title: 'Are you still alive?',
-          choices: ['True', 'False', 'Not Given'],
-          correctAnswer: ''
-        },
-        {
-          course_id: 'CS996',
-          session_id: '1',
-          questionType: 'Choice',
-          title: 'Which grade are you in?',
-          choices: ['1', '2', '3', '4'],
-          correctAnswer: ''
-        }
-      ],
+      questions: [],
       questionTimer: '',
       questionTimeInt: 3600000,
       questionTimeString: '',
@@ -225,17 +215,16 @@ export default {
     getSessionsCount() {
       axios({
         method: 'GET',
-        url: 'http://localhost:8080/education/video/getSessionsCount?course_id=' + this.$route.params.course_id,
+        url: 'http://localhost:8080/education/video/getSessionsCount?course_id=' + this.course_id,
       }).then(response => {
         this.session_cnt = response.data.data.session_count
       })
     },
 
     getSessionInfo(session) {
-      this.currentSession = session
       axios({
         method: 'GET',
-        url: 'http://localhost:8080/education/video/getSessionInfo?course_id=' + this.$route.params.course_id + '&session=' + session,
+        url: 'http://localhost:8080/education/video/getSessionInfo?course_id=' + this.course_id + '&session=' + session,
       }).then(response => {
         let resp = response.data.data.video
         this.session_info.title = resp.title
@@ -243,8 +232,10 @@ export default {
         this.session_info.description = resp.description
         this.session_info.url = resp.url
         this.session_info.score = resp.score
+        this.currentSession = resp.session
         this.videoOptions.src = resp.url
-        setTimeout(this.monitorVideoStatus, 100)
+        this.getTestBySession()
+        setTimeout(this.monitorVideoStatus, 10)
       })
     },
 
@@ -410,7 +401,6 @@ export default {
               _this.lastStartTime = currentTime
             }
 
-            console.log(_this.lastStartTime)
             _this.lastUpdateTime = currentTime
             duration = currentTime - _this.lastStartTime;
 
@@ -445,9 +435,8 @@ export default {
       axios({
         method: 'GET',
         url: 'http://localhost:8080/education/video/getScore?course_id='
-            + this.$route.params.course_id.trim() + '&session=' + this.currentSession + '&user=' + 'lsm@hhh.com'
+            + this.course_id + '&session=' + this.currentSession + '&user=' + this.user_id
       }).then(response => {
-        console.log(response.data.data)
         this.videoScore = response.data.data.video_score
         this.testScore = response.data.data.test_score
         this.watchPercentage = (this.videoScore / (this.session_info.score - this.questions.length)).toFixed(2) * 100
@@ -461,20 +450,23 @@ export default {
         curVideoScore += this.videoWatchTime[i]
       }
 
-      if (curVideoScore >= this.videoWatchTime.length * 0.85) {
+      if (curVideoScore >= this.videoWatchTime.length * 0.95) {
         curVideoScore = this.session_info.score - this.questions.length
+      } else {
+        curVideoScore = (curVideoScore / this.videoWatchTime.length) * (this.session_info.score - this.questions.length)
       }
 
-      this.videoScore = curVideoScore
+      this.videoScore = Math.max(curVideoScore, this.videoScore).toFixed(2)
+      this.watchPercentage = (this.videoScore / (this.session_info.score - this.questions.length) * 100).toFixed(2)
 
       axios({
         method: 'POST',
         url: 'http://localhost:8080/education/video/updateVideoScore',
         data: {
-          course_id: this.$route.params.course_id,
+          course_id: this.course_id,
           session: this.currentSession,
-          score: curVideoScore,
-          user: 'lsm@hhh.com'
+          score: this.videoScore,
+          user: this.user_id
         },
         transformRequest: [function (data) {
           let str = '';
@@ -489,44 +481,82 @@ export default {
           })
     },
 
-    updateTestScore() {
-      let testScore = this.testScore
-
+    getTestBySession() {
       axios({
-        method: 'POST',
-        url: 'http://localhost:8080/education/video/updateTestScore',
-        data: {
-          course_id: this.$route.params.course_id,
-          session: this.currentSession,
-          score: testScore,
-          user: 'lsm@hhh.com'
-        },
-        transformRequest: [function (data) {
-          let str = '';
-          for (let key in data) {
-            str += encodeURIComponent(key) + '=' + encodeURIComponent(data[key]) + '&';
-          }
-          return str;
-        }]
-      })
-          .then(response => {
-            console.log(response.data.message)
+        method: 'GET',
+        url: 'http://localhost:8080/education/video/getAllTestByCourseAndSession?course_id='
+            + this.course_id + '&session=' + this.currentSession,
+      }).then(response => {
+        let tests = response.data.data.Tests
+        console.log(tests)
+        for (let test of tests) {
+          this.questions.push({
+            id: test.id,
+            title: test.title,
+            questionType: test.question_type,
+            choices: test.choices.split(','),
+            correctAnswer: test.correct_answer,
+            answer: ref('')
           })
-    }
+        }
+      })
+    },
+
+    updateTestScore() {
+      let curTestScore = 0
+      for (let question of this.questions) {
+        if (question.answer === question.correctAnswer) {
+          curTestScore++
+        }
+      }
+
+      if (curTestScore > this.testScore) {
+        this.testScore = curTestScore
+        axios({
+          method: 'POST',
+          url: 'http://localhost:8080/education/video/updateTestScore',
+          data: {
+            course_id: this.course_id,
+            session: this.currentSession,
+            score: this.testScore,
+            user: this.user_id
+          },
+          transformRequest: [function (data) {
+            let str = '';
+            for (let key in data) {
+              str += encodeURIComponent(key) + '=' + encodeURIComponent(data[key]) + '&';
+            }
+            return str;
+          }]
+        })
+            .then(response => {
+              console.log(response.data.message)
+            })
+      }
+    },
+
+
   },
 
   mounted() {
+    this.course_id = this.$route.params.course_id
+    this.user_id = localStorage.getItem('USER_ID')
     this.checkCheating()
     this.getSessionsCount()
     this.getSessionInfo(1)
-    this.getVideoScore()
   },
 
-  unmounted() {
-    this.updateVideoScore()
+  beforeUnmount() {
     if (this.afkTimer !== null) {
       clearInterval(this.afkTimer)
     }
+    this.updateVideoScore()
+    let videoCnt = localStorage.getItem('VIDEO_CNT')
+    videoCnt = (parseInt(videoCnt) - 1).toString()
+    localStorage.setItem('VIDEO_CNT', videoCnt)
+  },
+
+  deactivated() {
     let videoCnt = localStorage.getItem('VIDEO_CNT')
     videoCnt = (parseInt(videoCnt) - 1).toString()
     localStorage.setItem('VIDEO_CNT', videoCnt)
@@ -556,6 +586,7 @@ export default {
   margin-top: 10px;
   font-size: 26px;
 }
+
 .percentage-label {
   display: block;
   margin-top: 10px;

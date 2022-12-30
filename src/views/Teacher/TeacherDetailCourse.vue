@@ -28,7 +28,7 @@
             <el-row>
               <h4>Playlist</h4>
               <el-button style="margin-left: 105px; margin-top: 15px" type="primary"
-                         @click="form_dialog_visible = true; formTitle = '添加课程章节'">
+                         @click="form_dialog_visible = true">
                 添加章节
               </el-button>
             </el-row>
@@ -106,28 +106,86 @@
 
       <el-drawer v-model="questionsVisible"
                  direction="rtl"
-                 :before-close="handleCloseQuestions"
       >
         <template #title>
           <h4>Questions</h4>
         </template>
         <template #default>
           <div>
-            <div id="questionArea" v-for="question in questions" :key="question">
+            <div class="question-area" v-for="question in questions" :key="question">
               <h3>{{ question.title }}</h3>
-              <el-radio-group v-model="question.answer">
-                <el-radio v-for="choice in question.choices" :key="choice" :label="choice">{{ choice }}</el-radio>
+              <el-radio-group v-model="question.correct_answer">
+                <el-radio disabled v-for="choice in question.choices" :key="choice" :label="choice">{{ choice }}</el-radio>
               </el-radio-group>
+              <br>
+              <el-button type="primary" size="small" @click="modifyQuestion(question)">Modify Question</el-button>
             </div>
           </div>
         </template>
         <template #footer>
           <div style="flex: auto">
-            <el-button @click="handleCloseQuestions">Cancel</el-button>
-            <el-button type="primary" @click="confirmSave">Save</el-button>
+            <el-button type="primary" @click="question_dialog_visible = true">Add Question</el-button>
           </div>
         </template>
       </el-drawer>
+
+      <el-dialog v-model="question_dialog_visible" :title="questionTitle" @close="cancelAddQuestion">
+        <el-form :model="questionForm" ref="questionFormRef">
+          <el-form-item label="Title">
+            <el-input v-model="questionForm.title"/>
+          </el-form-item>
+
+          <el-form-item label="Question Type">
+            <el-radio-group v-model="questionForm.questionType">
+              <el-radio label="T/F">True/False question</el-radio>
+              <el-radio label="Choice">Multiple choice question</el-radio>
+            </el-radio-group>
+          </el-form-item>
+
+          <el-form-item label="Choices" v-if="questionForm.questionType === 'T/F'">
+            <el-radio disabled label="disabled">True</el-radio>
+            <el-radio disabled label="disabled">False</el-radio>
+          </el-form-item>
+
+          <el-form-item label="Choices" v-if="questionForm.questionType === 'Choice'">
+            <el-input v-model="questionForm.choices[0]">
+              <template #prepend>A</template>
+            </el-input>
+            <el-input v-model="questionForm.choices[1]">
+              <template #prepend>B</template>
+            </el-input>
+            <el-input v-model="questionForm.choices[2]">
+              <template #prepend>C</template>
+            </el-input>
+            <el-input v-model="questionForm.choices[3]">
+              <template #prepend>D</template>
+            </el-input>
+          </el-form-item>
+
+          <el-form-item label="Correct Answer" v-if="questionForm.questionType === 'T/F'">
+            <el-radio-group v-model="questionForm.correctAnswer">
+              <el-radio-button label="True">True</el-radio-button>
+              <el-radio-button label="False">False</el-radio-button>
+            </el-radio-group>
+          </el-form-item>
+
+          <el-form-item label="Correct Answer" v-if="questionForm.questionType === 'Choice'">
+            <el-radio-group v-model="questionForm.correctAnswer">
+              <el-radio-button :label="questionForm.choices[0]">A</el-radio-button>
+              <el-radio-button :label="questionForm.choices[1]">B</el-radio-button>
+              <el-radio-button :label="questionForm.choices[2]">C</el-radio-button>
+              <el-radio-button :label="questionForm.choices[3]">D</el-radio-button>
+            </el-radio-group>
+          </el-form-item>
+        </el-form>
+
+        <template #footer>
+                  <span class="dialog_footer">
+                    <el-button type="primary" @click="confirmQuestion">Confirm</el-button>
+                    <el-button @click="cancelAddQuestion()">Cancel</el-button>
+                  </span>
+        </template>
+      </el-dialog>
     </div>
 
   </div>
@@ -136,7 +194,6 @@
 <script>
 import {reactive, ref} from "vue";
 import axios from "axios";
-import {ElMessageBox} from "element-plus";
 // import {useRoute} from 'vue-router'
 // const route = useRoute()
 
@@ -159,15 +216,30 @@ export default {
       url: '',
       score: ''
     })
+    let questionFormRef = reactive(ref(null))
+    let questionForm = reactive({
+      id: '',
+      questionType: '',
+      title: '',
+      choices: ['', '', '', ''],
+      correctAnswer: ''
+    })
 
     return {
+      course_id: '',
+      user_id: '',
       session_cnt: 0,
+      currentSession: 1,
       session_info,
       formRef,
       form,
+      questionFormRef,
+      questionForm,
       formTitle: '添加课程章节',
+      questionTitle: '添加问题',
       uploadActionUrl: 'http://localhost:8081/cloud_storage/file/uploading',
       form_dialog_visible: false,
+      question_dialog_visible: false,
       videoUrl: '',
       videoOptions: reactive({
         width: "100%", //播放器高度
@@ -196,26 +268,7 @@ export default {
         ], //显示所有按钮,
       }),
       questionsVisible: false,
-      questions: [
-        {
-          course_id: 'CS996',
-          session_id: '1',
-          questionType: 'T/F',
-          title: 'Are you still alive?',
-          choices: ['True', 'False', 'Not Given'],
-          correctAnswer: '',
-          answer: ''
-        },
-        {
-          course_id: 'CS996',
-          session_id: '1',
-          questionType: 'Choice',
-          title: 'Which grade are you in?',
-          choices: ['1', '2', '3', '4'],
-          correctAnswer: '',
-          answer: ''
-        }
-      ],
+      questions: [],
     }
   },
 
@@ -226,7 +279,6 @@ export default {
     },
 
     confirmAddChapter() {
-
       axios({
         method: 'POST',
         url: 'http://localhost:8080/education/video/uploadVideoMeta',
@@ -260,12 +312,13 @@ export default {
       this.form.description = ''
       this.form.uploadVideo = []
       this.$refs.formRef.resetFields()
+      this.formTitle = '添加课程章节'
     },
 
     getSessionsCount() {
       axios({
         method: 'GET',
-        url: 'http://localhost:8080/education/video/getSessionsCount?course_id=' + this.$route.params.course_id,
+        url: 'http://localhost:8080/education/video/getSessionsCount?course_id=' + this.course_id,
       }).then(response => {
         this.session_cnt = response.data.data.session_count
       })
@@ -274,7 +327,7 @@ export default {
     getSessionInfo(session) {
       axios({
         method: 'GET',
-        url: 'http://localhost:8080/education/video/getSessionInfo?course_id=' + this.$route.params.course_id + '&session=' + session,
+        url: 'http://localhost:8080/education/video/getSessionInfo?course_id=' + this.course_id + '&session=' + session,
       }).then(response => {
         let resp = response.data.data.video
         this.session_info.title = resp.title
@@ -283,6 +336,8 @@ export default {
         this.session_info.url = resp.url
         this.session_info.score = resp.score
         this.videoOptions.src = resp.url
+        this.currentSession = resp.session
+        this.getTestBySession()
       })
     },
 
@@ -295,35 +350,109 @@ export default {
       this.form.score = this.session_info.score
     },
 
+    getTestBySession() {
+      axios({
+        method: 'GET',
+        url: 'http://localhost:8080/education/video/getAllTestByCourseAndSession?course_id='
+            + this.course_id + '&session=' + this.currentSession,
+      }).then(response => {
+        this.questions = response.data.data.Tests
+        for (let question of this.questions) {
+          question.choices = question.choices.split(',')
+        }
+      })
+    },
 
-    handleCloseQuestions() {
-      ElMessageBox.confirm('Are you sure you want to close this?')
-          .then((value) => {
-            console.log(value)
-            if (value === 'confirm') {
-              this.questionsVisible = false
-            }
-          })
-          .catch(() => {
-            // catch error
+    modifyQuestion(question) {
+      console.log(question)
+      this.question_dialog_visible = true
+      this.questionTitle = '修改问题'
+      this.questionForm.id = question.id
+      this.questionForm.title = question.title
+      this.questionForm.questionType = question.questionType
+      this.questionForm.choices = question.choices
+      this.questionForm.correctAnswer = question.correctAnswer
+    },
+
+    cancelAddQuestion() {
+      this.question_dialog_visible = false
+      this.questionForm.title = ''
+      this.questionForm.questionType = ''
+      this.questionForm.choices = ['', '', '', '']
+      this.questionForm.correctAnswer = ''
+      this.$refs.questionFormRef.resetFields()
+      this.questionTitle = '添加问题'
+    },
+
+    confirmQuestion() {
+      if (this.questionTitle === '添加问题') {
+        this.confirmAddQuestion()
+      }
+      else if (this.questionTitle === '修改问题') {
+        this.confirmModifyQuestion()
+      }
+    },
+
+    confirmAddQuestion() {
+      if (this.questionForm.questionType === 'T/F') {
+        this.questionForm.choices = ['True', 'False']
+      }
+      axios({
+        method: 'POST',
+        url: 'http://localhost:8080/education/video/postTest',
+        data: {
+          course_id: this.course_id,
+          session: this.currentSession,
+          questionType: this.questionForm.questionType,
+          title: this.questionForm.title,
+          choices: this.questionForm.choices.toString().replace('[','').replace(']',''),
+          correct_answer: this.questionForm.correctAnswer
+        },
+        transformRequest: [function (data) {
+          let str = '';
+          for (let key in data) {
+            str += encodeURIComponent(key) + '=' + encodeURIComponent(data[key]) + '&';
+          }
+          return str;
+        }]
+      })
+          .then(response => {
+            console.log(response.data)
+            this.getTestBySession()
+            this.cancelAddQuestion()
           })
     },
 
-    confirmSave() {
-      ElMessageBox.confirm('Are you sure you want to save your change?')
-          .then((value) => {
-            console.log(value)
-            if (value === 'confirm') {
-              this.questionsVisible = false
-            }
+    confirmModifyQuestion() {
+      axios({
+        method: 'POST',
+        url: 'http://localhost:8080/education/video/updateTest',
+        data: {
+          id: this.questionForm.id,
+          questionType: this.questionForm.questionType,
+          title: this.questionForm.title,
+          choices: this.questionForm.choices.toString().replace('[','').replace(']',''),
+          correct_answer: this.questionForm.correctAnswer
+        },
+        transformRequest: [function (data) {
+          let str = '';
+          for (let key in data) {
+            str += encodeURIComponent(key) + '=' + encodeURIComponent(data[key]) + '&';
+          }
+          return str;
+        }]
+      })
+          .then(response => {
+            console.log(response.data)
+            this.getTestBySession()
+            this.cancelAddQuestion()
           })
-          .catch(() => {
-            // catch error
-          })
-    }
+    },
   },
 
   mounted() {
+    this.course_id = this.$route.params.course_id
+    this.user_id = localStorage.getItem('USER_ID')
     this.getSessionsCount()
     this.getSessionInfo(1)
   }

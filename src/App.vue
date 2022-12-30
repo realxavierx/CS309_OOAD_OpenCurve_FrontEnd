@@ -16,15 +16,10 @@ export default {
     }
   },
   methods: {
+  },
 
-    Login() {
-      this.axios.get('/Login/' + this.id + '/' + this.password).then(function (resp) {
-        console.log(resp);
-        if (resp.state === true) {
-          console.log("ok")
-        }
-      })
-    }
+  beforeUnmount() {
+    localStorage.clear()
   }
 }
 </script>
