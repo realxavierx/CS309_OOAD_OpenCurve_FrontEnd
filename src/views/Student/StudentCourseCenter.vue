@@ -7,10 +7,10 @@
           <el-col :span="Number(4)">
             <!-- 课程范围 -->
             <el-select
-              v-model="courseRange"
-              placeholder="CourseRange"
-              @change="handleSelectRange"
-              >
+                v-model="courseRange"
+                placeholder="CourseRange"
+                @change="handleSelectRange"
+            >
               <el-option label="My Courses" value="My Courses"></el-option>
               <el-option label="All Courses" value="All Courses"></el-option>
             </el-select>
@@ -46,7 +46,7 @@
                 @select="handleSelectTeacher"
             >
               <template #default="{ item }">
-                <div class="value">{{ item.teacherName }} - {{ item.teacherDepartment }}</div>
+                <div class="value">{{ item.name }} - {{ item.department }}</div>
                 <!--                  <span class="link">{{ item.link }}</span>-->
               </template>
             </el-autocomplete>
@@ -125,17 +125,18 @@
         </el-icon>
       </el-divider>
 
-      <div v-for="course in courses" :key="course.courseID" style="margin: 20px">
+      <div v-for="course in show_courses" :key="course.id" style="margin: 20px">
         <el-descriptions title="Course Information" border>
           <template #extra>
-            <el-button type="primary" @click="jumpToCourseDetail(course.courseID)">课程详情</el-button>
+            <el-button v-if="!checkEnrolled(course)" type="primary" @click="enrollCourse(course)">报名课程</el-button>
+            <el-button v-if="checkEnrolled(course)" type="success" @click="jumpToCourseDetail(course)">进入课程</el-button>
           </template>
-          <el-descriptions-item label="ID">{{ course.courseID }}</el-descriptions-item>
-          <el-descriptions-item label="Name">{{ course.courseName }}</el-descriptions-item>
-          <el-descriptions-item label="Teacher">{{ course.courseTeacher }}</el-descriptions-item>
-          <el-descriptions-item label="Type">{{ course.courseType }}</el-descriptions-item>
-          <el-descriptions-item label="Credit">{{ course.courseCredit }}</el-descriptions-item>
-          <el-descriptions-item label="Description">{{ course.courseDescription }}</el-descriptions-item>
+          <el-descriptions-item label="ID">{{ course.id }}</el-descriptions-item>
+          <el-descriptions-item label="Name">{{ course.name }}</el-descriptions-item>
+          <el-descriptions-item label="Teacher">{{ course.teacher_id }}</el-descriptions-item>
+          <el-descriptions-item label="Type">{{ course.course_type }}</el-descriptions-item>
+          <el-descriptions-item label="Credit">{{ course.credit }}</el-descriptions-item>
+          <el-descriptions-item label="Description">{{ course.info }}</el-descriptions-item>
         </el-descriptions>
       </div>
     </div>
@@ -144,7 +145,6 @@
 </template>
 
 <script>
-import StudentHeader from "@/components/StudentHeader";
 import axios from "axios";
 import router from "@/router";
 
@@ -156,6 +156,8 @@ export default {
     return {
       user_id: '',
       courses: [],
+      selected_courses: [],
+      show_courses: [],
       courseRange: 'My Courses',
       duplicate: false,
       departments: [],
@@ -167,7 +169,7 @@ export default {
       types: ['Optional', 'Compulsory'],
       courseType: '',
       typeSelected: 'process',
-      statuses: ['Upcoming', 'Ongoing', 'Ended'],
+      statuses: ['Unverified', 'Rejected', 'Ongoing'],
       courseStatus: '',
       statusSelected: 'process',
       fees: [
@@ -183,71 +185,42 @@ export default {
   },
 
   methods: {
-    jumpToCourseDetail(id) {
+    jumpToCourseDetail(course) {
 
       router.push({
         name: "StudentDetailCourse",
         params: {
-          course_id: id
+          course_id: course.id
         }
       })
     },
 
     getAllCourses() {
-      this.courses = []
-
       axios({
         method: 'GET',
         url: 'http://localhost:8080/education/course/getAllCourses',
       }).then(response => {
         console.log(response.data.message)
-        let response_data = response.data.data.courses
-        response_data.forEach((data) => {
-          let course = {
-            courseID: data.id,
-            courseName: data.name,
-            courseDepartment: data.department,
-            courseType: data.course_type,
-            courseCredit: data.credit,
-            courseStatus: data.status,
-            courseFees: data.fees,
-            courseDescription: data.info
-          }
-          this.courses.push(course)
-        })
+        this.courses = response.data.data.courses
+        this.show_courses = this.courses
       })
     },
 
     getStudentCourses() {
-      this.courses = []
-
       axios({
         method: 'GET',
         url: 'http://localhost:8080/education/course/getCoursesOfStudent?student_id=' + this.user_id,
       }).then(response => {
         console.log(response.data.message)
-        let response_data = response.data.data.courses
-        response_data.forEach((data) => {
-          let course = {
-            courseID: data.id,
-            courseName: data.name,
-            courseDepartment: data.department,
-            courseType: data.course_type,
-            courseCredit: data.credit,
-            courseStatus: data.status,
-            courseFees: data.fees,
-            courseDescription: data.info
-          }
-          this.courses.push(course)
-        })
+        this.selected_courses = response.data.data.courses
+        this.show_courses = this.selected_courses
       })
     },
 
     handleSelectRange() {
       if (this.courseRange === 'My Courses') {
         this.getStudentCourses()
-      }
-      else if (this.courseRange === 'All Courses') {
+      } else if (this.courseRange === 'All Courses') {
         this.getAllCourses()
       }
     },
@@ -258,17 +231,7 @@ export default {
         url: 'http://localhost:8080/education/teacher/getAllTeachers',
       }).then(response => {
         console.log(response.data.message)
-        let response_data = response.data.data.teachers
-        response_data.forEach((data) => {
-          let teacher = {
-            teacherID: data.id,
-            teacherName: data.name,
-            teacherDepartment: data.department,
-            teacherStatus: data.status
-          }
-          this.teachers.push(teacher)
-        })
-
+        this.teachers = response.data.data.teachers
       })
     },
 
@@ -278,10 +241,7 @@ export default {
         url: 'http://localhost:8080/education/course/getAllDepartments',
       }).then(response => {
         console.log(response.data.message)
-        let response_data = response.data.data.departments
-        response_data.forEach((data) => {
-          this.departments.push(data)
-        })
+        this.departments = response.data.data.departments
       })
     },
 
@@ -293,12 +253,12 @@ export default {
 
     createFilter(input) {
       return (teacher) => {
-        return (teacher.teacherName.toLowerCase().indexOf(input.toLowerCase()) === 0);
+        return (teacher.name.toLowerCase().indexOf(input.toLowerCase()) === 0);
       };
     },
 
     handleSelectTeacher(item) {
-      this.courseTeacher = item.teacherName + ' - ' + item.teacherDepartment
+      this.courseTeacher = item.name + ' - ' + item.department
       this.teacherSelected = 'success'
     },
 
@@ -335,8 +295,6 @@ export default {
     },
 
     selectCourses() {
-      this.courses = []
-
       axios({
         method: 'GET',
         url: 'http://localhost:8080/education/course/getCoursesWithConstraints?course_range='
@@ -345,21 +303,49 @@ export default {
             + this.courseType + '&course_status=' + this.courseStatus + '&course_fee=' + this.courseFee,
       }).then(response => {
         console.log(response.data.message)
-        let response_data = response.data.data.courses
-        response_data.forEach((data) => {
-          let course = {
-            courseID: data.id,
-            courseName: data.name,
-            courseDepartment: data.department,
-            courseType: data.course_type,
-            courseCredit: data.credit,
-            courseStatus: data.status,
-            courseFees: data.fees,
-            courseDescription: data.info
-          }
-          this.courses.push(course)
-        })
+        this.show_courses = response.data.data.courses
       })
+    },
+
+    purchaseCourse(course) {
+
+      router.push({
+        name: "StudentPayment",
+        params: {
+          user_id: this.user_id,
+          course_id: course.id
+        }
+      })
+
+    },
+
+    enrollCourse(course) {
+      axios({
+        method: 'POST',
+        url: 'http://localhost:8080/education/course/enrollCourse',
+        data: {
+          course_id: course.id,
+          student_id: this.user_id
+        },
+        transformRequest: [function (data) {
+          let str = '';
+          for (let key in data) {
+            str += encodeURIComponent(key) + '=' + encodeURIComponent(data[key]) + '&';
+          }
+          return str;
+        }]
+      })
+          .then(response => {
+            if (response.data.code === 200) {
+              console.log(response.data.message)
+              this.selected_courses.push(course)
+              console.log(this.selected_courses)
+            }
+          })
+    },
+
+    checkEnrolled(course) {
+      return this.selected_courses.some((item) => item.id === course.id && item.teacher_id === course.teacher_id)
     }
   },
 
@@ -373,13 +359,13 @@ export default {
 </script>
 
 <style scoped>
-.background{
-  background-color: rgb(243,244,246);
+.background {
+  background-color: rgb(243, 244, 246);
 }
 
-.course-center-stu{
-  width:80%;
-  margin:0 auto;
+.course-center-stu {
+  width: 80%;
+  margin: 0 auto;
   background-color: #fff;
 }
 </style>

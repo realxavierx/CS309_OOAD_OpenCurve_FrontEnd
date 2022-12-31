@@ -7,6 +7,7 @@
         <div v-for="course in courses" :key="course.id" style="margin: 20px">
           <el-descriptions title="Course Information" border>
             <template #extra>
+              <el-button type="primary" @click="getCourseStudents(course)">学生管理</el-button>
               <el-button type="primary" @click="jumpToCourseDetail(course.id)">课程详情</el-button>
             </template>
             <el-descriptions-item label="ID">{{ course.id }}</el-descriptions-item>
@@ -72,13 +73,83 @@
                   </span>
           </template>
         </el-dialog>
+
+        <el-drawer size="45%" v-model="student_progress_visible" direction="rtl">
+          <template #title>
+            <h2>学生管理</h2>
+          </template>
+          <template #default>
+            <div>
+              <el-card v-for="student in students" :key="student">
+                <el-row>
+                  <el-col :span="Number(12)">
+                    Student:
+                    <el-popover placement="right" :width="150" trigger="click">
+                      <template #reference>
+                        <el-tag style="width: 220px; height: 32px; margin-left: 10px" effect="dark">
+                          {{ student.id }}
+                        </el-tag>
+                      </template>
+                      <template #default>
+                        <el-avatar
+                            :size="50"
+                            :src="student.picture_url"
+                        />
+                        <h3 style="margin: 5px">{{ student.name }}</h3>
+                        <el-row>
+                          <el-col :span="Number(12)">
+                            <h4 style="margin: 5px">{{ student.department }}</h4>
+                          </el-col>
+                          <el-col :span="Number(12)">
+                            <h4 style="margin: 5px">{{ student.grade }}</h4>
+                          </el-col>
+                        </el-row>
+                      </template>
+                    </el-popover>
+                  </el-col>
+
+                  <el-col :span="Number(3)"></el-col>
+
+                  <el-col :span="Number(5)">
+                    <el-popover placement="top" :width="170" trigger="click">
+                      <template #reference>
+                        <el-button type="success" @click="exportStudentScore(student)">导出学生成绩</el-button>
+                      </template>
+                      <template #default>
+                        <p>您确定要导出学生成绩吗?</p>
+                        <vue3-json-excel
+                            :json-data="excelData"
+                            :fields="excelFields"
+                            :name="excelName"
+                        >
+                          <el-button style="margin-left: 50px" type="primary">确认</el-button>
+                        </vue3-json-excel>
+                      </template>
+                    </el-popover>
+                  </el-col>
+
+                  <el-col :span="Number(4)">
+                    <el-popover placement="top" :width="150" trigger="click">
+                      <template #reference>
+                        <el-button type="danger">移除学生</el-button>
+                      </template>
+                      <template #default>
+                        <p>您确定要移除该学生吗?</p>
+                        <el-button style="margin-left: 45px" type="primary" @click="removeStudent(student)">确认</el-button>
+                      </template>
+                    </el-popover>
+                  </el-col>
+                </el-row>
+              </el-card>
+            </div>
+          </template>
+        </el-drawer>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import TeacherHeader from "@/components/TeacherHeader";
 import router from "@/router/index"
 import {reactive, ref} from "vue";
 import axios from "axios";
@@ -104,8 +175,18 @@ export default {
       formRef,
       form,
       form_dialog_visible: false,
+      student_progress_visible: false,
       user_id: '',
-      courses: []
+      courses: [],
+      students: [],
+      currentCourse: '',
+      excelFields: {
+        'Session': 'session',
+        'Video_Score': 'video_score',
+        'Test_Score': 'test_score',
+      },
+      excelData: [],
+      excelName: '',
     }
   },
 
@@ -121,7 +202,6 @@ export default {
     },
 
     confirmAddCourse() {
-      console.log(this.form.courseDepartment)
       axios({
         method: 'POST',
         url: 'http://localhost:8080/education/course/addCourse',
@@ -171,10 +251,68 @@ export default {
       }).then(resp => {
         console.log(resp.data.message)
         let response = resp.data.data
-        console.log(response)
         this.courses = response.courses
       })
     },
+
+    getCourseStudents(course) {
+      this.currentCourse = course
+      axios({
+        method: 'GET',
+        url: 'http://localhost:8080/education/course/getStudentsOfCourse?course_id=' + course.id,
+      }).then(resp => {
+        console.log(resp.data.message)
+        this.students = resp.data.data.students
+        console.log(this.students)
+        this.student_progress_visible = true
+      })
+    },
+
+    exportStudentScore(student) {
+      this.excelData = []
+      this.excelName = student.name + '_score.xls'
+      axios({
+        method: 'GET',
+        url: 'http://localhost:8080/education/video/getStudentCourseScore?course_id='
+            + this.currentCourse.id + '&student_id=' + student.id,
+      }).then(resp => {
+        console.log(resp.data.message)
+        if (resp.data.code === 200) {
+          for (let score of resp.data.data.scores) {
+            this.excelData.push({
+              session: score.sess_id,
+              video_score: score.video_score,
+              test_score: score.test_score
+            })
+          }
+        }
+        else {
+          alert(resp.data.message)
+        }
+      })
+    },
+
+    removeStudent(student) {
+      axios({
+        method: 'POST',
+        url: 'http://localhost:8080/education/course/removeStudentFromCourse',
+        data: {
+          course_id: this.currentCourse.id,
+          student_id: student.id
+        },
+        transformRequest: [function (data) {
+          let str = '';
+          for (let key in data) {
+            str += encodeURIComponent(key) + '=' + encodeURIComponent(data[key]) + '&';
+          }
+          return str;
+        }]
+      })
+          .then(response => {
+            console.log(response.data.message)
+            this.students = this.students.filter((item) => item !== student)
+          })
+    }
   },
 
   mounted() {

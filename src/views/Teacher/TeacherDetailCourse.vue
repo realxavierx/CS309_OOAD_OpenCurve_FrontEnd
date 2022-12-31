@@ -188,6 +188,38 @@
       </el-dialog>
     </div>
 
+    <div class="student_progress">
+      <el-card class="student-score" v-for="student in students" :key="student">
+        <el-row>
+          <el-col :span="Number(7)">
+            Student:
+            <el-tag style="width: 220px; height: 40px; margin-left: 10px" effect="dark">
+              {{ student.stu_id }}
+            </el-tag>
+          </el-col>
+          <el-col :span="Number(4)">
+            Total Score:
+            <el-tag style="width: 80px; height: 40px; margin-left: 10px" effect="dark">
+              {{ (Number(student.video_score) + Number(student.test_score)).toFixed(2) }} / {{ session_info.score }}
+            </el-tag>
+          </el-col>
+          <el-col :span="Number(1)"></el-col>
+          <el-col :span="Number(8)">
+            <el-row style="margin-top: 7px">
+              Video Progress:
+              <el-progress :text-inside="true" :stroke-width="26" style="width: 220px; margin-left: 10px;"
+                           :percentage="Number((Number(student.video_score) / (session_info.score - questions.length)).toFixed(2))"/>
+            </el-row>
+          </el-col>
+          <el-col :span="Number(4)">
+            Test Score:
+            <el-tag style="width: 80px; height: 40px; margin-left: 10px" effect="dark">
+              {{ Number(student.test_score) }} / {{ questions.length }}
+            </el-tag>
+          </el-col>
+        </el-row>
+      </el-card>
+    </div>
   </div>
 </template>
 
@@ -269,6 +301,7 @@ export default {
       }),
       questionsVisible: false,
       questions: [],
+      students: []
     }
   },
 
@@ -338,6 +371,7 @@ export default {
         this.videoOptions.src = resp.url
         this.currentSession = resp.session
         this.getTestBySession()
+        this.getStudentProgressBySession()
       })
     },
 
@@ -448,6 +482,18 @@ export default {
             this.cancelAddQuestion()
           })
     },
+
+    getStudentProgressBySession() {
+      axios({
+        method: 'GET',
+        url: 'http://localhost:8080/education/video/getAllScore?course_id='
+            + this.course_id + '&session=' + this.currentSession,
+      }).then(response => {
+        console.log(response)
+        // {id: 37, stu_id: '12012902@mail.sustech.edu.cn', sess_id: 6, video_score: '0.00', text_score: null}
+        this.students = response.data.data.scores
+      })
+    }
   },
 
   mounted() {
@@ -474,5 +520,11 @@ export default {
 
 .card_content {
 
+}
+
+.student-score {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  height: 70px;
 }
 </style>
