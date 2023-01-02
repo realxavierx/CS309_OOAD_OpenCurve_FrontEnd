@@ -11,6 +11,13 @@
               {{ videoOptions.title }}
             </div>
             <div class="video-content">
+              <div class="barrage-stream">
+                <div class="barrage-block">
+                  <span class="barrage-block-item" v-for="(item,index) of barrageMsgList" :key="index" v-show="item.pos >= this.curTime && item.pos <= this.curTime + 5">
+                  {{ item.msg }}
+                  </span>
+                </div>
+              </div>
               <vue3-video-play id='videoPlayer' v-bind="videoOptions"></vue3-video-play>
             </div>
             <div class="student-functions">
@@ -20,7 +27,11 @@
                 <el-button type="primary" plain>录屏</el-button>
                 <el-button type="primary" plain>弹幕</el-button>
               </el-button-group>
-
+              <el-input v-model="barrageMsg" placeholder="发一条友善的弹幕吧~" clearable>
+                <template #append>
+                  <el-button type="primary" circle @click="sendBarrage()"><el-icon style="vertical-align: middle"><Position /></el-icon></el-button>
+                </template>
+              </el-input>
             </div>
           </el-col>
 
@@ -205,8 +216,14 @@ export default {
       afkTimeInt: 90000,
       afkTimeString: '',
       afkDialogVisible: false,
-
-      progressStatus: 'processing'
+      progressStatus: 'processing',
+      barrageMsg: "",
+      barrageMsgList: [
+        { pos: 1, msg: 'hello' },
+        { pos: 1, msg: 'world' },
+        { pos: 10, msg: '就是咖啡机肯定就疯狂拉升阶段离开房间' },
+      ],
+      curTime : 0,
     }
   },
 
@@ -395,6 +412,7 @@ export default {
             let currentTime;
             // 当前播放进度对应的秒数
             currentTime = Math.floor(video.currentTime)
+            _this.curTime = currentTime
 
             _this.videoWatchTime[currentTime] = 1
             if (Math.abs(currentTime - _this.lastUpdateTime) > 1) {
@@ -425,7 +443,7 @@ export default {
 
       video.addEventListener("ended", function () {
         // 监听  视频结束
-        console.log(_this.videoWatchTime)
+        _this.updateVideoScore()
       })
 
       this.getVideoScore()
@@ -535,7 +553,55 @@ export default {
       }
     },
 
+    sendBarrage() {
+      if (localStorage.getItem("USER_ID")) {
+        if (this.barrageMsg) {
+          let video = document.getElementById("videoPlayer");
+          let currentTime = Math.floor(video.currentTime)
+          this.barrageMsgList.push({
+            pos: currentTime,
+            msg: this.barrageMsg
+          })
+          this.barrageMsg = ''
+          axios({
+            method: "POST",
+            url: "http://localhost:8080/barrage/save",
+            data: {
+              course_id: this.$route.params.course_id,
+              session: this.currentSession,
+              message: this.barrageMsg,
+              position: currentTime
+            },
+            transformRequest: [function (data) {
+              let str = "";
+              for (let key in data) {
+                str += encodeURIComponent(key) + "=" + encodeURIComponent(data[key]) + "&";
+              }
+              return str;
+            }]
+          })
+              .then(response => {
+                console.log(response.data.message);
+              });
+          console.log('发送成功~')
+        } else {
+          alert('请输入弹幕内容~')
+        }
+      } else {
+        alert('请登录后再发言~')
+      }
+    },
 
+    getBarrage() {
+      axios({
+        method: "GET",
+        url: "http://localhost:8080/barrage/list?course_id=" + this.$route.params.course_id + "&session=" + this.currentSession,
+      }).then(response => {
+        let resp = response.data.data;
+        this.barrageMsgList = resp.barrage
+        console.log(resp)
+      });
+    }
   },
 
   mounted() {
