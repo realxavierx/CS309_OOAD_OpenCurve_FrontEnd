@@ -19,7 +19,8 @@
                 <template #append>
                   <el-button type="primary" circle @click="sendBarrage">
                     <el-icon style="vertical-align: middle">
-                    <Position /></el-icon>
+                      <Position/>
+                    </el-icon>
                   </el-button>
                 </template>
               </el-input>
@@ -93,6 +94,58 @@
         </el-row>
       </div>
 
+      <div class="comment-area">
+        <el-input
+            v-model="commentContent"
+            placeholder="Please input">
+          <template #append>
+            <el-button type="primary" @click="postComment">发送</el-button>
+          </template>
+        </el-input>
+        <el-timeline style="margin-top: 25px">
+          <el-timeline-item v-for="comment in comments.filter((item) => item.father_comment_id === -1)" :key="comment"
+                            :timestamp="comment.comment_date" placement="top">
+            <div>
+              <el-card class="father-comment">
+                <h4>{{ comment.user_id }}</h4>
+                <p>{{ comment.content }}</p>
+                <el-popover placement="bottom" :width="600" trigger="click" @show="replyContent = ''">
+                  <template #reference>
+                    <el-button style="margin-right: 16px">回复</el-button>
+                  </template>
+                  <el-input
+                      v-model="replyContent"
+                      placeholder="Please input your reply">
+                    <template #append>
+                      <el-button type="primary" @click="postReply(comment, comment)">发送</el-button>
+                    </template>
+                  </el-input>
+                </el-popover>
+              </el-card>
+              <el-timeline-item v-for="sonComment in comments.filter((item) => item.father_comment_id === comment.id)"
+                                :key="sonComment" :timestamp="sonComment.comment_date" placement="top">
+                <el-card class="son-comment">
+                  <h4>{{ sonComment.user_id }} reply to {{ sonComment.reply_user_id }}</h4>
+                  <p>{{ sonComment.content }}</p>
+                  <el-popover placement="bottom" :width="600" trigger="click" @show="replyContent = ''">
+                    <template #reference>
+                      <el-button style="margin-right: 16px">回复</el-button>
+                    </template>
+                    <el-input
+                        v-model="replyContent"
+                        placeholder="Please input your reply">
+                      <template #append>
+                        <el-button type="primary" @click="postReply(comment, sonComment)">发送</el-button>
+                      </template>
+                    </el-input>
+                  </el-popover>
+                </el-card>
+              </el-timeline-item>
+            </div>
+          </el-timeline-item>
+        </el-timeline>
+      </div>
+
       <el-drawer v-model="questionsVisible"
                  direction="rtl"
                  :before-close="handleCloseQuestions"
@@ -142,6 +195,9 @@ import axios from "axios";
 import {ElMessage, ElMessageBox} from "element-plus";
 import router from "@/router";
 import {Barrage} from "@/components/Entity/Barrage"
+import {Comment} from "@/components/Entity/Comment";
+import dayjs from "dayjs";
+
 // import {useRoute} from 'vue-router'
 // const route = useRoute()
 
@@ -201,22 +257,35 @@ export default {
           "fullScreen",
         ], //显示所有按钮,
       }),
+      // Text
       questionsVisible: false,
       questions: [],
       questionTimer: '',
       questionTimeInt: 3600000,
       questionTimeString: '',
+      progressStatus: 'processing',
+      // Away From Keyboard
       afkTimer: null,
       afkTimeInt: 90000,
       afkTimeString: '',
       afkDialogVisible: false,
-      progressStatus: 'processing',
+      // Barrage
       barrageMsg: "",
       barrageMsgList: [],
-      curTime : 0,
+      curTime: 0,
       canvasTimer: null,
       screenWidth: 830,
-      screenHeight: 200
+      screenHeight: 200,
+      // Comment
+      comments: [
+        new Comment('hello 1', -1, 'xavier', 6, dayjs().format('YYYY/MM/DD')),
+        new Comment('hello 2', -1, 'lsm', 6, dayjs().format('YYYY/MM/DD')),
+        new Comment('hello 3', -1, 'fdz', 6, dayjs().format('YYYY/MM/DD')),
+        new Comment('hello 1 - 1', -1, 'xjy', 6, dayjs().format('YYYY/MM/DD')),
+      ],
+      commentContent: '',
+      commentFatherId: -1,
+      replyContent: '',
     }
   },
 
@@ -237,10 +306,12 @@ export default {
         url: 'http://localhost:8080/education/video/getSessionInfo?course_id=' + this.course_id + '&session=' + session,
       }).then(response => {
         this.session_info = response.data.data.video
+
         this.currentSession = this.session_info.session
         this.videoOptions.src = this.session_info.url
         this.getTestBySession()
         this.getBarrage()
+        this.getComment()
         setTimeout(this.monitorVideoStatus, 10)
       })
     },
@@ -629,6 +700,74 @@ export default {
       this.barrageMsgList.forEach((barrage) => {
         barrage.generateStartPosition()
       })
+    },
+
+    getComment() {
+      axios({
+        method: "GET",
+        url: "http://localhost:8080/education/comment/getComments?session_id=" + this.session_info.id,
+      }).then(response => {
+        let resp = response.data;
+        console.log(resp.message)
+        this.comments = resp.data.comments
+        console.log(this.comments)
+      });
+    },
+
+    postComment() {
+      if (this.commentContent === '') return
+
+      axios({
+        method: "POST",
+        url: "http://localhost:8080/education/comment/postComment",
+        data: {
+          content: this.commentContent,
+          father_comment_id: -1,
+          user_id: this.user_id,
+          session_id: this.session_info.id,
+          comment_date: dayjs().format("YYYY/MM/DD")
+        },
+        transformRequest: [function (data) {
+          let str = "";
+          for (let key in data) {
+            str += encodeURIComponent(key) + "=" + encodeURIComponent(data[key]) + "&";
+          }
+          return str;
+        }]
+      })
+          .then(response => {
+            console.log(response.data.message);
+            this.getComment()
+            this.commentContent = ''
+          });
+    },
+
+    postReply(fatherComment, replyComment) {
+      if (this.replyContent === '') return
+      axios({
+        method: "POST",
+        url: "http://localhost:8080/education/comment/postReply",
+        data: {
+          content: this.replyContent,
+          father_comment_id: fatherComment.id,
+          user_id: this.user_id,
+          session_id: this.session_info.id,
+          comment_date: dayjs().format("YYYY/MM/DD"),
+          reply_user_id: replyComment.user_id
+        },
+        transformRequest: [function (data) {
+          let str = "";
+          for (let key in data) {
+            str += encodeURIComponent(key) + "=" + encodeURIComponent(data[key]) + "&";
+          }
+          return str;
+        }]
+      })
+          .then(response => {
+            console.log(response.data.message);
+            this.getComment()
+            this.replyContent = ''
+          });
     }
   },
 
@@ -695,5 +834,17 @@ export default {
 #videoPlayer {
   position: absolute;
   z-index: 10;
+}
+
+.comment-area {
+  margin-top: 25px;
+}
+
+.father-comment {
+
+}
+
+.son-comment {
+
 }
 </style>
