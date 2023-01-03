@@ -29,7 +29,6 @@ import Student_setting from "@/views/UserPage/Student_setting";
 import Teacher_info from "@/views/UserPage/Teacher_info.vue"
 import Teacher_setting from "@/views/UserPage/Teacher_setting.vue"
 import Teacher_vip from "@/views/UserPage/Teacher_vip.vue"
-import StudentPayment from "@/views/Student/StudentPayment";
 
 const routes = [
     {
@@ -70,11 +69,6 @@ const routes = [
                 path: 'StudentCourseCenter',
                 name: 'StudentCourseCenter',
                 component: StudentCourseCenter,
-            },
-            {
-                path: 'StudentPayment/:user_id:course_id',
-                name: 'StudentPayment',
-                component: StudentPayment
             },
             {
                 path: 'StudentDetailCourse/:course_id',

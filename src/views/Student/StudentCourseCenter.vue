@@ -95,7 +95,7 @@
                 @change="handleSelectFee"
             >
               <el-option
-                  v-for="fee in fees"
+                  v-for="fee in fee"
                   :key="fee.name"
                   :value="fee.value"
                   :label="fee.name">
@@ -128,7 +128,20 @@
       <div v-for="course in show_courses" :key="course.id" style="margin: 20px">
         <el-descriptions title="Course Information" border>
           <template #extra>
-            <el-button v-if="!checkEnrolled(course)" type="primary" @click="enrollCourse(course)">报名课程</el-button>
+            <el-popover v-if="!checkEnrolled(course)" placement="top" :width="230" trigger="click">
+              <p>The fee of this course is {{course.fee}}.</p>
+              <p>Do you want to enroll this course?</p>
+              <div style="text-align: center; margin: 0">
+                <el-button size="small" type="primary">
+                  <a :href="paymentUrl" target="_blank" style="text-decoration: none">
+                    Confirm
+                  </a>
+                </el-button>
+              </div>
+              <template #reference>
+                <el-button type="primary" @click="checkCourseFee(course)">报名课程</el-button>
+              </template>
+            </el-popover>
             <el-button v-if="checkEnrolled(course)" type="success" @click="jumpToCourseDetail(course)">进入课程</el-button>
           </template>
           <el-descriptions-item label="ID">{{ course.id }}</el-descriptions-item>
@@ -147,7 +160,6 @@
 <script>
 import axios from "axios";
 import router from "@/router";
-
 export default {
   name: "StudentCourseCenter",
 
@@ -172,7 +184,7 @@ export default {
       statuses: ['Unverified', 'Rejected', 'Ongoing'],
       courseStatus: '',
       statusSelected: 'process',
-      fees: [
+      fee: [
         {name: 'Free', value: 0},
         {name: 'Less than ￥10', value: 10},
         {name: 'Less than ￥20', value: 20},
@@ -180,7 +192,9 @@ export default {
         {name: 'Other', value: 51}
       ],
       courseFee: '',
-      feeSelected: 'process'
+      feeSelected: 'process',
+      checkFeeVisible: false,
+      paymentUrl: ''
     }
   },
 
@@ -307,16 +321,16 @@ export default {
       })
     },
 
-    purchaseCourse(course) {
-
-      router.push({
-        name: "StudentPayment",
-        params: {
-          user_id: this.user_id,
-          course_id: course.id
-        }
-      })
-
+    checkCourseFee(course) {
+      if (course.fee === 0) {
+        this.enrollCourse(course)
+        this.checkFeeVisible = false
+      }
+      else {
+        this.checkFeeVisible = true
+        this.paymentUrl = "http://localhost:8080/education/pay/purchase?courseId=" + course.id
+            + "&userId=" + this.user_id
+      }
     },
 
     enrollCourse(course) {

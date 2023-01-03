@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import AdminHeader from "@/components/AdminHeader";
+import AdminHeader from "@/components/Header/AdminHeader";
 
 export default {
   name: "AdminUserCenter",

@@ -13,6 +13,7 @@
     <el-button>
       <router-link to="/welcome">Welcome</router-link>
     </el-button>
+
   </div>
 
 </template>
@@ -31,9 +32,11 @@ export default {
     setAdmin() {
       sessionStorage.setItem('type','Admin');
     }
-  }
+  },
+
 }
 </script>
 
 <style scoped>
+
 </style>

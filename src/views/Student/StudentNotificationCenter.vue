@@ -89,7 +89,6 @@
 </template>
 
 <script>
-import StudentHeader from "@/components/StudentHeader";
 import axios from "axios";
 
 export default {

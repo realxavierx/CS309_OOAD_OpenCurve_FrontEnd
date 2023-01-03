@@ -1,6 +1,6 @@
 <template>
   <div id="nav_u">
-    <img src="../img/logo.png" alt="" style="height:40px;float:left;margin:20px 0 20px 20px;">
+    <img src="../../img/logo.png" alt="" style="height:40px;float:left;margin:20px 0 20px 20px;">
     <div class="nav">
       <ul>
         <li class="dropdown">
@@ -113,7 +113,7 @@ export default {
   background-color: rgb(37,40,48);
 }
 
-@import '../lib/nav.css';
+@import '../../lib/nav.css';
 .nav {
   float: left;
   line-height: 80px;
@@ -122,7 +122,7 @@ export default {
   color:#fff;
 }
 
-@import '../lib/search.css';
+@import '../../lib/search.css';
 
 .nav_r{
   float: right;

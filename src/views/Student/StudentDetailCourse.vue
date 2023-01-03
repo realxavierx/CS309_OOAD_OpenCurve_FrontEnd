@@ -11,25 +11,16 @@
               {{ videoOptions.title }}
             </div>
             <div class="video-content">
-              <div class="barrage-stream">
-                <div class="barrage-block">
-                  <span class="barrage-block-item" v-for="(item,index) of barrageMsgList" :key="index" v-show="item.pos >= this.curTime && item.pos <= this.curTime + 5">
-                  {{ item.msg }}
-                  </span>
-                </div>
-              </div>
+              <canvas id="canvas" :width="this.screenWidth" :height="this.screenHeight"></canvas>
               <vue3-video-play id='videoPlayer' v-bind="videoOptions"></vue3-video-play>
             </div>
             <div class="student-functions">
-              <el-button-group>
-                <el-button type="primary" plain>举手</el-button>
-                <el-button type="primary" plain>提问</el-button>
-                <el-button type="primary" plain>录屏</el-button>
-                <el-button type="primary" plain>弹幕</el-button>
-              </el-button-group>
-              <el-input v-model="barrageMsg" placeholder="发一条友善的弹幕吧~" clearable>
+              <el-input v-model="barrageMsg" @focus="readyToSendBarrage" placeholder="发一条友善的弹幕吧~" clearable>
                 <template #append>
-                  <el-button type="primary" circle @click="sendBarrage()"><el-icon style="vertical-align: middle"><Position /></el-icon></el-button>
+                  <el-button type="primary" circle @click="sendBarrage">
+                    <el-icon style="vertical-align: middle">
+                    <Position /></el-icon>
+                  </el-button>
                 </template>
               </el-input>
             </div>
@@ -150,6 +141,7 @@ import {reactive, ref} from "vue";
 import axios from "axios";
 import {ElMessage, ElMessageBox} from "element-plus";
 import router from "@/router";
+import {Barrage} from "@/components/Entity/Barrage"
 // import {useRoute} from 'vue-router'
 // const route = useRoute()
 
@@ -158,11 +150,13 @@ export default {
 
   data() {
     let session_info = reactive({
+      id: '',
       title: '',
       session: '',
       description: '',
       url: '',
-      score: ''
+      score: '',
+      course_id: ''
     })
 
     return {
@@ -218,12 +212,11 @@ export default {
       afkDialogVisible: false,
       progressStatus: 'processing',
       barrageMsg: "",
-      barrageMsgList: [
-        { pos: 1, msg: 'hello' },
-        { pos: 1, msg: 'world' },
-        { pos: 10, msg: '就是咖啡机肯定就疯狂拉升阶段离开房间' },
-      ],
+      barrageMsgList: [],
       curTime : 0,
+      canvasTimer: null,
+      screenWidth: 830,
+      screenHeight: 200
     }
   },
 
@@ -243,15 +236,11 @@ export default {
         method: 'GET',
         url: 'http://localhost:8080/education/video/getSessionInfo?course_id=' + this.course_id + '&session=' + session,
       }).then(response => {
-        let resp = response.data.data.video
-        this.session_info.title = resp.title
-        this.session_info.session = resp.session
-        this.session_info.description = resp.description
-        this.session_info.url = resp.url
-        this.session_info.score = resp.score
-        this.currentSession = resp.session
-        this.videoOptions.src = resp.url
+        this.session_info = response.data.data.video
+        this.currentSession = this.session_info.session
+        this.videoOptions.src = this.session_info.url
         this.getTestBySession()
+        this.getBarrage()
         setTimeout(this.monitorVideoStatus, 10)
       })
     },
@@ -401,6 +390,7 @@ export default {
           'loadedmetadata',
           function () {
             _this.videoWatchTime = new Array(Math.floor(video.duration)).fill(0)
+            _this.notifyBarrages(0)
           }
       )
 
@@ -434,16 +424,23 @@ export default {
 
       video.addEventListener("play", function () {
         // 监听  视频播放
+        _this.canvasTimer = setInterval(() => {
+          _this.notifyBarrages(video.currentTime)
+        }, 20)
+
         _this.lastStartTime = Math.floor(video.currentTime)
       })
 
       video.addEventListener("pause", function () {
         // 监听  视频暂停
+        clearInterval(_this.canvasTimer)
       })
 
       video.addEventListener("ended", function () {
         // 监听  视频结束
         _this.updateVideoScore()
+        _this.resetBarrages()
+        clearInterval(_this.canvasTimer)
       })
 
       this.getVideoScore()
@@ -553,24 +550,26 @@ export default {
       }
     },
 
+    readyToSendBarrage() {
+      let video = document.getElementById("videoPlayer")
+      video.pause()
+    },
+
     sendBarrage() {
-      if (localStorage.getItem("USER_ID")) {
+
+      if (this.user_id) {
         if (this.barrageMsg) {
           let video = document.getElementById("videoPlayer");
-          let currentTime = Math.floor(video.currentTime)
-          this.barrageMsgList.push({
-            pos: currentTime,
-            msg: this.barrageMsg
-          })
-          this.barrageMsg = ''
+          let currentTime = video.currentTime
+          this.barrageMsgList.push(new Barrage(this.barrageMsg, currentTime, this.screenWidth, this.screenHeight))
+
           axios({
             method: "POST",
-            url: "http://localhost:8080/barrage/save",
+            url: "http://localhost:8080/education/barrage/save",
             data: {
-              course_id: this.$route.params.course_id,
-              session: this.currentSession,
-              message: this.barrageMsg,
-              position: currentTime
+              session_id: this.session_info.id,
+              text: this.barrageMsg,
+              time: currentTime
             },
             transformRequest: [function (data) {
               let str = "";
@@ -582,8 +581,10 @@ export default {
           })
               .then(response => {
                 console.log(response.data.message);
+                alert('弹幕发送成功~')
+                this.barrageMsg = ''
+                video.play()
               });
-          console.log('发送成功~')
         } else {
           alert('请输入弹幕内容~')
         }
@@ -593,14 +594,41 @@ export default {
     },
 
     getBarrage() {
+      this.barrageMsgList = []
       axios({
         method: "GET",
-        url: "http://localhost:8080/barrage/list?course_id=" + this.$route.params.course_id + "&session=" + this.currentSession,
+        url: "http://localhost:8080/education/barrage/list?session_id=" + this.session_info.id,
       }).then(response => {
         let resp = response.data.data;
-        this.barrageMsgList = resp.barrage
-        console.log(resp)
+        for (let barrage of resp.barrages) {
+          this.barrageMsgList.push(new Barrage(barrage.text, barrage.time, this.screenWidth, this.screenHeight))
+        }
       });
+    },
+
+    notifyBarrages(currentTime) {
+      let canvas = document.getElementById("canvas")
+      let ctx = canvas.getContext("2d")
+      ctx.clearRect(0, 0, this.screenWidth, this.screenHeight);
+      ctx.font = '20px Arial';
+      ctx.fillStyle = '#ec7430';
+
+      this.barrageMsgList.forEach((barrage) => {
+        barrage.updatePosition(currentTime)
+        if (barrage.positionX > (-barrage.text.length * 5)) {
+          ctx.fillText(barrage.text, barrage.positionX, barrage.positionY)
+        }
+      })
+    },
+
+    resetBarrages() {
+      let canvas = document.getElementById("canvas")
+      let ctx = canvas.getContext("2d")
+      ctx.clearRect(0, 0, this.screenWidth, this.screenHeight);
+
+      this.barrageMsgList.forEach((barrage) => {
+        barrage.generateStartPosition()
+      })
     }
   },
 
@@ -613,20 +641,14 @@ export default {
   },
 
   beforeUnmount() {
-    if (this.afkTimer !== null) {
-      clearInterval(this.afkTimer)
-    }
+    clearInterval(this.afkTimer)
+    clearInterval(this.canvasTimer)
     this.updateVideoScore()
     let videoCnt = localStorage.getItem('VIDEO_CNT')
     videoCnt = (parseInt(videoCnt) - 1).toString()
     localStorage.setItem('VIDEO_CNT', videoCnt)
   },
 
-  deactivated() {
-    let videoCnt = localStorage.getItem('VIDEO_CNT')
-    videoCnt = (parseInt(videoCnt) - 1).toString()
-    localStorage.setItem('VIDEO_CNT', videoCnt)
-  }
 }
 </script>
 
@@ -657,5 +679,21 @@ export default {
   display: block;
   margin-top: 10px;
   font-size: 14px;
+}
+
+.barrage_item {
+  position: absolute;
+  z-index: 20;
+}
+
+#canvas {
+  position: absolute;
+  z-index: 20;
+  top: 60px;
+}
+
+#videoPlayer {
+  position: absolute;
+  z-index: 10;
 }
 </style>

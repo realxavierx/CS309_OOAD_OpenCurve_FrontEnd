@@ -6,8 +6,8 @@
 </template>
 
 <script>
-import UserHeader from '../../components/UserHeader.vue';
-import AdminHeader from '../../components/AdminHeader.vue'
+import UserHeader from '../../components/Header/UserHeader.vue';
+import AdminHeader from '../../components/Header/AdminHeader.vue'
 import router from "@/router";
 
 export default {
