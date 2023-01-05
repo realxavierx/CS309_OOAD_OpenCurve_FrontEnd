@@ -104,7 +104,7 @@ export default {
       value: true,
       sizeForm: {
         phone: '18881496979',
-        email: locationStorage.getItem('USER_ID'),
+        email: sessionStorage.getItem('USER_ID'),
       },
       isSetPhone: false,
       isSetEmail: false,
@@ -117,14 +117,9 @@ export default {
       selectedOptions:[],
       form: {
         name: '',
-        birthday: '',
-        college: '',
         major: '',
         gender: '',
-        region: ['440000', '440300', '440305'],
-        address: '',
         desc: '',
-        grade:''
       },
     }
   },
@@ -178,15 +173,15 @@ export default {
         this.departments = response.data.data.departments
       })
     },
+
     confirm_modify() {
       this.axios({
         method: 'POST',
         url: 'http://localhost:8080/education/Info/update',
         data: {
-          id: localStorage.getItem('USER_ID'),
+          id: sessionStorage.getItem('USER_ID'),
           name: this.form.name,
           department: this.form.major,
-          grade: this.form.grade,
           picture_url: this.imageUrl,
           gender:this.form.gender,
         },
@@ -197,14 +192,20 @@ export default {
           }
           return str;
         }]
-      }).then(response => {
-        console.log(response.data.message)
+      }).then(resp => {
+        console.log(resp)
+
       })
+      sessionStorage.setItem('NICK_NAME',this.form.name)
+      sessionStorage.setItem('MAJOR',this.form.major)
+      sessionStorage.setItem('AVATAR',this.imageUrl)
+      sessionStorage.setItem('GENDER',this.form.gender)
     },
     getInfo() {
-      this.form.name = localStorage.getItem('nick_name')
-      this.form.major = localStorage.getItem('major')
-      this.form.gender = localStorage.getItem('gender')
+      this.form.name = sessionStorage.getItem('NICK_NAME')
+      this.form.major = sessionStorage.getItem('MAJOR')
+      this.form.gender = sessionStorage.getItem('GENDER')
+      this.imageUrl = sessionStorage.getItem('AVATAR')
     },
 
     getRegionText(codeStr){
