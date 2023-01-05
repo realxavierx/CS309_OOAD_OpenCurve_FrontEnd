@@ -157,6 +157,7 @@
 import router from "@/router/index"
 import {reactive, ref} from "vue";
 import axios from "axios";
+import {ElMessage} from "element-plus";
 
 export default {
   name: "TeacherCourseCenter",
@@ -235,6 +236,10 @@ export default {
       })
           .then(response => {
             console.log(response.data)
+            ElMessage({
+              type: 'success',
+              message: '添加课程成功！',
+            })
             this.getTeacherCourses()
             this.cancelAddCourse()
           })
@@ -329,6 +334,10 @@ export default {
       })
           .then(response => {
             console.log(response.data.message)
+            ElMessage({
+              type: 'success',
+              message: '移除学生成功！',
+            })
             this.students = this.students.filter((item) => item !== student)
           })
     }

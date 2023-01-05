@@ -47,7 +47,7 @@
             <el-upload
               class="avatar-uploader"
               :action="uploadActionUrl"
-              accept="image/png, image/jpg, image/gif"
+              accept="image/png, image/jpg, image/jpeg, image/gif"
               :on-success="handleAvatarSuccess"
               :limit="1">
               <img v-if="imageUrl" :src="imageUrl" class="avatar" />
@@ -241,22 +241,21 @@ export default {
         }]
       }).then(response => {
         console.log(response.data.message)
+        sessionStorage.setItem('NICK_NAME',this.form.name)
+        sessionStorage.setItem('MAJOR',this.form.major)
+        sessionStorage.setItem('COLLEGE',this.form.college)
+        sessionStorage.setItem('GENDER',this.form.gender)
+        sessionStorage.setItem('AVATAR',this.imageUrl)
+        sessionStorage.setItem('BIRTHDAY',this.form.birthday)
+        sessionStorage.setItem('REGIONCODE',this.form.region)
+        sessionStorage.setItem('GRADE',this.form.grade)
+        sessionStorage.setItem('ADDRESS',this.form.address)
       })
-      sessionStorage.setItem('NICK_NAME',this.form.name)
-      sessionStorage.setItem('MAJOR',this.form.major)
-      sessionStorage.setItem('COLLEGE',this.form.college)
-      sessionStorage.setItem('GENDER',this.form.gender)
-      sessionStorage.setItem('AVATAR',this.imageUrl)
-      sessionStorage.setItem('BIRTHDAY',this.form.birthday)
-      sessionStorage.setItem('REGIONCODE',this.form.region)
-      sessionStorage.setItem('GRADE',this.form.grade)
-      sessionStorage.setItem('ADDRESS',this.form.address)
     },
       
 
     getRegionText(codeStr){
       this.selectedOptions = codeStr.split(",")
-      
     }
   },
   mounted() {

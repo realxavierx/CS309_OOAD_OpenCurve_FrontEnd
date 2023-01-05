@@ -5,25 +5,16 @@
     <h3>video room</h3>
     <div class="live-room">
       <el-row>
-        <el-col :span="18" style="background-color: #fff8c3">
+        <el-col :span="18">
           <div class="video-title">
             {{ videoOptions.title }}
           </div>
           <div class="video-content">
             <vue3-video-play v-bind="videoOptions"></vue3-video-play>
           </div>
-          <div class="student-functions">
-            <el-button-group>
-              <el-button type="primary" plain>举手</el-button>
-              <el-button type="primary" plain>提问</el-button>
-              <el-button type="primary" plain>录屏</el-button>
-              <el-button type="primary" plain>弹幕</el-button>
-            </el-button-group>
-
-          </div>
         </el-col>
 
-        <el-col :span="6" style="background-color: aliceblue">
+        <el-col :span="6">
           <div>
             <el-row>
               <h4>Playlist</h4>
@@ -72,7 +63,7 @@
           </el-form-item>
 
           <el-form-item label="Session">
-            <el-input v-model="form.session"/>
+            <el-input-number disabled v-model="form.session"/>
           </el-form-item>
 
           <el-form-item label="Description">
@@ -188,7 +179,24 @@
       </el-dialog>
     </div>
 
-    <div class="student_progress">
+    <div>
+      <el-row>
+        <el-col :span="12">
+          <el-button style="width: 100%; height: 50px"
+                     @click="selection = 'Students\' Progress'">
+            Students' Progress
+          </el-button>
+        </el-col>
+        <el-col :span="12">
+          <el-button style="width: 100%; height: 50px"
+                     @click="selection = 'Comments'">
+            Comments
+          </el-button>
+        </el-col>
+      </el-row>
+    </div>
+
+    <div v-if="selection === 'Students\' Progress'" class="student_progress">
       <el-card class="student-score" v-for="student in students" :key="student">
         <el-row>
           <el-col :span="Number(7)">
@@ -200,7 +208,7 @@
           <el-col :span="Number(4)">
             Total Score:
             <el-tag style="width: 80px; height: 40px; margin-left: 10px" effect="dark">
-              {{ (Number(student.video_score) + Number(student.test_score)).toFixed(2) }} / {{ session_info.score }}
+              {{ (parseFloat(student.video_score) + parseFloat(student.test_score)).toFixed(2) }} / {{ session_info.score }}
             </el-tag>
           </el-col>
           <el-col :span="Number(1)"></el-col>
@@ -208,7 +216,7 @@
             <el-row style="margin-top: 7px">
               Video Progress:
               <el-progress :text-inside="true" :stroke-width="26" style="width: 220px; margin-left: 10px;"
-                           :percentage="Number((Number(student.video_score) / (session_info.score - questions.length)).toFixed(2))"/>
+                           :percentage="Number((Number(student.video_score) / (session_info.score - questions.length)).toFixed(2)) * 100"/>
             </el-row>
           </el-col>
           <el-col :span="Number(4)">
@@ -220,12 +228,84 @@
         </el-row>
       </el-card>
     </div>
+
+    <div v-if="selection === 'Comments'" class="comment-area">
+      <el-input
+          style="margin-top: 10px; margin-bottom: 10px"
+          v-model="commentContent"
+          placeholder="Please input your comment">
+        <template #append>
+          <el-button type="primary" @click="postComment">发送</el-button>
+        </template>
+      </el-input>
+      <el-timeline style="margin-top: 25px">
+        <el-timeline-item v-for="comment in comments.filter((item) => item.father_comment_id === -1)" :key="comment"
+                          :timestamp="comment.comment_date" placement="top">
+          <div>
+            <el-card class="father-comment">
+              <h4 style="color: #409EFF">{{ comment.user_id }}</h4>
+              <p>{{ comment.content }}</p>
+              <el-popover placement="bottom" :width="600" trigger="click" @show="replyContent = ''">
+                <template #reference>
+                  <el-button style="margin-right: 16px">回复</el-button>
+                </template>
+                <el-input
+                    v-model="replyContent"
+                    placeholder="Please input your reply">
+                  <template #append>
+                    <el-button type="primary" @click="postReply(comment, comment)">发送</el-button>
+                  </template>
+                </el-input>
+              </el-popover>
+              <el-button v-if="show_sonComments.some((item) => item.comment_id === comment.id && item.show === true)"
+                         type="primary" @click="show_sonComment(comment, false)">
+                收起回复
+              </el-button>
+              <el-button v-if="show_sonComments.some((item) => item.comment_id === comment.id && item.show === false)"
+                         type="primary" @click="show_sonComment(comment, true)">
+                展开回复
+              </el-button>
+            </el-card>
+            <div class="sonComment-area" style="margin-top: 10px"
+                 v-if="show_sonComments.some((item) => item.comment_id === comment.id && item.show === true)">
+              <el-timeline-item
+                  v-for="sonComment in comments.filter((item) => item.father_comment_id === comment.id)"
+                  :key="sonComment" :timestamp="sonComment.comment_date" placement="top">
+                <el-card class="son-comment">
+                  <el-row>
+                    <h4 style="color: #409EFF">{{ sonComment.user_id }}</h4>
+                    <p style="margin-top: 19px; margin-left: 8px; margin-right: 8px;"> reply to </p>
+                    <h4 style="color: #409EFF"> {{ sonComment.reply_user_id }}</h4>
+                  </el-row>
+
+                  <p>{{ sonComment.content }}</p>
+                  <el-popover placement="bottom" :width="600" trigger="click" @show="replyContent = ''">
+                    <template #reference>
+                      <el-button style="margin-right: 16px">回复</el-button>
+                    </template>
+                    <el-input
+                        v-model="replyContent"
+                        placeholder="Please input your reply">
+                      <template #append>
+                        <el-button type="primary" @click="postReply(comment, sonComment)">发送</el-button>
+                      </template>
+                    </el-input>
+                  </el-popover>
+                </el-card>
+              </el-timeline-item>
+            </div>
+          </div>
+        </el-timeline-item>
+      </el-timeline>
+    </div>
   </div>
 </template>
 
 <script>
 import {reactive, ref} from "vue";
 import axios from "axios";
+import {ElMessage} from "element-plus";
+import dayjs from "dayjs";
 // import {useRoute} from 'vue-router'
 // const route = useRoute()
 
@@ -236,7 +316,7 @@ export default {
     let formRef = reactive(ref(null))
     let form = reactive({
       title: '',
-      session: '',
+      session: 0,
       description: '',
       uploadVideo: [],
       score: ''
@@ -301,7 +381,22 @@ export default {
       }),
       questionsVisible: false,
       questions: [],
-      students: []
+      students: [],
+      // Barrage
+      barrageMsg: "",
+      barrageMsgList: [],
+      curTime: 0,
+      canvasTimer: null,
+      screenWidth: 830,
+      screenHeight: 200,
+      // Comment
+      comments: [],
+      show_sonComments: [],
+      commentContent: '',
+      commentFatherId: -1,
+      replyContent: '',
+
+      selection: 'Comments'
     }
   },
 
@@ -333,6 +428,10 @@ export default {
       })
           .then(response => {
             console.log(response.data)
+            ElMessage({
+              type: 'success',
+              message: '添加章节成功！',
+            })
             this.getSessionsCount()
             this.cancelAddChapter()
           })
@@ -341,7 +440,7 @@ export default {
     cancelAddChapter() {
       this.form_dialog_visible = false
       this.form.title = ''
-      this.form.session = ''
+      this.form.session = this.session_cnt + 1
       this.form.description = ''
       this.form.uploadVideo = []
       this.$refs.formRef.resetFields()
@@ -354,6 +453,7 @@ export default {
         url: 'http://localhost:8080/education/video/getSessionsCount?course_id=' + this.course_id,
       }).then(response => {
         this.session_cnt = response.data.data.session_count
+        this.form.session = this.session_cnt + 1
       })
     },
 
@@ -368,6 +468,7 @@ export default {
         this.currentSession = resp.session
         this.getTestBySession()
         this.getStudentProgressBySession()
+        this.getComment()
       })
     },
 
@@ -375,7 +476,7 @@ export default {
       this.formTitle = '修改课程章节'
       this.form_dialog_visible = true
       this.form.title = this.session_info.title
-      this.form.session = this.session_info.session
+      this.form.session = this.session_cnt + 1
       this.form.description = this.session_info.description
       this.form.score = this.session_info.score
     },
@@ -448,6 +549,10 @@ export default {
       })
           .then(response => {
             console.log(response.data)
+            ElMessage({
+              type: 'success',
+              message: '添加问题成功！',
+            })
             this.getTestBySession()
             this.cancelAddQuestion()
           })
@@ -474,6 +579,10 @@ export default {
       })
           .then(response => {
             console.log(response.data)
+            ElMessage({
+              type: 'success',
+              message: '修改问题成功！',
+            })
             this.getTestBySession()
             this.cancelAddQuestion()
           })
@@ -489,6 +598,90 @@ export default {
         // {id: 37, stu_id: '12012902@mail.sustech.edu.cn', sess_id: 6, video_score: '0.00', text_score: null}
         this.students = response.data.data.scores
       })
+    },
+
+    getComment() {
+      axios({
+        method: "GET",
+        url: "http://localhost:8080/education/comment/getComments?session_id=" + this.session_info.id,
+      }).then(response => {
+        let resp = response.data;
+        console.log(resp.message)
+        this.comments = resp.data.comments
+        this.comments.forEach((comment) => {
+          if (comment.father_comment_id === -1) {
+            this.show_sonComments.push({comment_id: comment.id, show: false})
+          }
+        })
+      });
+    },
+
+    postComment() {
+      if (this.commentContent === '') return
+
+      axios({
+        method: "POST",
+        url: "http://localhost:8080/education/comment/postComment",
+        data: {
+          content: this.commentContent,
+          father_comment_id: -1,
+          user_id: this.user_id,
+          session_id: this.session_info.id,
+          comment_date: dayjs().format("YYYY/MM/DD")
+        },
+        transformRequest: [function (data) {
+          let str = "";
+          for (let key in data) {
+            str += encodeURIComponent(key) + "=" + encodeURIComponent(data[key]) + "&";
+          }
+          return str;
+        }]
+      })
+          .then(response => {
+            console.log(response.data.message);
+            this.getComment()
+            this.commentContent = ''
+          });
+    },
+
+    postReply(fatherComment, replyComment) {
+      if (this.replyContent === '') return
+      axios({
+        method: "POST",
+        url: "http://localhost:8080/education/comment/postReply",
+        data: {
+          content: this.replyContent,
+          father_comment_id: fatherComment.id,
+          user_id: this.user_id,
+          session_id: this.session_info.id,
+          comment_date: dayjs().format("YYYY/MM/DD"),
+          reply_user_id: replyComment.user_id
+        },
+        transformRequest: [function (data) {
+          let str = "";
+          for (let key in data) {
+            str += encodeURIComponent(key) + "=" + encodeURIComponent(data[key]) + "&";
+          }
+          return str;
+        }]
+      })
+          .then(response => {
+            console.log(response.data.message);
+            this.getComment()
+            this.replyContent = ''
+          });
+    },
+
+    show_sonComment(comment, expand) {
+      for (let showSonComment of this.show_sonComments) {
+        if (showSonComment.comment_id === comment.id) {
+          if (expand) {
+            showSonComment.show = true
+          } else {
+            showSonComment.show = false
+          }
+        }
+      }
     }
   },
 
@@ -496,6 +689,7 @@ export default {
     this.course_id = this.$route.params.course_id
     this.user_id = sessionStorage.getItem('USER_ID')
     this.getSessionsCount()
+    this.form.session = this.session_cnt + 1
     this.getSessionInfo(1)
   }
 }
