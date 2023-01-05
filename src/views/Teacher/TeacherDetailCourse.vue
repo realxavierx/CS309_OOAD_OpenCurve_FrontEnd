@@ -269,7 +269,7 @@ export default {
       questionForm,
       formTitle: '添加课程章节',
       questionTitle: '添加问题',
-      uploadActionUrl: 'http://localhost:8081/cloud_storage/file/uploading',
+      uploadActionUrl: 'http://localhost:8081/cloud_storage/file/video',
       form_dialog_visible: false,
       question_dialog_visible: false,
       videoUrl: '',

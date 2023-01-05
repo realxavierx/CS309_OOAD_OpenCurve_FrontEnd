@@ -132,6 +132,7 @@ export default {
                           '&userType=' + loggedInUserType
                     }).then(resp => {
                       console.log(resp)
+                      sessionStorage.clear()
                       ElMessage({
                         type: 'success',
                         message: 'Quit',
