@@ -177,13 +177,13 @@ export default {
     confirm_modify() {
       this.axios({
         method: 'POST',
-        url: 'http://localhost:8080/education/Info/update',
+        url: 'http://localhost:8080/education/teacher/update',
         data: {
-          id: sessionStorage.getItem('USER_ID'),
+          userId: sessionStorage.getItem('USER_ID'),
           name: this.form.name,
           department: this.form.major,
+          gender: this.form.gender,
           picture_url: this.imageUrl,
-          gender:this.form.gender,
         },
         transformRequest: [function (data) {
           let str = '';

@@ -71,7 +71,6 @@ export default {
     // }
   },
   mounted() {
-    this.getInfo()
   }
 }
 </script>
