@@ -77,7 +77,7 @@
                 </el-col>
 
                 <el-col :span="Number(12)">
-                  <p>{{ this.videoScore + this.testScore }} / {{ this.session_info.score }}</p>
+                  <p>{{ parseFloat(this.videoScore) + parseFloat(this.testScore) }} / {{ this.session_info.score }}</p>
                 </el-col>
               </el-row>
 
@@ -217,7 +217,9 @@ export default {
       description: '',
       url: '',
       score: '',
-      course_id: ''
+      course_id: '',
+      low_url: '',
+      medium_url: ''
     })
 
     return {
@@ -258,8 +260,6 @@ export default {
           "volume",
           "setting",
           "pip",
-          "pageFullScreen",
-          "fullScreen",
         ], //显示所有按钮,
       }),
       // Text
@@ -268,7 +268,7 @@ export default {
       questionTimer: '',
       questionTimeInt: 3600000,
       questionTimeString: '',
-      progressStatus: 'processing',
+      progressStatus: 'watched',
       // Away From Keyboard
       afkTimer: null,
       afkTimeInt: 90000,
@@ -282,15 +282,12 @@ export default {
       screenWidth: 830,
       screenHeight: 200,
       // Comment
-      comments: [
-        new Comment('hello 1', -1, 'xavier', 6, dayjs().format('YYYY/MM/DD')),
-        new Comment('hello 2', -1, 'lsm', 6, dayjs().format('YYYY/MM/DD')),
-        new Comment('hello 3', -1, 'fdz', 6, dayjs().format('YYYY/MM/DD')),
-        new Comment('hello 1 - 1', -1, 'xjy', 6, dayjs().format('YYYY/MM/DD')),
-      ],
+      comments: [],
       commentContent: '',
       commentFatherId: -1,
       replyContent: '',
+      networkTimer: null,
+      now_url: ''
     }
   },
 
@@ -313,7 +310,8 @@ export default {
         this.session_info = response.data.data.video
 
         this.currentSession = this.session_info.session
-        this.videoOptions.src = this.session_info.url
+        this.videoOptions.src = this.session_info.low_url
+        this.now_url = this.session_info.low_url
         this.getTestBySession()
         this.getBarrage()
         this.getComment()
@@ -503,12 +501,17 @@ export default {
           _this.notifyBarrages(video.currentTime)
         }, 20)
 
+        _this.networkTimer = setInterval(() => {
+          _this.checkNetworkStatus()
+        }, 2000)
+
         _this.lastStartTime = Math.floor(video.currentTime)
       })
 
       video.addEventListener("pause", function () {
         // 监听  视频暂停
         clearInterval(_this.canvasTimer)
+        clearInterval(_this.networkTimer)
       })
 
       video.addEventListener("ended", function () {
@@ -516,9 +519,50 @@ export default {
         _this.updateVideoScore()
         _this.resetBarrages()
         clearInterval(_this.canvasTimer)
+        clearInterval(_this.networkTimer)
       })
 
       this.getVideoScore()
+    },
+
+    checkNetworkStatus() {
+      let video = document.getElementById('videoPlayer')
+      let currentTime = video.currentTime
+      let speed = window.navigator.connection.downlink
+      console.log('network: ' + speed)
+      if (speed < 1) {
+        if (this.now_url !== this.session_info.low_url) {
+          this.videoOptions.src = this.session_info.low_url
+          this.now_url = this.session_info.low_url
+          video.currentTime = currentTime
+          ElMessage({
+            type: 'success',
+            message: 'Change to low quality',
+          })
+        }
+      }
+      else if (speed < 3) {
+        if (this.now_url !== this.session_info.medium_url) {
+          this.videoOptions.src = this.session_info.medium_url
+          this.now_url = this.session_info.medium_url
+          video.currentTime = currentTime
+          ElMessage({
+            type: 'success',
+            message: 'Change to medium quality',
+          })
+        }
+      }
+      else {
+        if (this.now_url !== this.session_info.url) {
+          this.videoOptions.src = this.session_info.url
+          this.now_url = this.session_info.url
+          video.currentTime = currentTime
+          ElMessage({
+            type: 'success',
+            message: 'Change to high quality',
+          })
+        }
+      }
     },
 
     getVideoScore() {
@@ -529,7 +573,8 @@ export default {
       }).then(response => {
         this.videoScore = response.data.data.video_score
         this.testScore = response.data.data.test_score
-        this.watchPercentage = (this.videoScore / (this.session_info.score - this.questions.length)).toFixed(2) * 100
+        this.watchPercentage = parseInt(
+            (this.videoScore / (this.session_info.score - this.questions.length)).toFixed(2)) * 100
       })
     },
 
@@ -547,7 +592,7 @@ export default {
       }
 
       this.videoScore = Math.max(curVideoScore, this.videoScore).toFixed(2)
-      this.watchPercentage = (this.videoScore / (this.session_info.score - this.questions.length) * 100).toFixed(2)
+      this.watchPercentage =  parseInt((this.videoScore / (this.session_info.score - this.questions.length)).toFixed(2)) * 100
 
       axios({
         method: 'POST',
@@ -772,7 +817,7 @@ export default {
             this.getComment()
             this.replyContent = ''
           });
-    }
+    },
   },
 
   mounted() {
@@ -781,12 +826,12 @@ export default {
     this.checkCheating()
     this.getSessionsCount()
     this.getSessionInfo(1)
-
   },
 
   beforeUnmount() {
     clearInterval(this.afkTimer)
     clearInterval(this.canvasTimer)
+    clearInterval(this.networkTimer)
     this.updateVideoScore()
     let videoCnt = parseInt(sessionStorage.getItem('VIDEO_CNT'))
     if (videoCnt <= 1) {

@@ -10,10 +10,10 @@
 
         <div id="input-box" class="animate__animated animate__lightSpeedInRight">
           <div class="input-text">
-            <input type="text" v-model="userId" id="inputId" placeholder="Your Email">
+            <el-input style="width: 220px" type="text" v-model="userId" id="inputId" placeholder="Your Email" clearable/>
           </div>
           <div class="input-text">
-            <input type="password" v-model="content" id="inputPassword" placeholder="Code / Password">
+            <el-input style="width: 220px" type="password" v-model="content" id="inputPassword" placeholder="Code / Password" clearable/>
           </div>
 
           <el-button
@@ -205,7 +205,7 @@ export default {
 #form {
   position: relative;
   width: 400px;
-  height: 370px;
+  height: 400px;
   top: 50%;
   left: 50%;
   margin-top: -250px;
