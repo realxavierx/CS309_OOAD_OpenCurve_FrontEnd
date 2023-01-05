@@ -68,17 +68,22 @@ export default {
 
     signShow() {
       this.$router.push({
-        path: '/welcome/login',
+        path: '/Welcome/login',
       })
     },
 
     toUserCenter() {
-      this.$router.push({
-        path: '/userPage',
-        // query: {
-        //     uid: sessionStorage.getItem('uid')
-        // }
-      })
+      if (localStorage.getItem('USER_ID')) {
+        this.$router.push({
+          path: '/userPage',
+        })
+      } else {
+        this.$router.push({
+          path: '/Welcome/login',
+          
+        })
+      }
+      
     }
   }
 }

@@ -244,26 +244,19 @@ export default {
       })
     },
     getInfo() {
-      this.axios({
-        method: 'GET',
-        url: 'http://localhost:8080/education/Info/getInfo/?id=' + localStorage.getItem('USER_ID'),
-      }).then(response => {
-        this.form.name = response.data.data.Info.name
-        this.imageUrl = response.data.data.Info.picture_url
-        this.form.birthday = response.data.data.Info.birthday
-        this.form.college = response.data.data.Info.college
-        this.form.major = response.data.data.Info.department
-        this.form.gender = response.data.data.Info.gender
-        this.form.region = response.data.data.Info.region
-        this.form.address = response.data.data.Info.address
-        this.form.grade = response.data.data.Info.grade
-      })
-      
+      this.form.name = localStorage.getItem('nick_name')
+      this.form.birthday = localStorage.getItem('birthday')
+      this.form.college = localStorage.getItem('college')
+      this.form.major = localStorage.getItem('major')
+      this.form.gender = localStorage.getItem('gender')
+      this.form.region = localStorage.getItem('regionCode')
+      this.form.address = localStorage.getItem('address')
+      this.form.grade = localStorage.getItem('grade')
     },
+
     getRegionText(codeStr){
-      for(var key in codeStr){
-        this.selectedOptions.push(codeStr[key])
-      }
+      this.selectedOptions = codeStr.split(",")
+      
     }
   },
   mounted() {
