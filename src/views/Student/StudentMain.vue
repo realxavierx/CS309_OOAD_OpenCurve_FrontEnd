@@ -2,104 +2,70 @@
   <div class="background">
     <div class="mainPage-student">
       <h1 align="center">Student Main Page</h1>
-      <el-carousel>
-        <el-carousel-item v-for="course in courses" :key="course">
-          <h2>
-            {{ course.course_id }}
-          </h2>
+      <el-carousel height="400px">
+        <el-carousel-item v-for="item in imgList" :key="item.name">
+          <img :src="item.url" style="height:100%;width:100%;cursor: pointer;" alt="图片丢失了" :title="item.course_id" @click="jumpToCourse(item.course_id)"/>
         </el-carousel-item>
       </el-carousel>
     </div>
-    <div class="mainpage-student tab">
+    <div class="mainPage-student tab">
 
       <el-tabs v-model="activeName" @tab-click="handleClick">
-        <el-tab-pane label="关注" name="first"></el-tab-pane>
-        <el-tab-pane label="推荐" name="second"></el-tab-pane>
-        <el-tab-pane label="热榜" name="third"></el-tab-pane>
-        <el-tab-pane label="按专业查看" name="fourth">
-          <el-row class="tac">
-            <el-col :span="4">
-              <el-menu
-                  default-active="2"
-                  class="el-menu-vertical-demo"
-                  @open="handleOpen"
-                  @close="handleClose"
-              >
-                <el-sub-menu index="1">
-                  <template #title>
-                    <el-icon>
-                      <location/>
-                    </el-icon>
-                    <span>计算机系</span>
-                  </template>
-                  <el-sub-menu index="1-1">
-                    <template #title>计算机科学与技术</template>
-                    <el-menu-item index="1-1-1">CS996</el-menu-item>
-                    <el-menu-item index="1-1-2">CS101</el-menu-item>
-                    <el-menu-item index="1-1-3">CS309</el-menu-item>
-                  </el-sub-menu>
-                  <el-sub-menu index="1-2">
-                    <template #title>人工智能科学</template>
-                    <el-menu-item index="1-2-1">CS405</el-menu-item>
-                    <el-menu-item index="1-2-2">CS303</el-menu-item>
-                  </el-sub-menu>
-                </el-sub-menu>
-                <el-sub-menu index="2">
-                  <template #title>
-                    <el-icon>
-                      <location/>
-                    </el-icon>
-                    <span>电子系</span>
-                  </template>
-                  <el-sub-menu index="2-1">
-                    <template #title>item four</template>
-                    <el-menu-item index="2-1-1">item one</el-menu-item>
-                  </el-sub-menu>
-                </el-sub-menu>
-                <el-sub-menu index="3">
-                  <template #title>
-                    <el-icon>
-                      <location/>
-                    </el-icon>
-                    <span>生物系</span>
-                  </template>
-                  <el-sub-menu index="3-1">
-                    <template #title>item four</template>
-                    <el-menu-item index="3-1-1">item one</el-menu-item>
-                  </el-sub-menu>
-                </el-sub-menu>
-              </el-menu>
-            </el-col>
-          </el-row>
+        <el-tab-pane label="推荐" name="first" >
+          <el-timeline>
+            <el-timeline-item v-for="(item, index) in history" :key="index" timestamp="2022/12/17" placement="top">
+              <el-card >
+                <h4>{{item.title}}</h4>
+                <p>{{item.teacher}} {{item.time}}</p>
+              </el-card>
+            </el-timeline-item>
+          </el-timeline>
         </el-tab-pane>
-      </el-tabs>
+
+        <el-tab-pane label="热榜" name="second">
+          <el-timeline>
+            <el-timeline-item v-for="(item, index) in history" :key="index" timestamp="2022/12/17" placement="top">
+              <el-card>
+                <h4>{{item.title}}</h4>
+                <p>{{item.teacher}} {{item.time}}</p>
+              </el-card>
+            </el-timeline-item>
+          </el-timeline>
+        </el-tab-pane>
+          
+        </el-tabs>
     </div>
   </div>
 </template>
 
 <script>
+import router from "@/router/index"
 export default {
   name: "StudentMain",
 
   data() {
 
     return {
-      courses: [
+      imgList: [],
+      activeName: 'first',
+      tabPosition: 'left',
+      history: [
         {
-          course_id: 'CS102'
+          title: '高等数学（上）-1',
+          teacher: '吴纪桃',
+          time: '2022-12-17'
         },
         {
-          course_id: 'CS202'
+          title: '大学物理（上）-12',
+          teacher: '鲁大为',
+          time: '2022-12-17'
         },
         {
-          course_id: 'CS209'
-        },
-        {
-          course_id: 'CS303'
-        },
+          title: '面向对象设计与分析-5',
+          teacher: '张煜群',
+          time: '2022-12-17'
+        }
       ],
-      activeName: 'fourth',
-      tabPosition: 'left'
     }
   },
 
@@ -112,8 +78,42 @@ export default {
     },
     handleClose(key, keyPath) {
       console.log(key, keyPath);
+    },
+    getBanner() {
+      this.axios({
+        method: 'GET',
+        url: 'http://localhost:8082/banner/getBanner',
+      }).then(response => {
+        let resp = response.data.data
+        this.imgList.push({
+          course_id: resp.Banner1.course_id,
+          url: resp.Banner1.url
+        })
+        this.imgList.push({
+          course_id: resp.Banner2.course_id,
+          url: resp.Banner2.url
+        })
+        this.imgList.push({
+          course_id: resp.Banner3.course_id,
+          url: resp.Banner3.url
+        })
+        this.imgList.push({
+          course_id: resp.Banner4.course_id,
+          url: resp.Banner4.url
+        })
+      })
+    },
+    jumpToCourse(course_id) {
+      router.push({
+        name: "StudentDetailCourse",
+        params: {
+          course_id: course_id
+        }
+      })
     }
-
+  },
+  mounted() {
+    this.getBanner()
   }
 }
 </script>
