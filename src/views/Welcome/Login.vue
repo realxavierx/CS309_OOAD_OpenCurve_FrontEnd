@@ -168,7 +168,7 @@ export default {
         if (res.data.code === 200) {
           sessionStorage.setItem('USER_ID', res.data.data.user.id)
           sessionStorage.setItem('TYPE', this.userType)
-          sessionStorage.setItem('AVATAR', res.data.data.picture_url)
+          sessionStorage.setItem('AVATAR', res.data.data.user.picture_url)
           localStorage.setItem('USER_CNT', '1')
 
           //路由跳转

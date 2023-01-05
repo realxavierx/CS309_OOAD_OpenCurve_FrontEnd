@@ -19,31 +19,58 @@
         </el-row>
       </div>
       <div v-if="selection === 'Course Applications'" class="CourseApplications">
-        <div v-for="course in courseApplications" :key="course.id" style="margin: 20px">
+        <div v-for="idx in courseApplications.length" :key="idx" style="margin: 20px">
           <el-descriptions title="Application" border>
             <template #extra>
               <el-button type="primary">Approve</el-button>
-              <el-button type="danger">Reject</el-button>
+              <el-button type="danger" @click="rejectApplication()">Reject</el-button>
             </template>
-            <el-descriptions-item label="ID">{{ course.id }}</el-descriptions-item>
-            <el-descriptions-item label="Name">{{ course.name }}</el-descriptions-item>
-            <el-descriptions-item label="Teacher">{{ course.courseTeacher }}</el-descriptions-item>
-            <el-descriptions-item label="Location">{{ course.courseLocation }}</el-descriptions-item>
-            <el-descriptions-item label="Description">{{ course.courseDescription }}</el-descriptions-item>
+            <el-descriptions-item label="ID">{{ courseApplications[idx].id }}</el-descriptions-item>
+            <el-descriptions-item label="Name">{{ courseApplications[idx].name }}</el-descriptions-item>
+            <el-descriptions-item label="Teacher">{{ teachers[idx] }}</el-descriptions-item>
+            <el-descriptions-item label="Department">{{ courseApplications[idx].department }}</el-descriptions-item>
+            <el-descriptions-item label="Type">{{ courseApplications[idx].course_type }}</el-descriptions-item>
+            <el-descriptions-item label="Credit">{{ courseApplications[idx].credit }}</el-descriptions-item>
+            <el-descriptions-item label="Status"> {{ courseApplications[idx].status }}</el-descriptions-item>
+            <el-descriptions-item label="Fee"> {{ courseApplications[idx].fee }}</el-descriptions-item>
+            <el-descriptions-item label="Description">{{ courseApplications[idx].info }}</el-descriptions-item>
           </el-descriptions>
         </div>
       </div>
+
+      <el-dialog
+          v-model="dialogVisible"
+          title="Tips"
+          width="30%"
+          :before-close="handleClose"
+      >
+        <span>This is a message</span>
+        <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="dialogVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="dialogVisible = false">
+          Confirm
+        </el-button>
+      </span>
+        </template>
+      </el-dialog>
+
       <div v-if="selection === 'Existing Courses'" class="ExistingCourses">
-        <div v-for="course in existingCourses" :key="course.id" style="margin: 20px">
+        <div v-for="idx in existingCourses.length" :key="idx" style="margin: 20px">
           <el-descriptions title="Course Information" border>
             <template #extra>
               <el-button type="primary">Edit</el-button>
               <el-button type="danger">Delete</el-button>
             </template>
-            <el-descriptions-item label="Name">{{ course.courseName }}</el-descriptions-item>
-            <el-descriptions-item label="Teacher">{{ course.courseTeacher }}</el-descriptions-item>
-            <el-descriptions-item label="Location">{{ course.courseLocation }}</el-descriptions-item>
-            <el-descriptions-item label="Description">{{ course.courseDescription }}</el-descriptions-item>
+            <el-descriptions-item label="ID">{{ existingCourses[idx].id }}</el-descriptions-item>
+            <el-descriptions-item label="Name">{{ existingCourses[idx].name }}</el-descriptions-item>
+            <el-descriptions-item label="Teacher">{{ teachers[idx] }}</el-descriptions-item>
+            <el-descriptions-item label="Department">{{ existingCourses[idx].department }}</el-descriptions-item>
+            <el-descriptions-item label="Type">{{ existingCourses[idx].course_type }}</el-descriptions-item>
+            <el-descriptions-item label="Credit">{{ existingCourses[idx].credit }}</el-descriptions-item>
+            <el-descriptions-item label="Status"> {{ existingCourses[idx].status }}</el-descriptions-item>
+            <el-descriptions-item label="Fee"> {{ existingCourses[idx].fee }}</el-descriptions-item>
+            <el-descriptions-item label="Description">{{ existingCourses[idx].info }}</el-descriptions-item>
           </el-descriptions>
         </div>
       </div>
@@ -61,29 +88,9 @@ export default {
   data() {
     return {
       selection: '',
-      courseApplications: [
-        {
-          id: 1,
-          courseName: 'OOAD',
-          courseTeacher: 'YUEMING ZHU',
-          courseLocation: 'Lecture Hall',
-          courseDescription: 'It\'s OK to work on an assignment with a friend, and think together' +
-              'about the program structure, share ideas and even the global logic. At ' +
-              'the time of actually writing the code, you should write it alone.'
-        },
-        {
-          id: 2,
-          courseName: 'DSAA',
-          courseTeacher: 'BO TANG',
-          courseLocation: 'Research Building',
-          courseDescription: 'It\'s OK to work on an assignment with a friend, and think together' +
-              'about the program structure, share ideas and even the global logic. At ' +
-              'the time of actually writing the code, you should write it alone.'
-        }
-      ],
-
-      existingCourses: [
-      ]
+      courseApplications: [],
+      existingCourses: [],
+      teachers: []
     }
   },
 
@@ -97,6 +104,7 @@ export default {
             console.log(resp.data.message)
             console.log(resp.data.data)
             this.courseApplications = resp.data.data.unverified_courses
+            this.teachers = resp.data.data.teachers
           })
     },
 
@@ -109,6 +117,7 @@ export default {
             console.log(resp.data.message)
             console.log(resp.data.data)
             this.existingCourses = resp.data.data.existing_courses
+            this.teachers = resp.data.data.teachers
           })
     }
   },
