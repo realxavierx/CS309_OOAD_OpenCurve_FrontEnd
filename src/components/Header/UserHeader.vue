@@ -1,6 +1,6 @@
 <template>
   <div id="nav_u">
-    <img src="../../img/logo.png" alt="" style="height:40px;float:left;margin:20px 0 20px 20px;">
+    <img src="../../img/logo.png" alt="" style="height:40px;float:left;margin:20px 0 20px 20px;cursor: pointer;" @click="toWelcome()">
     <div class="nav">
       <ul>
         <li class="dropdown">
@@ -18,23 +18,20 @@
         <li class="dropdown">
           <div class="route-box" @click="toSelfCenter()">个人中心</div>
         </li>
-        <li class="dropdown">
-          <router-link to="/" style="color:white">view</router-link>
-        </li>
       </ul>
     </div>
     <div class="nav_r">
       <ul>
         <li>
           <div>
-            <el-avatar src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></el-avatar>
+            <el-avatar :src="avatar_url"></el-avatar>
           </div>
         </li>
-        <li><div id="great">Hi~12012711</div></li>
+        <li><div id="great">Hi ~ {{ nick_name }}</div></li>
       </ul>
     </div>
   </div>
-  <router-view v-loading="loading"></router-view>
+  <router-view></router-view>
 </template>
 
 <script>
@@ -45,15 +42,15 @@ export default {
 
   data() {
     return {
-      loading: true
+      logo_url: '../../img/logo.png',
+      avatar_url: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png', //默认头像
+      nick_name: 'Visitor',
+      type : localStorage.getItem('type')
     }
-  },
-  mounted() {
-    this.loading = false;
   },
   methods: {
     toMain() {
-      if (sessionStorage.getItem('type') === 'Teacher') {
+      if (this.type == 'Teacher') {
         router.push('/userPage/TeacherMain')
       }
       else {
@@ -61,33 +58,66 @@ export default {
       }
     },
     toCourseCenter() {
-      if (sessionStorage.getItem('type') === 'Teacher') {
+      if (this.type == 'Teacher') {
         router.push('/userPage/TeacherCourseCenter')
       } else {
         router.push('/userPage/StudentCourseCenter')
       }
     },
     toNotificationCenter() {
-      if (sessionStorage.getItem('type') === 'Teacher') {
+      if (this.type == 'Teacher') {
         router.push('/userPage/TeacherNotificationCenter')
       } else {
         router.push('/userPage/StudentNotificationCenter')
       }
     },
     toAssignmentCenter() {
-      if (sessionStorage.getItem('type') === 'Teacher') {
+      if (this.type == 'Teacher') {
         router.push('/userPage/TeacherAssignmentCenter')
       } else {
         router.push('/userPage/StudentAssignmentCenter')
       }
     },
     toSelfCenter() {
-      if (sessionStorage.getItem('type') === 'Teacher') {
+      if (this.type == 'Teacher') {
         router.push('/userPage/TeacherSelfCenter/information')
       } else {
         router.push('/userPage/StudentSelfCenter/information')
       }
+    },
+    toWelcome() {
+      router.push('/')
+    },
+    getInfo() {
+      this.axios({
+        method: 'GET',
+        url: 'http://localhost:8080/education/Info/getInfo/?id=' + localStorage.getItem('USER_ID') + "&userType=" + localStorage.getItem('type'),
+      }).then(response => {
+        let resp = response.data.data.Info
+        if (this.type == 'Student') {
+          localStorage.setItem('avatar_url',resp.picture_url)
+          localStorage.setItem('nick_name', resp.name)
+          localStorage.setItem('birthday',resp.birthday)
+          localStorage.setItem('college',resp.college)
+          localStorage.setItem('major',resp.department)
+          localStorage.setItem('gender',resp.gender)
+          localStorage.setItem('regionCode',resp.region)
+          localStorage.setItem('address',resp.address)
+          localStorage.setItem('grade',resp.grade)
+        } else if (this.type == 'Teacher') {
+          localStorage.setItem('avatar_url',resp.picture_url)
+          localStorage.setItem('nick_name', resp.name)
+          localStorage.setItem('major',resp.department)
+          localStorage.setItem('gender',resp.gender)
+        }
+        
+      })
+      this.avatar_url = localStorage.getItem('avatar_url')
+      this.nick_name = localStorage.getItem('nick_name')
     }
+  },
+  mounted() {
+    this.getInfo()
   }
 
 }
