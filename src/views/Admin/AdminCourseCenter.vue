@@ -6,34 +6,38 @@
         <el-row>
           <el-col :span="12">
             <el-button style="width: 100%; height: 50px"
-                       @click="selection = 'Course Applications'">
+                       @click="selection = 'Course Applications'; getUnverifiedCourses">
               Course Application
             </el-button>
           </el-col>
           <el-col :span="12">
             <el-button style="width: 100%; height: 50px"
-                       @click="selection = 'Existing Courses'">
+                       @click="selection = 'Existing Courses'; getExistingCourses">
               Existing Courses
             </el-button>
           </el-col>
         </el-row>
       </div>
+
       <div v-if="selection === 'Course Applications'" class="CourseApplications">
-        <div v-for="idx in courseApplications.length" :key="idx" style="margin: 20px">
+        <div v-for="(value, key) in courseApplications" :key="key" style="margin: 20px">
           <el-descriptions title="Application" border>
             <template #extra>
-              <el-button type="primary">Approve</el-button>
-              <el-button type="danger" @click="rejectApplication()">Reject</el-button>
+              <el-button type="primary" @click="passApplication(courseApplications[key].id)">Approve</el-button>
+              <el-button type="danger"
+                         @click="curApplication = courseApplications[key].id; dialogVisible = true">
+                Reject
+              </el-button>
             </template>
-            <el-descriptions-item label="ID">{{ courseApplications[idx].id }}</el-descriptions-item>
-            <el-descriptions-item label="Name">{{ courseApplications[idx].name }}</el-descriptions-item>
-            <el-descriptions-item label="Teacher">{{ teachers[idx] }}</el-descriptions-item>
-            <el-descriptions-item label="Department">{{ courseApplications[idx].department }}</el-descriptions-item>
-            <el-descriptions-item label="Type">{{ courseApplications[idx].course_type }}</el-descriptions-item>
-            <el-descriptions-item label="Credit">{{ courseApplications[idx].credit }}</el-descriptions-item>
-            <el-descriptions-item label="Status"> {{ courseApplications[idx].status }}</el-descriptions-item>
-            <el-descriptions-item label="Fee"> {{ courseApplications[idx].fee }}</el-descriptions-item>
-            <el-descriptions-item label="Description">{{ courseApplications[idx].info }}</el-descriptions-item>
+            <el-descriptions-item label="ID">{{ value.id }}</el-descriptions-item>
+            <el-descriptions-item label="Name">{{ value.name }}</el-descriptions-item>
+            <el-descriptions-item label="Teacher">{{ teachers[key] }}</el-descriptions-item>
+            <el-descriptions-item label="Department">{{ value.department }}</el-descriptions-item>
+            <el-descriptions-item label="Type">{{ value.course_type }}</el-descriptions-item>
+            <el-descriptions-item label="Credit">{{ value.credit }}</el-descriptions-item>
+            <el-descriptions-item label="Status"> {{ value.status }}</el-descriptions-item>
+            <el-descriptions-item label="Fee"> {{ value.fee }}</el-descriptions-item>
+            <el-descriptions-item label="Description">{{ value.info }}</el-descriptions-item>
           </el-descriptions>
         </div>
       </div>
@@ -61,22 +65,26 @@
       </el-dialog>
 
       <div v-if="selection === 'Existing Courses'" class="ExistingCourses">
-        <div v-for="idx in existingCourses.length" :key="idx" style="margin: 20px">
+        <div v-for="(value, key) in existingCourses" :key="key" style="margin: 20px">
           <el-descriptions title="Course Information" border>
             <template #extra>
               <el-button type="primary">Edit</el-button>
               <el-button type="danger">Delete</el-button>
             </template>
-            <el-descriptions-item label="ID">{{ existingCourses[idx].id }}</el-descriptions-item>
-            <el-descriptions-item label="Name">{{ existingCourses[idx].name }}</el-descriptions-item>
-            <el-descriptions-item label="Teacher">{{ teachers[idx] }}</el-descriptions-item>
-            <el-descriptions-item label="Department">{{ existingCourses[idx].department }}</el-descriptions-item>
-            <el-descriptions-item label="Type">{{ existingCourses[idx].course_type }}</el-descriptions-item>
-            <el-descriptions-item label="Credit">{{ existingCourses[idx].credit }}</el-descriptions-item>
-            <el-descriptions-item label="Status"> {{ existingCourses[idx].status }}</el-descriptions-item>
-            <el-descriptions-item label="Fee"> {{ existingCourses[idx].fee }}</el-descriptions-item>
-            <el-descriptions-item label="Description">{{ existingCourses[idx].info }}</el-descriptions-item>
+            <el-descriptions-item label="ID">{{ value.id }}</el-descriptions-item>
+            <el-descriptions-item label="Name">{{ value.name }}</el-descriptions-item>
+            <el-descriptions-item label="Teacher">{{ teachers[key] }}</el-descriptions-item>
+            <el-descriptions-item label="Department">{{ value.department }}</el-descriptions-item>
+            <el-descriptions-item label="Type">{{ value.course_type }}</el-descriptions-item>
+            <el-descriptions-item label="Credit">{{ value.credit }}</el-descriptions-item>
+            <el-descriptions-item label="Status"> {{ value.status }}</el-descriptions-item>
+            <el-descriptions-item label="Fee"> {{ value.fee }}</el-descriptions-item>
+            <el-descriptions-item label="Description">{{ value.info }}</el-descriptions-item>
           </el-descriptions>
+
+          <el-divider>
+            <el-icon><star-filled /></el-icon>
+          </el-divider>
         </div>
       </div>
     </div>
@@ -86,6 +94,7 @@
 <script>
 
 import axios from "axios";
+import {ElMessageBox} from "element-plus";
 
 export default {
   name: "AdminCourse",
@@ -97,6 +106,7 @@ export default {
       existingCourses: [],
       teachers: [],
       dialogVisible: false,
+      curApplication: '',
       reason: ''
     }
   },
@@ -128,12 +138,40 @@ export default {
           })
     },
 
-    handleClose() {
+    passApplication(course_id) {
+      axios({
+        method: 'GET',
+        url: 'http://localhost:8080/education/manage/passApplication?course=' + course_id
+      })
+          .then((resp) => {
+            console.log(resp.data.message)
+            this.courseApplications = this.courseApplications.filter((c) => c.id !== course_id)
+          })
+    },
 
+    handleClose() {
+      ElMessageBox.confirm('Are you sure to close this dialog?')
+          .then(() => {
+            this.dialogVisible = false
+            this.reason = ''
+          })
+          .catch(() => {
+            // catch error
+          })
     },
 
     rejectApplication() {
-
+      axios({
+        method: 'GET',
+        url: 'http://localhost:8080/education/manage/passApplication?course='
+            + this.curApplication + '&reason=' + this.reason
+      })
+          .then((resp) => {
+            console.log(resp.data.message)
+            this.courseApplications = this.courseApplications.filter((c) => c.id !== this.curApplication)
+            this.reason = ''
+            this.dialogVisible = false
+          })
     },
   },
 
