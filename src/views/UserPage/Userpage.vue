@@ -6,15 +6,10 @@
 
 <script>
 import UserHeader from '../../components/Header/UserHeader.vue';
-import router from "@/router";
 
 export default {
   components: {
     UserHeader,
-  },
-  data() {
-  },
-  mounted() {
   },
 
 }

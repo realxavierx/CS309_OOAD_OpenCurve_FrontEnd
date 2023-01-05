@@ -133,7 +133,8 @@ export default {
       this.getType()
       this.axios({
         method: 'GET',
-        url: 'http://localhost:8080/education/Info/getInfo/?id=' + localStorage.getItem('USER_ID') + "&userType=" + localStorage.getItem('type'),
+        url: 'http://localhost:8080/education/Info/getInfo/?id=' + sessionStorage.getItem('USER_ID')
+            + "&userType=" + sessionStorage.getItem('TYPE'),
       }).then(response => {
         let resp = response.data.data.Info
         if (this.type === 'Student') {
@@ -152,10 +153,14 @@ export default {
           sessionStorage.setItem('MAJOR',resp.department)
           sessionStorage.setItem('GENDER',resp.gender)
         }
+        else {
+          sessionStorage.setItem('AVATAR',resp.picture_url)
+          sessionStorage.setItem('MAJOR',resp.department)
+        }
         
       })
-      this.avatar_url = sessionStorage.getItem('avatar_url')
-      this.nick_name = sessionStorage.getItem('nick_name')
+      this.avatar_url = sessionStorage.getItem('AVATAR')
+      this.nick_name = sessionStorage.getItem('NICK_NAME')
     }
   },
 

@@ -42,7 +42,6 @@
           <el-button type="danger" style="margin: 10px" @click="this.$router.push({path: '/welcome'})">暂不登录</el-button>
         </div>
       </div>
-
     </div>
   </div>
 

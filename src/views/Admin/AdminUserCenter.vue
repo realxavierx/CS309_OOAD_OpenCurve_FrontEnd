@@ -90,13 +90,13 @@
               <el-card style="height: 200px">
                 <el-row>
                   <el-col :span="8">
-                    <el-avatar style="margin-top: 10px; margin-left: 20px" :size="100" :src="teacher.picture_url" />
-                    <el-button style="margin-top: 25px; margin-left: 30px"
+                    <el-avatar style="margin-top: 1px; margin-left: 25px" :size="120" :src="teacher.picture_url" />
+                    <el-button style="margin-top: 10px; margin-left: 26px"
                                v-if="teacher.status === 'normal'"
                                type="danger" @click="blockTeacher(teacher)">
                       Block Teacher
                     </el-button>
-                    <el-button style="margin-top: 30px; margin-left: 26px"
+                    <el-button style="margin-top: 10px; margin-left: 26px"
                                v-if="teacher.status === 'blocked'"
                                type="success" @click="unblockTeacher(teacher)">
                       Unblock Teacher
@@ -223,7 +223,49 @@ export default {
             console.log(response.data.message)
             this.getStudentsInfo()
           })
-    }
+    },
+
+    blockTeacher(teacher) {
+      axios({
+        method: 'POST',
+        url: 'http://localhost:8080/education/manage/blockTeacher',
+        data: {
+          id: teacher.id
+        },
+        transformRequest: [function (data) {
+          let str = '';
+          for (let key in data) {
+            str += encodeURIComponent(key) + '=' + encodeURIComponent(data[key]) + '&';
+          }
+          return str;
+        }]
+      })
+          .then(response => {
+            console.log(response.data.message)
+            this.getTeachersInfo()
+          })
+    },
+
+    unblockTeacher(teacher) {
+      axios({
+        method: 'POST',
+        url: 'http://localhost:8080/education/manage/unblockTeacher',
+        data: {
+          id: teacher.id
+        },
+        transformRequest: [function (data) {
+          let str = '';
+          for (let key in data) {
+            str += encodeURIComponent(key) + '=' + encodeURIComponent(data[key]) + '&';
+          }
+          return str;
+        }]
+      })
+          .then(response => {
+            console.log(response.data.message)
+            this.getTeachersInfo()
+          })
+    },
   },
 
   mounted() {
