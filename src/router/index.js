@@ -31,15 +31,13 @@ import Teacher_setting from "@/views/UserPage/Teacher_setting.vue"
 import Teacher_vip from "@/views/UserPage/Teacher_vip.vue"
 
 const routes = [
-    {
-        path: '/',
-        name: 'home',
-        component: HomeView
-    },
-
     // Welcome
     {
-        path: '/welcome',
+        path: '/',
+        redirect: '/Welcome'
+    },
+    {
+        path: '/Welcome',
         component: Welcome,
         children: [
             {
