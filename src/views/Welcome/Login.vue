@@ -107,15 +107,8 @@ export default {
             let loggedInUserId = sessionStorage.getItem('USER_ID')
             let loggedInUserType = sessionStorage.getItem('TYPE')
 
-            if (accountDuplicateLogin || deviceDuplicateLogin) {
-              if (accountDuplicateLogin) {
-                alert("This account has already been logged in!")
-              }
-              else if (deviceDuplicateLogin) {
-                alert("This device has already logged in an account!")
-              }
-            }
-            else if (loggedInUserId !== null && loggedInUserType !== null) {
+
+            if (loggedInUserId !== null && loggedInUserType !== null) {
               ElMessageBox.confirm(
                   'You have already logged in an account.\nYou have to quit before you login another one.',
                   'Warning',
@@ -133,6 +126,7 @@ export default {
                     }).then(resp => {
                       console.log(resp)
                       sessionStorage.clear()
+                      localStorage.setItem('USER_CNT', '0')
                       ElMessage({
                         type: 'success',
                         message: 'Quit',
@@ -145,6 +139,14 @@ export default {
                       message: 'Canceled',
                     })
                   })
+            }
+            else if (accountDuplicateLogin || deviceDuplicateLogin) {
+              if (accountDuplicateLogin) {
+                alert("This account has already been logged in!")
+              }
+              else if (deviceDuplicateLogin) {
+                alert("This device has already logged in an account!")
+              }
             }
             else  {
               if (this.loginWay === 'Verification Code' && this.content !== this.vertiCodeFromEnd) {
