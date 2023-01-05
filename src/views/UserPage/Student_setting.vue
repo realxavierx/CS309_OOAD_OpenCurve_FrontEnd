@@ -38,12 +38,101 @@
       </div>
 
     </div>
+    <div class="base-info">
+      <div class="base-info-head">编辑信息</div>
+      <div class="base-info-content">
+
+        <el-form ref="form" :model="form" label-width="80px" size="mini">
+          <el-form-item label="上传头像">
+            <el-upload
+              class="avatar-uploader"
+              :action="uploadActionUrl"
+              accept="image/png, image/jpg, image/gif"
+              :on-success="handleAvatarSuccess"
+              :limit="1">
+              <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+              <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+            </el-upload>
+          </el-form-item>
+          <el-form-item label="用户昵称">
+            <el-input v-model="form.name"></el-input>
+          </el-form-item>
+          <el-form-item label="出生日期">
+            <el-col :span="11">
+              <el-date-picker
+                value-format="YYYY-MM-DD"
+                v-model="form.birthday"
+                type="date"
+                placeholder="Pick a day"
+              />
+            </el-col>
+          </el-form-item>
+          <el-form-item label="书院">
+            <el-select v-model="form.college" placeholder="请选择活动区域">
+              <el-option label="Zhi Ren" value="zhiren"></el-option>
+              <el-option label="Shu Ren" value="shuren"></el-option>
+              <el-option label="Zhi Cheng" value="zhicheng"></el-option>
+              <el-option label="Shu De" value="shude"></el-option>
+              <el-option label="Zhi Xin" value="zhixin"></el-option>
+              <el-option label="Shu Li" value="shuli"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="院系">
+            <el-select
+                v-model="form.major"
+                placeholder="院系"
+                clearable
+            >
+              <el-option
+                  v-for="department in departments"
+                  :key="department"
+                  :label="department"
+                  :value="department"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="grade">
+            <el-select v-model="form.grade" placeholder="grade">
+              <el-option label="2019" value="2019"></el-option>
+              <el-option label="2020" value="2020"></el-option>
+              <el-option label="2021" value="2021"></el-option>
+              <el-option label="2022" value="2022"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="性别">
+            <el-radio-group v-model="form.gender">
+              <el-radio label="男"></el-radio>
+              <el-radio label="女"></el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="Your Region">
+            <el-cascader
+                size="large"
+                :options="options"
+                v-model="selectedOptions"
+
+            >
+            </el-cascader>
+          </el-form-item>
+          <el-form-item label="Your Address">
+            <el-input v-model="form.address"></el-input>
+          </el-form-item>
+
+          <el-form-item label="个人简介">
+            <el-input type="textarea" v-model="form.desc" placeholder="主人很懒，还没有简介噢~"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="confirm_modify();">提交修改</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import { Check } from '@element-plus/icons-vue';
-
+import {regionData, CodeToText} from "element-china-area-data";
 export default {
   components: {
     Check
@@ -59,6 +148,22 @@ export default {
       isSetEmail: false,
       checkPhone: false,
       checkEmail: false,
+      options: regionData,
+      imageUrl: '',
+      uploadActionUrl: 'http://localhost:8081/cloud_storage/file/uploading',
+      departments: [],
+      selectedOptions:[],
+      form: {
+        name: '',
+        birthday: '',
+        college: '',
+        major: '',
+        gender: '',
+        region: ['440000', '440300', '440305'],
+        address: '',
+        desc: '',
+        grade:''
+      },
     }
   },
   methods: {
@@ -97,7 +202,74 @@ export default {
       //TODO: commit modified email to database
       this.isSetEmail = !this.isSetEmail
       this.checkEmail = !this.checkEmail
+    },
+    handleAvatarSuccess(resp) {
+      console.log(resp)
+      this.imageUrl = resp.data.url
+    },
+    getAllDepartments() {
+      this.axios({
+        method: 'GET',
+        url: 'http://localhost:8080/education/course/getAllDepartments',
+      }).then(response => {
+        console.log(response.data.message)
+        this.departments = response.data.data.departments
+      })
+    },
+    confirm_modify() {
+      this.axios({
+        method: 'POST',
+        url: 'http://localhost:8080/education/Info/update',
+        data: {
+          id: localStorage.getItem('USER_ID'),
+          name: this.form.name,
+          department: this.form.major,
+          college: this.form.college,
+          grade: this.form.grade,
+          picture_url: this.imageUrl,
+          birthday:this.form.birthday,
+          gender:this.form.gender,
+          region:this.form.region,
+          address:this.form.address
+        },
+        transformRequest: [function (data) {
+          let str = '';
+          for (let key in data) {
+            str += encodeURIComponent(key) + '=' + encodeURIComponent(data[key]) + '&';
+          }
+          return str;
+        }]
+      }).then(response => {
+        console.log(response.data.message)
+      })
+    },
+    getInfo() {
+      this.axios({
+        method: 'GET',
+        url: 'http://localhost:8080/education/Info/getInfo/?id=' + localStorage.getItem('USER_ID'),
+      }).then(response => {
+        this.form.name = response.data.data.Info.name
+        this.imageUrl = response.data.data.Info.picture_url
+        this.form.birthday = response.data.data.Info.birthday
+        this.form.college = response.data.data.Info.college
+        this.form.major = response.data.data.Info.department
+        this.form.gender = response.data.data.Info.gender
+        this.form.region = response.data.data.Info.region
+        this.form.address = response.data.data.Info.address
+        this.form.grade = response.data.data.Info.grade
+      })
+      
+    },
+    getRegionText(codeStr){
+      for(var key in codeStr){
+        this.selectedOptions.push(codeStr[key])
+      }
     }
+  },
+  mounted() {
+    this.getAllDepartments();
+    this.getInfo();
+    this.getRegionText(this.form.region);
   }
 }
 </script>
@@ -126,5 +298,77 @@ export default {
 }
 .setting-content {
   width: 90%;
+}
+
+.avatar-hover img {
+  width: 80%;
+  height: 80%;
+}
+
+.avatar-hover {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, .5);
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  border-radius: 50%;
+}
+
+
+.avatar-uploader .avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
+}
+
+.avatar-uploader .el-upload {
+  border: 1px dashed var(--el-border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: var(--el-transition-duration-fast);
+}
+
+.avatar-uploader .el-upload:hover {
+  border-color: var(--el-color-primary);
+}
+
+.el-icon.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  text-align: center;
+}
+
+.base-info {
+  background-color: rgb(255, 255, 255);
+}
+
+.base-info-head {
+  height: 48px;
+  line-height: 48px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #000;
+
+  padding-left: 16px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #f0f0f2;
+}
+
+.base-info-content {
+  width: 90%;
+  margin: 0 auto;
 }
 </style>
