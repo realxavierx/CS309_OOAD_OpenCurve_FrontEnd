@@ -210,7 +210,7 @@ export default {
   },
 
   mounted() {
-    this.user_id = localStorage.getItem('USER_ID')
+    this.user_id = sessionStorage.getItem('USER_ID')
     this.assignment_id = this.$route.params.assignment_id
     this.getAssignment()
     this.getSubmission()

@@ -97,7 +97,7 @@ export default {
   },
 
   mounted() {
-    this.user_id = localStorage.getItem('USER_ID')
+    this.user_id = sessionStorage.getItem('USER_ID')
     this.getStudentAssignments()
   }
 }

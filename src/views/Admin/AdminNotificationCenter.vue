@@ -1,10 +1,6 @@
 <template>
   <div>
     <el-container>
-      <el-header>
-        <AdminHeader></AdminHeader>
-      </el-header>
-
       <el-container>
         <el-main>
           <p>Notification Center</p>
@@ -22,10 +18,8 @@
 </template>
 
 <script>
-import AdminHeader from "@/components/Header/AdminHeader";
 export default {
   name: "AdminNotificationCenter",
-  components: {AdminHeader},
 
   data() {
     return {

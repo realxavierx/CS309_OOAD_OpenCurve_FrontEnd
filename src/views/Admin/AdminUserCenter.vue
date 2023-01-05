@@ -1,9 +1,6 @@
 <template>
   <div>
     <el-container>
-      <el-header>
-        <AdminHeader></AdminHeader>
-      </el-header>
 
       <el-container>
         <el-main>
@@ -34,7 +31,6 @@ import AdminHeader from "@/components/Header/AdminHeader";
 
 export default {
   name: "AdminUserCenter",
-  components: {AdminHeader},
 
   data() {
     return {

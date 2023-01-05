@@ -107,7 +107,7 @@
                             :timestamp="comment.comment_date" placement="top">
             <div>
               <el-card class="father-comment">
-                <h4>{{ comment.user_id }}</h4>
+                <h4 style="color: #409EFF">{{ comment.user_id }}</h4>
                 <p>{{ comment.content }}</p>
                 <el-popover placement="bottom" :width="600" trigger="click" @show="replyContent = ''">
                   <template #reference>
@@ -125,7 +125,12 @@
               <el-timeline-item v-for="sonComment in comments.filter((item) => item.father_comment_id === comment.id)"
                                 :key="sonComment" :timestamp="sonComment.comment_date" placement="top">
                 <el-card class="son-comment">
-                  <h4>{{ sonComment.user_id }} reply to {{ sonComment.reply_user_id }}</h4>
+                  <el-row>
+                    <h4 style="color: #409EFF">{{ sonComment.user_id }}</h4>
+                    <p style="margin-top: 19px; margin-left: 8px; margin-right: 8px;"> reply to </p>
+                    <h4 style="color: #409EFF"> {{ sonComment.reply_user_id }}</h4>
+                  </el-row>
+
                   <p>{{ sonComment.content }}</p>
                   <el-popover placement="bottom" :width="600" trigger="click" @show="replyContent = ''">
                     <template #reference>
@@ -388,17 +393,16 @@ export default {
     },
 
     checkCheating() {
-      let videoCnt = localStorage.getItem('VIDEO_CNT')
+      let videoCnt = sessionStorage.getItem('VIDEO_CNT')
       if (videoCnt === null || videoCnt === '0') {
         videoCnt = '1'
-        localStorage.setItem('VIDEO_CNT', videoCnt)
+        sessionStorage.setItem('VIDEO_CNT', videoCnt)
       } else {
-        videoCnt = (parseInt(videoCnt) + 1).toString()
-        localStorage.setItem('VIDEO_CNT', videoCnt)
         // alert('You have already open one course video!\nDO NOT CHEATING!')
         ElMessage({
           showClose: true,
-          message: 'You have already open one course video!\\nDO NOT CHEATING!',
+          message: 'You have already open one course video!\n' +
+              'DO NOT CHEATING!',
           type: 'error',
           center: true,
         })
@@ -773,21 +777,22 @@ export default {
 
   mounted() {
     this.course_id = this.$route.params.course_id
-    this.user_id = localStorage.getItem('USER_ID')
+    this.user_id = sessionStorage.getItem('USER_ID')
     this.checkCheating()
     this.getSessionsCount()
     this.getSessionInfo(1)
+
   },
 
   beforeUnmount() {
     clearInterval(this.afkTimer)
     clearInterval(this.canvasTimer)
     this.updateVideoScore()
-    let videoCnt = localStorage.getItem('VIDEO_CNT')
-    videoCnt = (parseInt(videoCnt) - 1).toString()
-    localStorage.setItem('VIDEO_CNT', videoCnt)
-  },
-
+    let videoCnt = parseInt(sessionStorage.getItem('VIDEO_CNT'))
+    if (videoCnt <= 1) {
+      sessionStorage.setItem('VIDEO_CNT', '0')
+    }
+  }
 }
 </script>
 

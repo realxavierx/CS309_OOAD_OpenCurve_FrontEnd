@@ -3,9 +3,9 @@
     <div id="login_bg" class="animate__animated animate__bounceInDown">
       <div id="form">
         <h1>Login</h1>
-        <el-radio-group v-model="loginWay" style="margin-bottom: 10px" size="Large">
-          <el-radio-button label="Password" @click="vertiMode = false"/>
-          <el-radio-button label="Verification Code" @click="vertiMode = true"/>
+        <el-radio-group v-model="loginWay" style="margin-bottom: 10px" size="large">
+          <el-radio-button label="Password" @click="vertiMode = false; content = ''"/>
+          <el-radio-button label="Verification Code" @click="vertiMode = true; content=''"/>
         </el-radio-group>
 
         <div id="input-box" class="animate__animated animate__lightSpeedInRight">
@@ -31,7 +31,7 @@
             <el-radio-group v-model="userType">
               <el-radio label="Student">Student</el-radio>
               <el-radio label="Teacher">Teacher</el-radio>
-              <el-radio label="Admin">Admin</el-radio>
+              <el-radio label="Manager">Manager</el-radio>
             </el-radio-group>
           </div>
           <el-button class="submitBtn" type="primary" @click="login">Login</el-button>
@@ -42,6 +42,7 @@
           <el-button type="danger" style="margin: 10px" @click="this.$router.push({path: '/welcome'})">暂不登录</el-button>
         </div>
       </div>
+
     </div>
   </div>
 
@@ -50,6 +51,7 @@
 <script>
 import axios from "axios";
 import router from "@/router";
+import {ElMessage, ElMessageBox} from "element-plus";
 
 export default {
   data() {
@@ -73,10 +75,10 @@ export default {
 
       axios({
         method: 'POST',
-        url: 'http://10.24.233.83:8080/education/register/getVertiCode',
+        url: 'http://localhost:8080/education/register/getVertiCode',
         data: {
           Email: this.userId,
-          type: this.type
+          type: this.userType
         },
         transformRequest: [function (data) {
           let str = '';
@@ -94,30 +96,82 @@ export default {
     },
 
     login() {
-      if (this.loginWay === 'Verification Code' && this.content !== this.vertiCodeFromEnd) {
-        alert("Your verification code is wrong!")
-      }
-      else {
-        this.loginWithPassword()
-      }
+      axios({
+        method: 'GET',
+        url: 'http://localhost:8080/education/Info/getInfo?id=' + this.userId + '&userType=' + this.userType,
+      })
+          .then(resp => {
+            let response = resp.data.data
+            let accountDuplicateLogin = (response.Info.online === 'True')
+            let deviceDuplicateLogin = (localStorage.getItem('USER_CNT') === '1')
+            let loggedInUserId = sessionStorage.getItem('USER_ID')
+            let loggedInUserType = sessionStorage.getItem('TYPE')
+
+            if (accountDuplicateLogin || deviceDuplicateLogin) {
+              if (accountDuplicateLogin) {
+                alert("This account has already been logged in!")
+              }
+              else if (deviceDuplicateLogin) {
+                alert("This device has already logged in an account!")
+              }
+            }
+            else if (loggedInUserId !== null && loggedInUserType !== null) {
+              ElMessageBox.confirm(
+                  'You have already logged in an account.\nYou have to quit before you login another one.',
+                  'Warning',
+                  {
+                    confirmButtonText: 'OK',
+                    cancelButtonText: 'Cancel',
+                    type: 'warning',
+                  }
+              )
+                  .then(() => {
+                    axios({
+                      method: 'GET',
+                      url: 'http://localhost:8080/education/login/exit?userId=' + loggedInUserId +
+                          '&userType=' + loggedInUserType
+                    }).then(resp => {
+                      console.log(resp)
+                      ElMessage({
+                        type: 'success',
+                        message: 'Quit',
+                      })
+                    })
+                  })
+                  .catch(() => {
+                    ElMessage({
+                      type: 'info',
+                      message: 'Canceled',
+                    })
+                  })
+            }
+            else  {
+              if (this.loginWay === 'Verification Code' && this.content !== this.vertiCodeFromEnd) {
+                alert("Your verification code is wrong!")
+              }
+              else {
+                this.loginWithPassword()
+              }
+            }
+          })
     },
 
     loginWithPassword() {
-      this.axios({
+      axios({
         method: 'GET',
         url: 'http://localhost:8080/education/login/user?userId='
             + this.userId + '&content=' + this.content + '&userType=' + this.userType + '&loginWay=' + this.loginWay
       }).then(res => {
         if (res.data.code === 200) {
-          //res中需要包含uid，头像url，以及会话密钥，来让浏览器知道用户已经处于登录状态
-          // sessionStorage.setItem('SESSION_KEY', res.session_key)
-          localStorage.setItem('USER_ID', res.data.data.user.id)
-          localStorage.setItem('type', this.userType)
-          // sessionStorage.setItem('AVATAR', res.avatar)
+          sessionStorage.setItem('USER_ID', res.data.data.user.id)
+          sessionStorage.setItem('TYPE', this.userType)
+          sessionStorage.setItem('AVATAR', res.data.data.picture_url)
+          localStorage.setItem('USER_CNT', '1')
+
           //路由跳转
           if (this.userType === 'Teacher') {
             router.push('/userPage/TeacherMain')
-          } else if (this.userType === 'Admin') {
+          } else if (this.userType === 'Manager') {
             router.push('/userPage/AdminMain')
           } else {
             router.push('/userPage/StudentMain')

@@ -57,7 +57,9 @@
           <el-dialog v-model="form_dialog_visible" title="添加通知" @close="cancelAddNotification">
             <el-form :model="form" ref="formRef">
               <el-form-item label="Course">
-                <el-input v-model="form.course_id"/>
+                <el-select v-model="form.course_id">
+                  <el-option v-for="course in courses" :key="course.id" :label="course.id" :value="course.id"/>
+                </el-select>
               </el-form-item>
 
               <el-form-item label="Title">
@@ -268,7 +270,7 @@ export default {
   },
 
   mounted() {
-    this.user_id = localStorage.getItem('USER_ID')
+    this.user_id = sessionStorage.getItem('USER_ID')
     this.form.sender = this.user_id
     this.getTeacherNotification()
   }

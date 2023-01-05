@@ -363,11 +363,7 @@ export default {
         url: 'http://localhost:8080/education/video/getSessionInfo?course_id=' + this.course_id + '&session=' + session,
       }).then(response => {
         let resp = response.data.data.video
-        this.session_info.title = resp.title
-        this.session_info.session = resp.session
-        this.session_info.description = resp.description
-        this.session_info.url = resp.url
-        this.session_info.score = resp.score
+        this.session_info = resp
         this.videoOptions.src = resp.url
         this.currentSession = resp.session
         this.getTestBySession()
@@ -498,7 +494,7 @@ export default {
 
   mounted() {
     this.course_id = this.$route.params.course_id
-    this.user_id = localStorage.getItem('USER_ID')
+    this.user_id = sessionStorage.getItem('USER_ID')
     this.getSessionsCount()
     this.getSessionInfo(1)
   }

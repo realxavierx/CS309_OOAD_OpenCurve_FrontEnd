@@ -42,23 +42,27 @@
             </el-form-item>
 
             <el-form-item label="Course Department">
-              <el-input v-model="form.courseDepartment"/>
+              <el-select v-model="form.courseDepartment">
+                <el-option v-for="department in departments" :key="department" :label="department" :value="department"/>
+              </el-select>
             </el-form-item>
 
             <el-form-item label="Course Type">
-              <el-input v-model="form.courseType"/>
+              <el-select v-model="form.courseType">
+                <el-option v-for="type in courseTypes" :key="type" :label="type" :value="type"/>
+              </el-select>
             </el-form-item>
 
             <el-form-item label="Course Credit">
-              <el-input v-model="form.courseCredit"/>
+              <el-input-number v-model="form.courseCredit" :precision="1" :step="0.5" :min="0" :max="5" />
             </el-form-item>
 
             <el-form-item label="Course Status">
-              <el-input v-model="form.courseStatus"/>
+              <el-input disabled v-model="form.courseStatus"/>
             </el-form-item>
 
             <el-form-item label="Course Fee">
-              <el-input v-model="form.courseFee"/>
+              <el-input-number v-model="form.courseFee" :precision="1" :step="1" :min="0"/>
             </el-form-item>
 
             <el-form-item label="Description">
@@ -163,10 +167,10 @@ export default {
       courseID: '',
       courseName: '',
       courseType: '',
-      courseCredit: '',
+      courseCredit: 0,
       courseDepartment: '',
-      courseStatus: '',
-      courseFee: '',
+      courseStatus: 'Unverified',
+      courseFee: 0,
       courseDescription: ''
     })
 
@@ -178,7 +182,12 @@ export default {
       student_progress_visible: false,
       user_id: '',
       courses: [],
+      departments: [],
       students: [],
+      courseTypes: [
+          'Optional',
+          'Compulsory'
+      ],
       currentCourse: '',
       excelFields: {
         'Session': 'session',
@@ -237,9 +246,9 @@ export default {
       this.form.courseName = ''
       this.form.courseDepartment = ''
       this.form.courseType = ''
-      this.form.courseCredit = ''
-      this.form.courseStatus = ''
-      this.form.courseFee = ''
+      this.form.courseCredit = 0
+      this.form.courseStatus = 'Unverified'
+      this.form.courseFee = 0
       this.form.courseDescription = ''
       this.$refs.formRef.resetFields()
     },
@@ -252,6 +261,16 @@ export default {
         console.log(resp.data.message)
         let response = resp.data.data
         this.courses = response.courses
+      })
+    },
+
+    getAllDepartments() {
+      axios({
+        method: 'GET',
+        url: 'http://localhost:8080/education/course/getAllDepartments',
+      }).then(response => {
+        console.log(response.data.message)
+        this.departments = response.data.data.departments
       })
     },
 
@@ -316,8 +335,9 @@ export default {
   },
 
   mounted() {
-    this.user_id = localStorage.getItem('USER_ID')
+    this.user_id = sessionStorage.getItem('USER_ID')
     this.getTeacherCourses()
+    this.getAllDepartments()
   }
 }
 </script>
