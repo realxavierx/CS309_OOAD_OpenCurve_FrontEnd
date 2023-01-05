@@ -40,15 +40,20 @@
 
       <el-dialog
           v-model="dialogVisible"
-          title="Tips"
+          title="Rejection"
           width="30%"
           :before-close="handleClose"
       >
-        <span>This is a message</span>
+        <span>Please write the reason for rejection:</span>
+        <el-input
+            v-model="reason"
+            :rows="2"
+            type="textarea"
+        />
         <template #footer>
       <span class="dialog-footer">
-        <el-button @click="dialogVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="dialogVisible = false">
+        <el-button @click="handleClose">Cancel</el-button>
+        <el-button type="primary" @click="rejectApplication">
           Confirm
         </el-button>
       </span>
@@ -90,7 +95,9 @@ export default {
       selection: '',
       courseApplications: [],
       existingCourses: [],
-      teachers: []
+      teachers: [],
+      dialogVisible: false,
+      reason: ''
     }
   },
 
@@ -99,7 +106,7 @@ export default {
       axios({
         method: 'GET',
         url: 'http://localhost:8080/education/manage/getAllUnverifiedCourses'
-          })
+      })
           .then((resp) => {
             console.log(resp.data.message)
             console.log(resp.data.data)
@@ -119,7 +126,15 @@ export default {
             this.existingCourses = resp.data.data.existing_courses
             this.teachers = resp.data.data.teachers
           })
-    }
+    },
+
+    handleClose() {
+
+    },
+
+    rejectApplication() {
+
+    },
   },
 
   mounted() {

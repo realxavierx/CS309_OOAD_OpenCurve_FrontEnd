@@ -2,20 +2,33 @@
   <div id="nav_u">
     <img src="../../img/logo.png" alt="" style="height:40px;float:left;margin:20px 0 20px 20px;cursor: pointer;" @click="toWelcome()">
     <div class="nav">
+
       <ul>
         <li class="dropdown">
           <div class="route-box" @click="toMain()">主页</div>
         </li>
-        <li class="dropdown">
-          <div class="route-box" @click="toCourseCenter()">课程中心</div>
+        <!-- Manager -->
+        <li v-if="type === 'Manager'" class="dropdown">
+          <div class="route-box" @click="toCourseCenter()"> 课程管理中心 </div>
         </li>
-        <li class="dropdown">
-          <div class="route-box" @click="toNotificationCenter()">通知中心</div>
+        <li v-if="type === 'Manager'" class="dropdown">
+          <div class="route-box" @click="toUserCenter()"> 用户管理中心 </div>
         </li>
-        <li class="dropdown">
+        <li v-if="type === 'Manager'" class="dropdown">
+          <div class="route-box" @click="toNotificationCenter()"> 通知管理中心 </div>
+        </li>
+
+        <!-- Teacher & Student -->
+        <li v-if="type !== 'Manager'" class="dropdown">
+          <div class="route-box" @click="toCourseCenter()"> 课程中心 </div>
+        </li>
+        <li v-if="type !== 'Manager'" class="dropdown">
+          <div class="route-box" @click="toNotificationCenter()"> 通知中心 </div>
+        </li>
+        <li v-if="type !== 'Manager'" class="dropdown">
           <div class="route-box" @click="toAssignmentCenter()">作业中心</div>
         </li>
-        <li class="dropdown">
+        <li v-if="type !== 'Manager'" class="dropdown">
           <div class="route-box" @click="toSelfCenter()">个人中心</div>
         </li>
       </ul>
@@ -45,77 +58,107 @@ export default {
       logo_url: '../../img/logo.png',
       avatar_url: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png', //默认头像
       nick_name: 'Visitor',
-      type : localStorage.getItem('type')
+      type: ''
     }
   },
+
   methods: {
+
+    getType() {
+      this.type = sessionStorage.getItem('TYPE')
+    },
+
     toMain() {
-      if (this.type == 'Teacher') {
+      this.getType()
+      if (this.type === 'Teacher') {
         router.push('/userPage/TeacherMain')
       }
-      else {
+      else if (this.type === 'Student'){
         router.push('/userPage/StudentMain')
       }
-    },
-    toCourseCenter() {
-      if (this.type == 'Teacher') {
-        router.push('/userPage/TeacherCourseCenter')
-      } else {
-        router.push('/userPage/StudentCourseCenter')
+      else {
+        router.push('/userPage/AdminMain')
       }
     },
+
+    toCourseCenter() {
+      this.getType()
+      if (this.type === 'Teacher') {
+        router.push('/userPage/TeacherCourseCenter')
+      } else if (this.type === 'Student'){
+        router.push('/userPage/StudentCourseCenter')
+      }
+      else {
+        router.push('/userPage/AdminCourseCenter')
+      }
+    },
+
+    toUserCenter() {
+      router.push('/userPage/AdminUserCenter')
+    },
+
     toNotificationCenter() {
-      if (this.type == 'Teacher') {
+      this.getType()
+      if (this.type === 'Teacher') {
         router.push('/userPage/TeacherNotificationCenter')
-      } else {
+      } else if (this.type === 'Student'){
         router.push('/userPage/StudentNotificationCenter')
+      }
+      else {
+        router.push('/userPage/AdminNotificationCenter')
       }
     },
     toAssignmentCenter() {
-      if (this.type == 'Teacher') {
+      this.getType()
+      if (this.type === 'Teacher') {
         router.push('/userPage/TeacherAssignmentCenter')
       } else {
         router.push('/userPage/StudentAssignmentCenter')
       }
     },
     toSelfCenter() {
-      if (this.type == 'Teacher') {
+      this.getType()
+      if (this.type === 'Teacher') {
         router.push('/userPage/TeacherSelfCenter/information')
       } else {
         router.push('/userPage/StudentSelfCenter/information')
       }
     },
     toWelcome() {
+      this.getType()
       router.push('/')
     },
+
     getInfo() {
+      this.getType()
       this.axios({
         method: 'GET',
         url: 'http://localhost:8080/education/Info/getInfo/?id=' + localStorage.getItem('USER_ID') + "&userType=" + localStorage.getItem('type'),
       }).then(response => {
         let resp = response.data.data.Info
-        if (this.type == 'Student') {
-          localStorage.setItem('avatar_url',resp.picture_url)
-          localStorage.setItem('nick_name', resp.name)
-          localStorage.setItem('birthday',resp.birthday)
-          localStorage.setItem('college',resp.college)
-          localStorage.setItem('major',resp.department)
-          localStorage.setItem('gender',resp.gender)
-          localStorage.setItem('regionCode',resp.region)
-          localStorage.setItem('address',resp.address)
-          localStorage.setItem('grade',resp.grade)
-        } else if (this.type == 'Teacher') {
-          localStorage.setItem('avatar_url',resp.picture_url)
-          localStorage.setItem('nick_name', resp.name)
-          localStorage.setItem('major',resp.department)
-          localStorage.setItem('gender',resp.gender)
+        if (this.type === 'Student') {
+          sessionStorage.setItem('AVATAR',resp.picture_url)
+          sessionStorage.setItem('NICK_NAME', resp.name)
+          sessionStorage.setItem('BIRTHDAY',resp.birthday)
+          sessionStorage.setItem('COLLEGE',resp.college)
+          sessionStorage.setItem('MAJOR',resp.department)
+          sessionStorage.setItem('GENDER',resp.gender)
+          sessionStorage.setItem('REGIONCODE',resp.region)
+          sessionStorage.setItem('ADDRESS',resp.address)
+          sessionStorage.setItem('GRADE',resp.grade)
+        } else if (this.type === 'Teacher') {
+          sessionStorage.setItem('AVATAR',resp.picture_url)
+          sessionStorage.setItem('NICK_NAME', resp.name)
+          sessionStorage.setItem('MAJOR',resp.department)
+          sessionStorage.setItem('GENDER',resp.gender)
         }
         
       })
-      this.avatar_url = localStorage.getItem('avatar_url')
-      this.nick_name = localStorage.getItem('nick_name')
+      this.avatar_url = sessionStorage.getItem('avatar_url')
+      this.nick_name = sessionStorage.getItem('nick_name')
     }
   },
+
   mounted() {
     this.getInfo()
   }
