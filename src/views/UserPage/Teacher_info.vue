@@ -3,18 +3,15 @@
     <div class="general-info-t">
       <div class="general-info-avatar">
         <!-- <img :src="baseInfo.avatar_url" alt=""> -->
-        <img src="../../img/123.jpg" alt="">
-        <div class="avatar-hover">
-          <img src="../../img/avatar-hover.png" alt="">
-        </div>
+        <img :src="baseInfo.avatar_url" alt="">
       </div>
       <div class="general-info-t-info">
-        <div class="name">{{baseInfo.nick_name}}</div>
-        <div class="email">注册邮箱:{{baseInfo.email}}</div>
+        <div class="name">{{ baseInfo.nick_name }}</div>
+        <div class="email">注册邮箱:{{ baseInfo.email }}</div>
       </div>
     </div>
     <div class="general-info-b">
-      <div style="margin-right:10px">我的余额:{{baseInfo.money}}</div>
+      <div style="margin-right:10px">我的余额:{{ baseInfo.money }}</div>
       <el-button type="primary" icon="el-icon-shopping-cart-2" @click="toVIP()">去充值</el-button>
     </div>
     <div class="base-info">
@@ -22,177 +19,101 @@
 
       <div class="base-info-content">
         <el-descriptions>
-          <el-descriptions-item label="用户昵称">{{baseInfo.nick_name}}</el-descriptions-item>
-          <el-descriptions-item label="用户ID">{{baseInfo.email}}</el-descriptions-item>
-          <el-descriptions-item label="出生日期">{{baseInfo.birthday}}</el-descriptions-item>
-          <el-descriptions-item label="书院">{{baseInfo.collage}}</el-descriptions-item>
-          <el-descriptions-item label="院系">{{baseInfo.major}}</el-descriptions-item>
-          <el-descriptions-item label="性别">{{baseInfo.gender}}</el-descriptions-item>
-          <el-descriptions-item label="所在地区">{{baseInfo.region}}</el-descriptions-item>
-          <el-descriptions-item label="配送地址">{{baseInfo.address}}</el-descriptions-item>
+          <el-descriptions-item label="nick Name">{{ baseInfo.nick_name }}</el-descriptions-item>
+          <el-descriptions-item label="User ID">{{ baseInfo.email }}</el-descriptions-item>
+          <el-descriptions-item label="Department">{{ baseInfo.major }}</el-descriptions-item>
+          <el-descriptions-item label="Gender">{{ baseInfo.gender }}</el-descriptions-item>
 
           <el-descriptions-item label="职业">
-            <el-tag size="small">{{baseInfo.type}}</el-tag>
+            <el-tag size="small">{{ baseInfo.type }}</el-tag>
           </el-descriptions-item>
         </el-descriptions>
-      </div>
-    </div>
-    <div class="base-info">
-      <div class="base-info-head">编辑信息</div>
-      <div class="base-info-content">
-
-        <el-form ref="form" :model="form" label-width="80px" size="mini">
-          <el-form-item label="上传头像">
-            <el-upload
-                class="avatar-uploader"
-                action="https://jsonplaceholder.typicode.com/posts/"
-                :show-file-list="false"
-                :on-success="handleAvatarSuccess"
-                :before-upload="beforeAvatarUpload">
-              <img v-if="imageUrl" :src="imageUrl" class="avatar">
-              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-            </el-upload>
-          </el-form-item>
-          <el-form-item label="用户昵称">
-            <el-input v-model="form.name"></el-input>
-          </el-form-item>
-          <el-form-item label="出生日期">
-            <el-col :span="11">
-              <el-date-picker type="date" placeholder="选择日期" v-model="form.birthday" style="width: 100%;"></el-date-picker>
-            </el-col>
-          </el-form-item>
-          <el-form-item label="书院">
-            <el-select v-model="form.collage" placeholder="请选择活动区域">
-              <el-option label="致仁书院" value="zhiren"></el-option>
-              <el-option label="树仁书院" value="shuren"></el-option>
-              <el-option label="致诚书院" value="zhicheng"></el-option>
-              <el-option label="树德书院" value="shude"></el-option>
-              <el-option label="致新书院" value="zhixin"></el-option>
-              <el-option label="树礼书院" value="shuli"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="院系">
-            <el-select v-model="form.major" placeholder="请选择活动区域">
-              <el-option label="计算机科学与工程" value="shanghai"></el-option>
-              <el-option label="生物医学工程" value="beijing"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="性别">
-            <el-radio-group v-model="form.gender">
-              <el-radio label="男"></el-radio>
-              <el-radio label="女"></el-radio>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item label="所在地区">
-            <el-cascader
-                size="large"
-                :options="options"
-                v-model="form.region"
-                @change="handleChange"
-            >
-            </el-cascader>
-          </el-form-item>
-          <el-form-item label="配送地址">
-            <el-input v-model="form.address"></el-input>
-          </el-form-item>
-
-          <el-form-item label="个人简介">
-            <el-input type="textarea" v-model="form.desc" placeholder="主人很懒，还没有简介噢~"></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" @click="onSubmit">提交修改</el-button>
-          </el-form-item>
-        </el-form>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { regionData, CodeToText } from "element-china-area-data";
+
+import {CodeToText} from "element-china-area-data";
 export default {
 
   data() {
     return {
-      options: regionData,
-      form: {
-        name: '教父爷爷',
-        birthday:'2001-09-24',
-        collage: '树仁书院',
-        major: '计算机科学与工程',
-        gender: '男',
-        region: ['440000','440300','440305'],
-        address:'广东省-深圳市-南山区-桃园街道1088号-南方科技大学',
-        desc: ''
-      },
-      baseInfo:{
-        nick_name: '教父爷爷',
-        email:sessionStorage.getItem(''),
+      
+      baseInfo: {
+        nick_name: '',
+        email: localStorage.getItem('USER_ID'),
         avatar_url: '',
-        money:114514,
-        birthday:'2001-09-24',
-        collage:'树仁书院',
-        major:'计算机科学与工程',
-        gender:'男',
-        region:'广东省-深圳市-南山区',
-        address:'广东省-深圳市-南山区-桃园街道1088号-南方科技大学',
-        type:'学生'
+        money: 0,
+        birthday: '未填写',
+        college: '未填写',
+        major: '未填写',
+        gender: '未填写',
+        regionCode: '',
+        region:'',
+        address: '未填写',
+        type: localStorage.getItem('type'),
+        grade: ''
       }
     }
   },
   methods: {
-    initial() {
-      this.axios({
-        method: 'POST',
-        url: 'http://10.24.233.83:8080/education/register/getVertiCode',
-        data: {
-          key: sessionStorage.getItem('SESSION_KEY')
-        },
-        transformRequest: [function (data) {
-          var str='';
-          for (var key in data) {
-            str += encodeURIComponent(key) + '=' + encodeURIComponent(data[key]) + '&';
-          }
-          return str;
-        }]
-      }).then(res => {
-        if (res.status === 200) {
-          if (res.nick_name === '###') {
-            this.baseInfo.nick_name = res.email.substr(0,8)
-          }
-        }
-      })
+    getInfo() {
+      this.baseInfo.nick_name = localStorage.getItem('nick_name')
+      this.baseInfo.avatar_url = localStorage.getItem('avatar_url')
+      this.baseInfo.birthday = localStorage.getItem('birthday')
+      this.baseInfo.college = localStorage.getItem('college')
+      this.baseInfo.major = localStorage.getItem('major')
+      this.baseInfo.gender = localStorage.getItem('gender')
+      this.baseInfo.regionCode = localStorage.getItem('regionCode')
+      this.baseInfo.region = CodeToText[this.baseInfo.regionCode.split(",")[0]]+'-'+CodeToText[this.baseInfo.regionCode.split(",")[1]]+'-'+CodeToText[this.baseInfo.regionCode.split(",")[2]]
+      this.baseInfo.address = localStorage.getItem('address')
+      this.baseInfo.grade = localStorage.getItem('grade')
     },
     toVIP() {
       this.$router.push({
         path: '/userpage/student/vip',
       })
-    }
+    },
+    
+    // beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
+    //   if (rawFile.type !== 'image/jpeg') {
+    //     ElMessage.error('Avatar picture must be JPG format!')
+    //     return false
+    //   } else if (rawFile.size / 1024 / 1024 > 2) {
+    //     ElMessage.error('Avatar picture size can not exceed 2MB!')
+    //     return false
+    //   }
+    //   return true
+    // }
   },
   mounted() {
-
+    this.getInfo()
   }
 }
 </script>
 
 <style scoped>
-.general-info{
-  width:80%;
+.general-info {
+  width: 80%;
   color: #000;
-  margin:0 auto;
+  margin: 0 auto;
 
 }
+
 .general-info-t {
   padding: 24px 0 40px 24px;
   position: relative;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  background-color: rgb(255,255,255);
+  background-color: rgb(255, 255, 255);
   margin-bottom: 10px;
   -webkit-box-shadow: 0 1px 8px 0 rgb(0 0 0 / 4%);
   box-shadow: 0 1px 8px 0 rgb(0 0 0 / 4%);
 }
+
 .general-info-avatar {
   flex-shrink: 0;
   position: relative;
@@ -213,27 +134,7 @@ export default {
   border-radius: 50%;
 }
 
-.avatar-hover{
-  display: none;
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255,255,255,.5);
-  -webkit-box-pack: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  border-radius: 50%;
-}
-.avatar-hover img {
-  width: 80%;
-  height: 80%;
 
-}
 .general-info-t-info {
   display: flex;
   -webkit-box-orient: vertical;
@@ -253,21 +154,23 @@ export default {
   font-size: 250%;
 }
 
-.general-info-b{
+.general-info-b {
   height: 48px;
-  margin:0 auto;
-  background-color: rgb(255,255,255);
+  margin: 0 auto;
+  background-color: rgb(255, 255, 255);
   font-size: 14px;
   line-height: 48px;
 }
-.general-info-b div{
+
+.general-info-b div {
   margin-left: 24px;
   display: inline-block;
 }
 
 .base-info {
-  background-color: rgb(255,255,255);
+  background-color: rgb(255, 255, 255);
 }
+
 .base-info-head {
   height: 48px;
   line-height: 48px;
@@ -284,29 +187,8 @@ export default {
 .base-info-content {
   width: 90%;
   margin: 0 auto;
+  margin-bottom: 20px;
 }
 
-.avatar-uploader .el-upload {
-  border: 1px dashed #d9d9d9;
-  border-radius: 6px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-.avatar-uploader .el-upload:hover {
-  border-color: #409EFF;
-}
-.avatar-uploader-icon {
-  font-size: 28px;
-  color: #8c939d;
-  width: 178px;
-  height: 178px;
-  line-height: 178px;
-  text-align: center;
-}
-.avatar {
-  width: 178px;
-  height: 178px;
-  display: block;
-}
+
 </style>

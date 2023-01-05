@@ -65,24 +65,16 @@ export default {
   },
   methods: {
     getInfo() {
-      this.axios({
-        method: 'GET',
-        url: 'http://localhost:8080/education/Info/getInfo/?id=' + this.baseInfo.email,
-      }).then(response => {
-        console.log(response.data.data.Info)
-        this.baseInfo.nick_name = response.data.data.Info.name
-        this.baseInfo.avatar_url = response.data.data.Info.picture_url
-        this.baseInfo.birthday = response.data.data.Info.birthday
-        this.baseInfo.college = response.data.data.Info.college
-        this.baseInfo.major = response.data.data.Info.department
-        this.baseInfo.gender = response.data.data.Info.gender
-        this.baseInfo.regionCode = response.data.data.Info.region
-        this.baseInfo.region = CodeToText[this.baseInfo.regionCode.split(",")[0]]+'-'+CodeToText[this.baseInfo.regionCode.split(",")[1]]+'-'+CodeToText[this.baseInfo.regionCode.split(",")[2]]
-        this.baseInfo.address = response.data.data.Info.address
-        this.baseInfo.grade = response.data.data.Info.grade
-      })
-      
-      
+      this.baseInfo.nick_name = localStorage.getItem('nick_name')
+      this.baseInfo.avatar_url = localStorage.getItem('avatar_url')
+      this.baseInfo.birthday = localStorage.getItem('birthday')
+      this.baseInfo.college = localStorage.getItem('college')
+      this.baseInfo.major = localStorage.getItem('major')
+      this.baseInfo.gender = localStorage.getItem('gender')
+      this.baseInfo.regionCode = localStorage.getItem('regionCode')
+      this.baseInfo.region = CodeToText[this.baseInfo.regionCode.split(",")[0]]+'-'+CodeToText[this.baseInfo.regionCode.split(",")[1]]+'-'+CodeToText[this.baseInfo.regionCode.split(",")[2]]
+      this.baseInfo.address = localStorage.getItem('address')
+      this.baseInfo.grade = localStorage.getItem('grade')
     },
     toVIP() {
       this.$router.push({

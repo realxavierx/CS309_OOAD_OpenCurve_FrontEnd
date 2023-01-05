@@ -21,14 +21,6 @@ export default {
     }
   },
   mounted() {
-    if (sessionStorage.getItem('type') === 'Teacher') {
-      router.push('/userPage/TeacherMain')
-    } else if (sessionStorage.getItem('type') === 'Admin') {
-      this.admin = true
-      router.push('/userPage/AdminMain')
-    } else {
-      router.push('/userPage/StudentMain')
-    }
   },
 
 }
