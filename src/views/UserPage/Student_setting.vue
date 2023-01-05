@@ -142,7 +142,7 @@ export default {
       value: true,
       sizeForm: {
         phone: '18881496979',
-        email: 'yang_jia_jian@163.com',
+        email: sessionStorage.getItem('USER_ID'),
       },
       isSetPhone: false,
       isSetEmail: false,
@@ -154,15 +154,15 @@ export default {
       departments: [],
       selectedOptions:[],
       form: {
-        name: '',
-        birthday: '',
-        college: '',
-        major: '',
-        gender: '',
-        region: ['440000', '440300', '440305'],
-        address: '',
+        name: sessionStorage.getItem('NICK_NAME'),
+        birthday: sessionStorage.getItem('BIRTHDAY'),
+        college: sessionStorage.getItem('COLLEGE'),
+        major: sessionStorage.getItem('MAJOR'),
+        gender: sessionStorage.getItem('GENDER'),
+        region: sessionStorage.getItem('REGIONCODE'),
+        address: sessionStorage.getItem('ADDRESS'),
         desc: '',
-        grade:''
+        grade:sessionStorage.getItem('GRADE')
       },
     }
   },
@@ -221,7 +221,7 @@ export default {
         method: 'POST',
         url: 'http://localhost:8080/education/Info/update',
         data: {
-          id: localStorage.getItem('USER_ID'),
+          id: sessionStorage.getItem('USER_ID'),
           name: this.form.name,
           department: this.form.major,
           college: this.form.college,
@@ -242,17 +242,17 @@ export default {
       }).then(response => {
         console.log(response.data.message)
       })
+      sessionStorage.setItem('NICK_NAME',this.form.name)
+      sessionStorage.setItem('MAJOR',this.form.major)
+      sessionStorage.setItem('COLLEGE',this.form.college)
+      sessionStorage.setItem('GENDER',this.form.gender)
+      sessionStorage.setItem('AVATAR',this.imageUrl)
+      sessionStorage.setItem('BIRTHDAY',this.form.birthday)
+      sessionStorage.setItem('REGIONCODE',this.form.region)
+      sessionStorage.setItem('GRADE',this.form.grade)
+      sessionStorage.setItem('ADDRESS',this.form.address)
     },
-    getInfo() {
-      this.form.name = localStorage.getItem('nick_name')
-      this.form.birthday = localStorage.getItem('birthday')
-      this.form.college = localStorage.getItem('college')
-      this.form.major = localStorage.getItem('major')
-      this.form.gender = localStorage.getItem('gender')
-      this.form.region = localStorage.getItem('regionCode')
-      this.form.address = localStorage.getItem('address')
-      this.form.grade = localStorage.getItem('grade')
-    },
+      
 
     getRegionText(codeStr){
       this.selectedOptions = codeStr.split(",")
@@ -261,7 +261,6 @@ export default {
   },
   mounted() {
     this.getAllDepartments();
-    this.getInfo();
     this.getRegionText(this.form.region);
   }
 }

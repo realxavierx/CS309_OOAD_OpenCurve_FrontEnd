@@ -35,42 +35,24 @@
 
 <script>
 
-import {CodeToText} from "element-china-area-data";
 export default {
 
   data() {
     return {
       
       baseInfo: {
-        nick_name: '',
+        nick_name: sessionStorage.getItem('NICK_NAME'),
         email: localStorage.getItem('USER_ID'),
-        avatar_url: '',
+        avatar_url: sessionStorage.getItem('AVATAR'),
         money: 0,
-        birthday: '未填写',
-        college: '未填写',
-        major: '未填写',
-        gender: '未填写',
-        regionCode: '',
-        region:'',
-        address: '未填写',
-        type: localStorage.getItem('type'),
-        grade: ''
+        major: sessionStorage.getItem('MAJOR'),
+        gender: sessionStorage.getItem('GENDER'),
+        type: sessionStorage.getItem('TYPE'),
       }
     }
   },
   methods: {
-    getInfo() {
-      this.baseInfo.nick_name = localStorage.getItem('nick_name')
-      this.baseInfo.avatar_url = localStorage.getItem('avatar_url')
-      this.baseInfo.birthday = localStorage.getItem('birthday')
-      this.baseInfo.college = localStorage.getItem('college')
-      this.baseInfo.major = localStorage.getItem('major')
-      this.baseInfo.gender = localStorage.getItem('gender')
-      this.baseInfo.regionCode = localStorage.getItem('regionCode')
-      this.baseInfo.region = CodeToText[this.baseInfo.regionCode.split(",")[0]]+'-'+CodeToText[this.baseInfo.regionCode.split(",")[1]]+'-'+CodeToText[this.baseInfo.regionCode.split(",")[2]]
-      this.baseInfo.address = localStorage.getItem('address')
-      this.baseInfo.grade = localStorage.getItem('grade')
-    },
+    
     toVIP() {
       this.$router.push({
         path: '/userpage/student/vip',
