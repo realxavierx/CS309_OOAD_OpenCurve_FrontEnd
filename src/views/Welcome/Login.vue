@@ -101,11 +101,11 @@ export default {
       })
           .then(resp => {
             let response = resp.data.data
+            let userBlocked = (response.Info.status === 'blocked')
             let accountDuplicateLogin = (response.Info.online === 'True')
             let deviceDuplicateLogin = (localStorage.getItem('USER_CNT') === '1')
             let loggedInUserId = sessionStorage.getItem('USER_ID')
             let loggedInUserType = sessionStorage.getItem('TYPE')
-
 
             if (loggedInUserId !== null && loggedInUserType !== null) {
               ElMessageBox.confirm(
@@ -147,6 +147,9 @@ export default {
                 alert("This device has already logged in an account!")
               }
             }
+            else if (userBlocked) {
+              alert("Sorry, you have been blocked!")
+            }
             else  {
               if (this.loginWay === 'Verification Code' && this.content !== this.vertiCodeFromEnd) {
                 alert("Your verification code is wrong!")
@@ -179,7 +182,7 @@ export default {
             router.push('/userPage/StudentMain')
           }
         }
-        else if (res.data.code === 2001) {
+        else {
           alert(res.data.message)
         }
       })
