@@ -146,7 +146,6 @@
           </template>
           <el-descriptions-item label="ID">{{ course.id }}</el-descriptions-item>
           <el-descriptions-item label="Name">{{ course.name }}</el-descriptions-item>
-          <el-descriptions-item label="Teacher">{{ course.teacher_id }}</el-descriptions-item>
           <el-descriptions-item label="Type">{{ course.course_type }}</el-descriptions-item>
           <el-descriptions-item label="Credit">{{ course.credit }}</el-descriptions-item>
           <el-descriptions-item label="Description">{{ course.info }}</el-descriptions-item>

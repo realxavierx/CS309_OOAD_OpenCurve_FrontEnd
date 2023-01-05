@@ -121,31 +121,43 @@
                     </template>
                   </el-input>
                 </el-popover>
+                <el-button v-if="show_sonComments.some((item) => item.comment_id === comment.id && item.show === true)"
+                           type="primary" @click="show_sonComment(comment, false)">
+                  收起回复
+                </el-button>
+                <el-button v-if="show_sonComments.some((item) => item.comment_id === comment.id && item.show === false)"
+                           type="primary" @click="show_sonComment(comment, true)">
+                  展开回复
+                </el-button>
               </el-card>
-              <el-timeline-item v-for="sonComment in comments.filter((item) => item.father_comment_id === comment.id)"
-                                :key="sonComment" :timestamp="sonComment.comment_date" placement="top">
-                <el-card class="son-comment">
-                  <el-row>
-                    <h4 style="color: #409EFF">{{ sonComment.user_id }}</h4>
-                    <p style="margin-top: 19px; margin-left: 8px; margin-right: 8px;"> reply to </p>
-                    <h4 style="color: #409EFF"> {{ sonComment.reply_user_id }}</h4>
-                  </el-row>
+              <div class="sonComment-area" style="margin-top: 10px"
+                   v-if="show_sonComments.some((item) => item.comment_id === comment.id && item.show === true)">
+                <el-timeline-item
+                    v-for="sonComment in comments.filter((item) => item.father_comment_id === comment.id)"
+                    :key="sonComment" :timestamp="sonComment.comment_date" placement="top">
+                  <el-card class="son-comment">
+                    <el-row>
+                      <h4 style="color: #409EFF">{{ sonComment.user_id }}</h4>
+                      <p style="margin-top: 19px; margin-left: 8px; margin-right: 8px;"> reply to </p>
+                      <h4 style="color: #409EFF"> {{ sonComment.reply_user_id }}</h4>
+                    </el-row>
 
-                  <p>{{ sonComment.content }}</p>
-                  <el-popover placement="bottom" :width="600" trigger="click" @show="replyContent = ''">
-                    <template #reference>
-                      <el-button style="margin-right: 16px">回复</el-button>
-                    </template>
-                    <el-input
-                        v-model="replyContent"
-                        placeholder="Please input your reply">
-                      <template #append>
-                        <el-button type="primary" @click="postReply(comment, sonComment)">发送</el-button>
+                    <p>{{ sonComment.content }}</p>
+                    <el-popover placement="bottom" :width="600" trigger="click" @show="replyContent = ''">
+                      <template #reference>
+                        <el-button style="margin-right: 16px">回复</el-button>
                       </template>
-                    </el-input>
-                  </el-popover>
-                </el-card>
-              </el-timeline-item>
+                      <el-input
+                          v-model="replyContent"
+                          placeholder="Please input your reply">
+                        <template #append>
+                          <el-button type="primary" @click="postReply(comment, sonComment)">发送</el-button>
+                        </template>
+                      </el-input>
+                    </el-popover>
+                  </el-card>
+                </el-timeline-item>
+              </div>
             </div>
           </el-timeline-item>
         </el-timeline>
@@ -283,6 +295,7 @@ export default {
       screenHeight: 200,
       // Comment
       comments: [],
+      show_sonComments: [],
       commentContent: '',
       commentFatherId: -1,
       replyContent: '',
@@ -459,11 +472,18 @@ export default {
       _this.lastStartTime = Math.floor(video.currentTime)
       _this.lastUpdateTime = 0
 
+
       video.addEventListener(
           'loadedmetadata',
           function () {
             _this.videoWatchTime = new Array(Math.floor(video.duration)).fill(0)
-            _this.notifyBarrages(0)
+
+            if (_this.canvasTimer === null || _this.canvasTimer === undefined) {
+              _this.canvasTimer = setInterval(() => {
+                _this.notifyBarrages(video.currentTime)
+                console.log(video.currentTime + ' notify')
+              }, 20)
+            }
           }
       )
 
@@ -496,21 +516,19 @@ export default {
       )
 
       video.addEventListener("play", function () {
-        // 监听  视频播放
-        _this.canvasTimer = setInterval(() => {
-          _this.notifyBarrages(video.currentTime)
-        }, 20)
+        console.log('play')
 
-        _this.networkTimer = setInterval(() => {
-          _this.checkNetworkStatus()
-        }, 2000)
+        if (_this.networkTimer === null || _this.networkTimer === undefined) {
+          _this.networkTimer = setInterval(() => {
+            _this.checkNetworkStatus()
+          }, 2000)
+        }
 
         _this.lastStartTime = Math.floor(video.currentTime)
       })
 
       video.addEventListener("pause", function () {
         // 监听  视频暂停
-        clearInterval(_this.canvasTimer)
         clearInterval(_this.networkTimer)
       })
 
@@ -529,6 +547,7 @@ export default {
       let video = document.getElementById('videoPlayer')
       let currentTime = video.currentTime
       let speed = window.navigator.connection.downlink
+      video.pause()
       console.log('network: ' + speed)
       if (speed < 1) {
         if (this.now_url !== this.session_info.low_url) {
@@ -540,8 +559,7 @@ export default {
             message: 'Change to low quality',
           })
         }
-      }
-      else if (speed < 3) {
+      } else if (speed < 3) {
         if (this.now_url !== this.session_info.medium_url) {
           this.videoOptions.src = this.session_info.medium_url
           this.now_url = this.session_info.medium_url
@@ -551,8 +569,7 @@ export default {
             message: 'Change to medium quality',
           })
         }
-      }
-      else {
+      } else {
         if (this.now_url !== this.session_info.url) {
           this.videoOptions.src = this.session_info.url
           this.now_url = this.session_info.url
@@ -563,6 +580,8 @@ export default {
           })
         }
       }
+
+      video.play()
     },
 
     getVideoScore() {
@@ -592,7 +611,7 @@ export default {
       }
 
       this.videoScore = Math.max(curVideoScore, this.videoScore).toFixed(2)
-      this.watchPercentage =  parseInt((this.videoScore / (this.session_info.score - this.questions.length)).toFixed(2)) * 100
+      this.watchPercentage = parseInt((this.videoScore / (this.session_info.score - this.questions.length)).toFixed(2)) * 100
 
       axios({
         method: 'POST',
@@ -759,7 +778,11 @@ export default {
         let resp = response.data;
         console.log(resp.message)
         this.comments = resp.data.comments
-        console.log(this.comments)
+        this.comments.forEach((comment) => {
+          if (comment.father_comment_id === -1) {
+            this.show_sonComments.push({comment_id: comment.id, show: false})
+          }
+        })
       });
     },
 
@@ -818,6 +841,18 @@ export default {
             this.replyContent = ''
           });
     },
+
+    show_sonComment(comment, expand) {
+      for (let showSonComment of this.show_sonComments) {
+        if (showSonComment.comment_id === comment.id) {
+          if (expand) {
+            showSonComment.show = true
+          } else {
+            showSonComment.show = false
+          }
+        }
+      }
+    }
   },
 
   mounted() {

@@ -16,6 +16,7 @@ export class Barrage {
     speed
 
 
+
     constructor(text, time, screenWidth, screenHeight) {
         this.text = text
         this.time = time
