@@ -40,7 +40,7 @@
             <el-avatar :src="avatar_url"></el-avatar>
           </div>
         </li>
-        <li><div id="great">Hi ~ {{ nick_name }}</div></li>
+        <li><div id="great"> Hi~ {{ nick_name }}</div></li>
       </ul>
     </div>
   </div>
@@ -130,42 +130,17 @@ export default {
     },
 
     getInfo() {
-      this.getType()
-      this.axios({
-        method: 'GET',
-        url: 'http://localhost:8080/education/Info/getInfo/?id=' + sessionStorage.getItem('USER_ID')
-            + "&userType=" + sessionStorage.getItem('TYPE'),
-      }).then(response => {
-        let resp = response.data.data.Info
-        if (this.type === 'Student') {
-          sessionStorage.setItem('AVATAR',resp.picture_url)
-          sessionStorage.setItem('NICK_NAME', resp.name)
-          sessionStorage.setItem('BIRTHDAY',resp.birthday)
-          sessionStorage.setItem('COLLEGE',resp.college)
-          sessionStorage.setItem('MAJOR',resp.department)
-          sessionStorage.setItem('GENDER',resp.gender)
-          sessionStorage.setItem('REGIONCODE',resp.region)
-          sessionStorage.setItem('ADDRESS',resp.address)
-          sessionStorage.setItem('GRADE',resp.grade)
-        } else if (this.type === 'Teacher') {
-          sessionStorage.setItem('AVATAR',resp.picture_url)
-          sessionStorage.setItem('NICK_NAME', resp.name)
-          sessionStorage.setItem('MAJOR',resp.department)
-          sessionStorage.setItem('GENDER',resp.gender)
-        }
-        else {
-          sessionStorage.setItem('AVATAR',resp.picture_url)
-          sessionStorage.setItem('MAJOR',resp.department)
-        }
-        
-      })
       this.avatar_url = sessionStorage.getItem('AVATAR')
       this.nick_name = sessionStorage.getItem('NICK_NAME')
     }
   },
 
   mounted() {
-    this.getInfo()
+    setTimeout(() => {
+      this.getInfo()
+      this.getType()
+    }, 100);
+    console.log(sessionStorage.getItem('NICK_NAME'))
   }
 
 }

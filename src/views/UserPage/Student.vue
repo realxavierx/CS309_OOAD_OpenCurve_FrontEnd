@@ -3,8 +3,7 @@
     <div class="activity">
       <div @click="toInfo()" tabindex="1">个人资料</div>
       <div @click="toSetting()" tabindex="2">账号设置</div>
-      <div @click="toHistory()" tabindex="3">浏览历史</div>
-      <div @click="toVip()" tabindex="4">会员中心</div>
+      <div @click="toVip()" tabindex="3">会员中心</div>
     </div>
     <router-view></router-view>
   </div>
@@ -16,22 +15,17 @@ export default {
 
   },
   methods: {
-    toInfo(){
+    toInfo() {
       this.$router.push({
         path: '/userPage/StudentSelfCenter/information',
       })
     },
-    toSetting(){
+    toSetting() {
       this.$router.push({
         path: '/userPage/StudentSelfCenter/setting',
       })
     },
-    toHistory(){
-      this.$router.push({
-        path: '/userPage/StudentSelfCenter/history',
-      })
-    },
-    toVip(){
+    toVip() {
       this.$router.push({
         path: '/userPage/StudentSelfCenter/vip',
       })

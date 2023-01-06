@@ -100,7 +100,7 @@ import {
   // Search,
   // Star,
 } from '@element-plus/icons-vue'
-
+import { ElNotification } from 'element-plus'
 export default {
   name: "StudentDetailAssignment",
 
@@ -205,6 +205,11 @@ export default {
       })
           .then(response => {
             console.log(response.data)
+            ElNotification({
+              title: 'Success',
+              message: 'This is a success message',
+              type: 'success',
+            })
           })
     },
   },
