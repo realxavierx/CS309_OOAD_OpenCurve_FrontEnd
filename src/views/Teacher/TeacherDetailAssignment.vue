@@ -108,6 +108,7 @@ import {
   Search,
   // Star,
 } from '@element-plus/icons-vue'
+import {ElMessage} from "element-plus";
 
 export default {
   name: "TeacherDetailAssignment",
@@ -198,6 +199,10 @@ export default {
           .then(response => {
             console.log(response.data)
             this.rateSubmission.score = this.submissionScore
+            ElMessage({
+              type: 'success',
+              message: '您已完成评分！',
+            })
             this.cancelRate()
           })
     },

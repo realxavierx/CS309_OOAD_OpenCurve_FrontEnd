@@ -11,7 +11,13 @@
             <vue3-video-play id='videoPlayer' v-bind="videoOptions"></vue3-video-play>
           </div>
           <div class="student-functions">
+
             <el-input v-model="barrageMsg" @focus="readyToSendBarrage" placeholder="发一条友善的弹幕吧~" clearable>
+              <template #prepend>
+                <el-button type="primary" @click="alterBarrage">
+                  {{ barrageText }}
+                </el-button>
+              </template>
               <template #append>
                 <el-button type="primary" circle @click="sendBarrage">
                   <el-icon style="vertical-align: middle">
@@ -288,8 +294,9 @@ export default {
       barrageMsgList: [],
       curTime: 0,
       canvasTimer: null,
-      screenWidth: 830,
-      screenHeight: 200,
+      screenWidth: 900,
+      screenHeight: 250,
+      barrageText: '关闭弹幕',
       // Comment
       comments: [],
       show_sonComments: [],
@@ -494,6 +501,13 @@ export default {
             currentTime = Math.floor(video.currentTime)
             _this.curTime = currentTime
 
+            if (_this.canvasTimer === null || _this.canvasTimer === undefined) {
+              _this.canvasTimer = setInterval(() => {
+                _this.notifyBarrages(video.currentTime)
+                console.log(video.currentTime + ' notify')
+              }, 20)
+            }
+
             _this.videoWatchTime[currentTime] = 1
             if (Math.abs(currentTime - _this.lastUpdateTime) > 1) {
               _this.lastStartTime = currentTime
@@ -521,6 +535,13 @@ export default {
           }, 2000)
         }
 
+        if (_this.canvasTimer === null || _this.canvasTimer === undefined) {
+          _this.canvasTimer = setInterval(() => {
+            _this.notifyBarrages(video.currentTime)
+            console.log(video.currentTime + ' notify')
+          }, 20)
+        }
+
         _this.lastStartTime = Math.floor(video.currentTime)
       })
 
@@ -533,8 +554,8 @@ export default {
         // 监听  视频结束
         _this.updateVideoScore()
         _this.resetBarrages()
-        clearInterval(_this.canvasTimer)
-        clearInterval(_this.networkTimer)
+        _this.canvasTimer = clearInterval(_this.canvasTimer)
+        _this.networkTimer = clearInterval(_this.networkTimer)
       })
 
       this.getVideoScore()
@@ -748,6 +769,15 @@ export default {
       });
     },
 
+    alterBarrage() {
+      if (this.barrageText === '关闭弹幕') {
+        this.barrageText = '开启弹幕'
+      }
+      else if (this.barrageText === '开启弹幕') {
+        this.barrageText = '关闭弹幕'
+      }
+    },
+
     notifyBarrages(currentTime) {
       let canvas = document.getElementById("canvas")
       let ctx = canvas.getContext("2d")
@@ -757,7 +787,7 @@ export default {
 
       this.barrageMsgList.forEach((barrage) => {
         barrage.updatePosition(currentTime)
-        if (barrage.positionX > (-barrage.text.length * 5)) {
+        if (barrage.positionX > (-barrage.text.length * 5) && this.barrageText === '关闭弹幕') {
           ctx.fillText(barrage.text, barrage.positionX, barrage.positionY)
         }
       })
@@ -812,6 +842,10 @@ export default {
       })
           .then(response => {
             console.log(response.data.message);
+            ElMessage({
+              type: 'success',
+              message: '评论发布成功！',
+            })
             this.getComment()
             this.commentContent = ''
           });
@@ -840,6 +874,10 @@ export default {
       })
           .then(response => {
             console.log(response.data.message);
+            ElMessage({
+              type: 'success',
+              message: '评论发布成功！',
+            })
             this.getComment()
             this.replyContent = ''
           });

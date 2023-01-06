@@ -94,7 +94,7 @@
 <script>
 
 import axios from "axios";
-import {ElMessageBox} from "element-plus";
+import {ElMessage, ElMessageBox} from "element-plus";
 
 export default {
   name: "AdminCourse",
@@ -145,6 +145,10 @@ export default {
       })
           .then((resp) => {
             console.log(resp.data.message)
+            ElMessage({
+              type: 'success',
+              message: '您已通过课程申请！',
+            })
             this.courseApplications = this.courseApplications.filter((c) => c.id !== course_id)
           })
     },
@@ -168,6 +172,10 @@ export default {
       })
           .then((resp) => {
             console.log(resp.data.message)
+            ElMessage({
+              type: 'success',
+              message: '您已拒绝课程申请！',
+            })
             this.courseApplications = this.courseApplications.filter((c) => c.id !== this.curApplication)
             this.reason = ''
             this.dialogVisible = false

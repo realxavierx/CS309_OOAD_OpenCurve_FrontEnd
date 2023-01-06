@@ -147,6 +147,7 @@
 <script>
 
 import axios from "axios";
+import {ElMessage} from "element-plus";
 
 export default {
   name: "AdminUserCenter",
@@ -201,6 +202,10 @@ export default {
           .then(response => {
             console.log(response.data.message)
             this.getStudentsInfo()
+            ElMessage({
+              type: 'success',
+              message: '成功冻结用户！',
+            })
           })
     },
 
@@ -221,6 +226,10 @@ export default {
       })
           .then(response => {
             console.log(response.data.message)
+            ElMessage({
+              type: 'success',
+              message: '成功解冻用户！',
+            })
             this.getStudentsInfo()
           })
     },
@@ -243,6 +252,10 @@ export default {
           .then(response => {
             console.log(response.data.message)
             this.getTeachersInfo()
+            ElMessage({
+              type: 'success',
+              message: '成功冻结用户！',
+            })
           })
     },
 
@@ -264,6 +277,10 @@ export default {
           .then(response => {
             console.log(response.data.message)
             this.getTeachersInfo()
+            ElMessage({
+              type: 'success',
+              message: '成功解冻用户！',
+            })
           })
     },
   },

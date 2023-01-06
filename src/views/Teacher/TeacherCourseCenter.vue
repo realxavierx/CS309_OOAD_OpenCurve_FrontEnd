@@ -2,34 +2,8 @@
   <div class="background">
     <h1 align="center">Teacher Course Center</h1>
     <div class="course-center">
-
-      <div class="Courses">
-        <div v-for="course in courses" :key="course.id" style="margin: 20px">
-          <el-descriptions title="Course Information" border>
-            <template #extra>
-              <el-button type="primary" @click="getCourseStudents(course)">学生管理</el-button>
-              <el-button type="primary" @click="jumpToCourseDetail(course.id)">课程详情</el-button>
-            </template>
-            <el-descriptions-item label="ID">{{ course.id }}</el-descriptions-item>
-            <el-descriptions-item label="Name">{{ course.name }}</el-descriptions-item>
-            <el-descriptions-item label="Department">{{ course.department }}</el-descriptions-item>
-            <el-descriptions-item label="Type">{{ course.course_type }}</el-descriptions-item>
-            <el-descriptions-item label="Credit">{{ course.credit }}</el-descriptions-item>
-            <el-descriptions-item label="Status"> {{ course.status }}</el-descriptions-item>
-            <el-descriptions-item label="Fee"> {{ course.fee }}</el-descriptions-item>
-            <el-descriptions-item label="Description">{{ course.info }}</el-descriptions-item>
-          </el-descriptions>
-        </div>
-      </div>
-
-      <el-divider style="margin:40px">
-        <el-icon>
-          <StarFilled/>
-        </el-icon>
-      </el-divider>
-
       <div>
-        <el-button type="primary" @click="form_dialog_visible = true">Create new Course</el-button>
+        <el-button type="primary" style="margin-left: 44%; margin-top: 20px" @click="form_dialog_visible = true">Create new Course</el-button>
 
         <el-dialog v-model="form_dialog_visible" title="添加课程" @close="cancelAddCourse">
           <el-form :model="form" ref="formRef">
@@ -149,6 +123,38 @@
           </template>
         </el-drawer>
       </div>
+
+      <el-divider>
+        <el-icon>
+          <StarFilled/>
+        </el-icon>
+      </el-divider>
+
+      <div class="Courses">
+        <div v-for="course in courses" :key="course.id" style="margin: 20px">
+          <el-descriptions title="Course Information" border>
+            <template #extra>
+              <el-button type="primary" @click="getCourseStudents(course)">学生管理</el-button>
+              <el-button type="primary" @click="jumpToCourseDetail(course.id)">课程详情</el-button>
+            </template>
+            <el-descriptions-item label="ID">{{ course.id }}</el-descriptions-item>
+            <el-descriptions-item label="Name">{{ course.name }}</el-descriptions-item>
+            <el-descriptions-item label="Department">{{ course.department }}</el-descriptions-item>
+            <el-descriptions-item label="Type">{{ course.course_type }}</el-descriptions-item>
+            <el-descriptions-item label="Credit">{{ course.credit }}</el-descriptions-item>
+            <el-descriptions-item label="Status"> {{ course.status }}</el-descriptions-item>
+            <el-descriptions-item label="Fee"> {{ course.fee }}</el-descriptions-item>
+            <el-descriptions-item label="Description">{{ course.info }}</el-descriptions-item>
+          </el-descriptions>
+          <el-divider>
+            <el-icon>
+              <StarFilled/>
+            </el-icon>
+          </el-divider>
+        </div>
+      </div>
+
+
     </div>
   </div>
 </template>

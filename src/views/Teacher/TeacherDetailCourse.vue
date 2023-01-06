@@ -384,13 +384,7 @@ export default {
       questionsVisible: false,
       questions: [],
       students: [],
-      // Barrage
-      barrageMsg: "",
-      barrageMsgList: [],
-      curTime: 0,
-      canvasTimer: null,
-      screenWidth: 830,
-      screenHeight: 200,
+
       // Comment
       comments: [],
       show_sonComments: [],
@@ -645,6 +639,10 @@ export default {
       })
           .then(response => {
             console.log(response.data.message);
+            ElMessage({
+              type: 'success',
+              message: '您的评论已发布！',
+            })
             this.getComment()
             this.commentContent = ''
           });
@@ -674,6 +672,10 @@ export default {
           .then(response => {
             console.log(response.data.message);
             this.getComment()
+            ElMessage({
+              type: 'success',
+              message: '您的评论已发布！',
+            })
             this.replyContent = ''
           });
     },
@@ -681,11 +683,7 @@ export default {
     show_sonComment(comment, expand) {
       for (let showSonComment of this.show_sonComments) {
         if (showSonComment.comment_id === comment.id) {
-          if (expand) {
-            showSonComment.show = true
-          } else {
-            showSonComment.show = false
-          }
+          showSonComment.show = !!expand;
         }
       }
     }

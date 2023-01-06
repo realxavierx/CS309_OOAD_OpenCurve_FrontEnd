@@ -120,6 +120,7 @@
 import {reactive, ref} from "vue";
 import axios from "axios";
 import dayjs from "dayjs";
+import {ElMessage} from "element-plus";
 
 export default {
   name: "AdminNotificationCenter",
@@ -202,6 +203,11 @@ export default {
       })
           .then(response => {
             console.log(response)
+            ElMessage({
+              type: 'success',
+              message: '通知发布成功！',
+            })
+
             if (this.form.sendMail) {
               this.sendMailToStudents(this.form.course_id, this.form.title, this.form.content)
             }
@@ -228,6 +234,12 @@ export default {
       })
           .then(response => {
             console.log(response)
+            if (response.data.code === 200) {
+              ElMessage({
+                type: 'success',
+                message: '邮件发送成功！',
+              })
+            }
           })
     },
   },
