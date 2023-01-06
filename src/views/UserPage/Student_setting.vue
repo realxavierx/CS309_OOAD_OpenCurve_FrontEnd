@@ -229,7 +229,7 @@ export default {
           picture_url: this.imageUrl,
           birthday:this.form.birthday,
           gender:this.form.gender,
-          region:this.form.region,
+          region:this.selectedOptions,
           address:this.form.address
         },
         transformRequest: [function (data) {
@@ -247,7 +247,7 @@ export default {
         sessionStorage.setItem('GENDER',this.form.gender)
         sessionStorage.setItem('AVATAR',this.imageUrl)
         sessionStorage.setItem('BIRTHDAY',this.form.birthday)
-        sessionStorage.setItem('REGIONCODE',this.form.region)
+        sessionStorage.setItem('REGIONCODE',this.selectedOptions)
         sessionStorage.setItem('GRADE',this.form.grade)
         sessionStorage.setItem('ADDRESS',this.form.address)
       })

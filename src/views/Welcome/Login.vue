@@ -211,6 +211,9 @@ export default {
           sessionStorage.setItem('NICK_NAME', resp.name)
           sessionStorage.setItem('MAJOR',resp.department)
           sessionStorage.setItem('GENDER',resp.gender)
+        } else {
+          sessionStorage.setItem('AVATAR',resp.picture_url)
+          sessionStorage.setItem('NICK_NAME', resp.name)
         }
 
       })

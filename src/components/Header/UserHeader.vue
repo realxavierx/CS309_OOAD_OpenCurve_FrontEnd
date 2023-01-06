@@ -175,7 +175,7 @@ export default {
   color:#fff;
 }
 
-@import '../../lib/search.css';
+@import "../../lib/search.css";
 
 .nav_r{
   float: right;
