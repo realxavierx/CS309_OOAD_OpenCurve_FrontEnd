@@ -4,119 +4,133 @@
     <div class="course-center-stu">
       <div class="selection">
         <el-row>
-          <el-col :span="Number(4)">
-            <!-- 课程范围 -->
-            <el-select
-                v-model="courseRange"
-                placeholder="CourseRange"
-                @change="handleSelectRange"
-            >
-              <el-option label="My Courses" value="My Courses"></el-option>
-              <el-option label="All Courses" value="All Courses"></el-option>
-            </el-select>
+          <el-col :span="12">
+            <el-button style="width: 100%; height: 50px"
+                       @click="getStudentCourses">
+              My Courses
+            </el-button>
           </el-col>
-
-
-          <el-col :span="Number(4)">
-            <!-- 课程院系 -->
-            <el-select
-                v-model="courseDepartment"
-                placeholder="Any Department"
-                clearable
-                @change="handleSelectDepartment"
-            >
-              <el-option
-                  v-for="department in departments"
-                  :key="department"
-                  :label="department"
-                  :value="department"
-              />
-            </el-select>
+          <el-col :span="12">
+            <el-button style="width: 100%; height: 50px"
+                       @click="getAllCourses">
+              All Courses
+            </el-button>
           </el-col>
-
-          <el-col :span="Number(4)">
-            <!-- 课程老师 自动补全-->
-            <el-autocomplete
-                style="width: 100%;"
-                v-model="courseTeacher"
-                :fetch-suggestions="searchTeacher"
-                clearable
-                placeholder="Any Teacher"
-                @change="teacherSelected = 'process'"
-                @select="handleSelectTeacher"
-            >
-              <template #default="{ item }">
-                <div class="value">{{ item.name }} - {{ item.department }}</div>
-                <!--                  <span class="link">{{ item.link }}</span>-->
-              </template>
-            </el-autocomplete>
-          </el-col>
-
-          <el-col :span="Number(4)">
-            <!-- 课程类型 -->
-            <el-select
-                v-model="courseType"
-                placeholder="Any Type"
-                clearable
-                @change="handleSelectType"
-            >
-              <el-option
-                  v-for="type in types"
-                  :key="type"
-                  :value="type"
-                  :label="type">
-              </el-option>
-            </el-select>
-          </el-col>
-
-          <el-col :span="Number(4)">
-            <!-- 课程状态 -->
-            <el-select
-                v-model="courseStatus"
-                placeholder="Any Status"
-                clearable
-                @change="handleSelectStatus"
-            >
-              <el-option
-                  v-for="status in statuses"
-                  :key="status"
-                  :value="status"
-                  :label="status">
-              </el-option>
-            </el-select>
-          </el-col>
-
-          <el-col :span="Number(4)">
-            <!-- 课程费用 -->
-            <el-select
-                v-model="courseFee"
-                placeholder="Any Fee"
-                clearable
-                @change="handleSelectFee"
-            >
-              <el-option
-                  v-for="fee in fee"
-                  :key="fee.name"
-                  :value="fee.value"
-                  :label="fee.name">
-              </el-option>
-            </el-select>
-          </el-col>
-
         </el-row>
 
-        <el-row style="margin-top: 30px; margin-left: 150px">
-          <el-steps style="margin-right: 50px; width: 900px" space="16%" align-center>
-            <el-step status="success" title="Course Range"/>
-            <el-step :status="departmentSelected" title="Department"/>
-            <el-step :status="teacherSelected" title="Teacher"/>
-            <el-step :status="typeSelected" title="Course Type"/>
-            <el-step :status="statusSelected" title="Status"/>
-            <el-step :status="feeSelected" title="Course Fee"/>
-          </el-steps>
+<!--        <el-row>-->
+<!--          <el-col :span="Number(4)">-->
+<!--            &lt;!&ndash; 课程范围 &ndash;&gt;-->
+<!--            <el-select-->
+<!--                v-model="courseRange"-->
+<!--                placeholder="CourseRange"-->
+<!--                @change="handleSelectRange"-->
+<!--            >-->
+<!--              <el-option label="My Courses" value="My Courses"></el-option>-->
+<!--              <el-option label="All Courses" value="All Courses"></el-option>-->
+<!--            </el-select>-->
+<!--          </el-col>-->
 
-          <el-button type="primary" size="large" @click="selectCourses">Select</el-button>
-        </el-row>
+
+<!--          <el-col :span="Number(4)">-->
+<!--            &lt;!&ndash; 课程院系 &ndash;&gt;-->
+<!--            <el-select-->
+<!--                v-model="courseDepartment"-->
+<!--                placeholder="Any Department"-->
+<!--                clearable-->
+<!--                @change="handleSelectDepartment"-->
+<!--            >-->
+<!--              <el-option-->
+<!--                  v-for="department in departments"-->
+<!--                  :key="department"-->
+<!--                  :label="department"-->
+<!--                  :value="department"-->
+<!--              />-->
+<!--            </el-select>-->
+<!--          </el-col>-->
+
+<!--          <el-col :span="Number(4)">-->
+<!--            &lt;!&ndash; 课程老师 自动补全&ndash;&gt;-->
+<!--            <el-autocomplete-->
+<!--                style="width: 100%;"-->
+<!--                v-model="courseTeacher"-->
+<!--                :fetch-suggestions="searchTeacher"-->
+<!--                clearable-->
+<!--                placeholder="Any Teacher"-->
+<!--                @change="teacherSelected = 'process'"-->
+<!--                @select="handleSelectTeacher"-->
+<!--            >-->
+<!--              <template #default="{ item }">-->
+<!--                <div class="value">{{ item.name }} - {{ item.department }}</div>-->
+<!--                &lt;!&ndash;                  <span class="link">{{ item.link }}</span>&ndash;&gt;-->
+<!--              </template>-->
+<!--            </el-autocomplete>-->
+<!--          </el-col>-->
+
+<!--          <el-col :span="Number(4)">-->
+<!--            &lt;!&ndash; 课程类型 &ndash;&gt;-->
+<!--            <el-select-->
+<!--                v-model="courseType"-->
+<!--                placeholder="Any Type"-->
+<!--                clearable-->
+<!--                @change="handleSelectType"-->
+<!--            >-->
+<!--              <el-option-->
+<!--                  v-for="type in types"-->
+<!--                  :key="type"-->
+<!--                  :value="type"-->
+<!--                  :label="type">-->
+<!--              </el-option>-->
+<!--            </el-select>-->
+<!--          </el-col>-->
+
+<!--          <el-col :span="Number(4)">-->
+<!--            &lt;!&ndash; 课程状态 &ndash;&gt;-->
+<!--            <el-select-->
+<!--                v-model="courseStatus"-->
+<!--                placeholder="Any Status"-->
+<!--                clearable-->
+<!--                @change="handleSelectStatus"-->
+<!--            >-->
+<!--              <el-option-->
+<!--                  v-for="status in statuses"-->
+<!--                  :key="status"-->
+<!--                  :value="status"-->
+<!--                  :label="status">-->
+<!--              </el-option>-->
+<!--            </el-select>-->
+<!--          </el-col>-->
+
+<!--          <el-col :span="Number(4)">-->
+<!--            &lt;!&ndash; 课程费用 &ndash;&gt;-->
+<!--            <el-select-->
+<!--                v-model="courseFee"-->
+<!--                placeholder="Any Fee"-->
+<!--                clearable-->
+<!--                @change="handleSelectFee"-->
+<!--            >-->
+<!--              <el-option-->
+<!--                  v-for="fee in fee"-->
+<!--                  :key="fee.name"-->
+<!--                  :value="fee.value"-->
+<!--                  :label="fee.name">-->
+<!--              </el-option>-->
+<!--            </el-select>-->
+<!--          </el-col>-->
+<!--        </el-row>-->
+
+<!--        <el-row style="margin-top: 30px; margin-left: 150px">-->
+<!--          <el-steps style="margin-right: 50px; width: 900px" space="16%" align-center>-->
+<!--            <el-step status="success" title="Course Range"/>-->
+<!--            <el-step :status="departmentSelected" title="Department"/>-->
+<!--            <el-step :status="teacherSelected" title="Teacher"/>-->
+<!--            <el-step :status="typeSelected" title="Course Type"/>-->
+<!--            <el-step :status="statusSelected" title="Status"/>-->
+<!--            <el-step :status="feeSelected" title="Course Fee"/>-->
+<!--          </el-steps>-->
+
+<!--          <el-button type="primary" size="large" @click="selectCourses">Select</el-button>-->
+<!--        </el-row>-->
       </div>
 
       <el-divider style="margin: 40px auto">
@@ -148,8 +162,14 @@
           <el-descriptions-item label="Name">{{ course.name }}</el-descriptions-item>
           <el-descriptions-item label="Type">{{ course.course_type }}</el-descriptions-item>
           <el-descriptions-item label="Credit">{{ course.credit }}</el-descriptions-item>
+          <el-descriptions-item label="Credit">{{ course.fee }}</el-descriptions-item>
           <el-descriptions-item label="Description">{{ course.info }}</el-descriptions-item>
         </el-descriptions>
+        <el-divider style="margin: 40px auto">
+          <el-icon>
+            <StarFilled/>
+          </el-icon>
+        </el-divider>
       </div>
     </div>
 
@@ -308,16 +328,17 @@ export default {
     },
 
     selectCourses() {
-      axios({
-        method: 'GET',
-        url: 'http://localhost:8080/education/course/getCoursesWithConstraints?course_range='
-            + this.courseRange.split(' ')[0] + '&student_id=' + this.user_id + '&department='
-            + this.courseDepartment + '&teacher=' + this.courseTeacher.split('-')[0] + '&course_type='
-            + this.courseType + '&course_status=' + this.courseStatus + '&course_fee=' + this.courseFee,
-      }).then(response => {
-        console.log(response.data.message)
-        this.show_courses = response.data.data.courses
-      })
+      // axios({
+      //   method: 'GET',
+      //   url: 'http://localhost:8080/education/course/getCoursesWithConstraints?course_range='
+      //       + this.courseRange.split(' ')[0] + '&student_id=' + this.user_id + '&department='
+      //       + this.courseDepartment + '&teacher=' + this.courseTeacher.split('-')[0] + '&course_type='
+      //       + this.courseType + '&course_status=' + this.courseStatus + '&course_fee=' + this.courseFee,
+      // }).then(response => {
+      //   console.log(response.data.message)
+      //   this.show_courses = response.data.data.courses
+      // }
+
     },
 
     checkCourseFee(course) {

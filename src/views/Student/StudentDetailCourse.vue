@@ -2,206 +2,202 @@
   <div class="detail_course">
     <!-- 页面头部 -->
 
-    <el-main>
-      <h3>video room</h3>
-      <div class="live-room">
-        <el-row :gutter="Number(30)">
-          <el-col :span="18" style="background-color: #fff8c3">
-            <div class="video-title">
-              {{ videoOptions.title }}
-            </div>
-            <div class="video-content">
-              <canvas id="canvas" :width="this.screenWidth" :height="this.screenHeight"></canvas>
-              <vue3-video-play id='videoPlayer' v-bind="videoOptions"></vue3-video-play>
-            </div>
-            <div class="student-functions">
-              <el-input v-model="barrageMsg" @focus="readyToSendBarrage" placeholder="发一条友善的弹幕吧~" clearable>
-                <template #append>
-                  <el-button type="primary" circle @click="sendBarrage">
-                    <el-icon style="vertical-align: middle">
-                      <Position/>
-                    </el-icon>
-                  </el-button>
-                </template>
-              </el-input>
-            </div>
-          </el-col>
-
-          <el-col :span="6" style="background-color: aliceblue">
-            <div>
-              <h4>Playlist</h4>
-              <el-scrollbar style="height: 150px">
-                <el-card class="card_item" v-for="index in this.session_cnt" :key="index"
-                         @click="getSessionInfo(index)">
-                  <span class="card_content">Chapter {{ index }}</span>
-                </el-card>
-              </el-scrollbar>
-            </div>
-
-            <div class="session-info">
-              <el-descriptions title="Session Information" border :column="Number(1)">
-                <el-descriptions-item label="Title">{{ session_info.title }}</el-descriptions-item>
-                <br>
-                <el-descriptions-item label="Session">{{ session_info.session }}</el-descriptions-item>
-                <br>
-                <el-descriptions-item label="Description">{{ session_info.description }}</el-descriptions-item>
-              </el-descriptions>
-            </div>
-
-            <div class="session-stats">
-              <el-row>
-                <el-col :span="Number(12)">
-                  <el-tag style="margin-top: 40px; width: 110px; height: 40px; font-size: 14px;"
-                          color="#FFFFFF"
-                  >
-                    观看进度
-                  </el-tag>
-                </el-col>
-                <el-col :span="Number(12)">
-                  <el-progress type="dashboard" :percentage="watchPercentage">
-                    <template #default="{ percentage }">
-                      <span class="percentage-value">{{ percentage }}%</span>
-                      <span class="percentage-label">{{ progressStatus }}</span>
-                    </template>
-                  </el-progress>
-                </el-col>
-              </el-row>
-
-              <el-row>
-                <el-col :span="Number(12)">
-                  <el-tag style="width: 110px; height: 40px; font-size: 14px;"
-                          color="#FFFFFF"
-                  >
-                    章节分数
-                  </el-tag>
-                </el-col>
-
-                <el-col :span="Number(12)">
-                  <p>{{ parseFloat(this.videoScore) + parseFloat(this.testScore) }} / {{ this.session_info.score }}</p>
-                </el-col>
-              </el-row>
-
-            </div>
-
-            <div>
-              <el-button style="margin-left: 10px; margin-right: 10px;"
-                         type="primary"
-                         @click="handleBeginQuestions">
-                开始做题
-              </el-button>
-            </div>
-          </el-col>
-        </el-row>
-      </div>
-
-      <div class="comment-area">
-        <el-input
-            v-model="commentContent"
-            placeholder="Please input">
-          <template #append>
-            <el-button type="primary" @click="postComment">发送</el-button>
-          </template>
-        </el-input>
-        <el-timeline style="margin-top: 25px">
-          <el-timeline-item v-for="comment in comments.filter((item) => item.father_comment_id === -1)" :key="comment"
-                            :timestamp="comment.comment_date" placement="top">
-            <div>
-              <el-card class="father-comment">
-                <h4 style="color: #409EFF">{{ comment.user_id }}</h4>
-                <p>{{ comment.content }}</p>
-                <el-popover placement="bottom" :width="600" trigger="click" @show="replyContent = ''">
-                  <template #reference>
-                    <el-button style="margin-right: 16px">回复</el-button>
-                  </template>
-                  <el-input
-                      v-model="replyContent"
-                      placeholder="Please input your reply">
-                    <template #append>
-                      <el-button type="primary" @click="postReply(comment, comment)">发送</el-button>
-                    </template>
-                  </el-input>
-                </el-popover>
-                <el-button v-if="show_sonComments.some((item) => item.comment_id === comment.id && item.show === true)"
-                           type="primary" @click="show_sonComment(comment, false)">
-                  收起回复
+    <h3> {{ course_id }}</h3>
+    <div class="live-room">
+      <el-row :gutter="Number(30)">
+        <el-col :span="18">
+          <div class="video-content">
+            <canvas id="canvas" :width="this.screenWidth" :height="this.screenHeight"></canvas>
+            <vue3-video-play id='videoPlayer' v-bind="videoOptions"></vue3-video-play>
+          </div>
+          <div class="student-functions">
+            <el-input v-model="barrageMsg" @focus="readyToSendBarrage" placeholder="发一条友善的弹幕吧~" clearable>
+              <template #append>
+                <el-button type="primary" circle @click="sendBarrage">
+                  <el-icon style="vertical-align: middle">
+                    <Position/>
+                  </el-icon>
                 </el-button>
-                <el-button v-if="show_sonComments.some((item) => item.comment_id === comment.id && item.show === false)"
-                           type="primary" @click="show_sonComment(comment, true)">
-                  展开回复
-                </el-button>
-              </el-card>
-              <div class="sonComment-area" style="margin-top: 10px"
-                   v-if="show_sonComments.some((item) => item.comment_id === comment.id && item.show === true)">
-                <el-timeline-item
-                    v-for="sonComment in comments.filter((item) => item.father_comment_id === comment.id)"
-                    :key="sonComment" :timestamp="sonComment.comment_date" placement="top">
-                  <el-card class="son-comment">
-                    <el-row>
-                      <h4 style="color: #409EFF">{{ sonComment.user_id }}</h4>
-                      <p style="margin-top: 19px; margin-left: 8px; margin-right: 8px;"> reply to </p>
-                      <h4 style="color: #409EFF"> {{ sonComment.reply_user_id }}</h4>
-                    </el-row>
+              </template>
+            </el-input>
+          </div>
+        </el-col>
 
-                    <p>{{ sonComment.content }}</p>
-                    <el-popover placement="bottom" :width="600" trigger="click" @show="replyContent = ''">
-                      <template #reference>
-                        <el-button style="margin-right: 16px">回复</el-button>
-                      </template>
-                      <el-input
-                          v-model="replyContent"
-                          placeholder="Please input your reply">
-                        <template #append>
-                          <el-button type="primary" @click="postReply(comment, sonComment)">发送</el-button>
-                        </template>
-                      </el-input>
-                    </el-popover>
-                  </el-card>
-                </el-timeline-item>
-              </div>
-            </div>
-          </el-timeline-item>
-        </el-timeline>
-      </div>
-
-      <el-drawer v-model="questionsVisible"
-                 direction="rtl"
-                 :before-close="handleCloseQuestions"
-      >
-        <template #title>
-          <h4>Questions</h4>
-        </template>
-        <template #default>
+        <el-col :span="6">
           <div>
-            <p>Your Highest Score: {{ this.testScore }}</p>
-            <p>{{ this.questionTimeString }}</p>
-            <div class="question-area" v-for="question in questions" :key="question">
-              <h3>{{ question.title }}</h3>
-              <el-radio-group v-model="question.answer">
-                <el-radio v-for="choice in question.choices" :key="choice" :label="choice">{{ choice }}</el-radio>
-              </el-radio-group>
+            <h4>Playlist</h4>
+            <el-scrollbar style="height: 150px">
+              <el-card class="card_item" v-for="index in this.session_cnt" :key="index"
+                       @click="getSessionInfo(index)">
+                <span class="card_content">Chapter {{ index }}</span>
+              </el-card>
+            </el-scrollbar>
+          </div>
+
+          <div class="session-info">
+            <el-descriptions title="Session Information" border :column="Number(1)">
+              <el-descriptions-item label="Title">{{ session_info.title }}</el-descriptions-item>
+              <br>
+              <el-descriptions-item label="Session">{{ session_info.session }}</el-descriptions-item>
+              <br>
+              <el-descriptions-item label="Description">{{ session_info.description }}</el-descriptions-item>
+            </el-descriptions>
+          </div>
+
+          <div class="session-stats">
+            <el-row>
+              <el-col :span="Number(12)">
+                <el-tag style="margin-top: 40px; width: 110px; height: 40px; font-size: 14px;"
+                        color="#FFFFFF"
+                >
+                  观看进度
+                </el-tag>
+              </el-col>
+              <el-col :span="Number(12)">
+                <el-progress type="dashboard" :percentage="watchPercentage">
+                  <template #default="{ percentage }">
+                    <span class="percentage-value">{{ percentage }}%</span>
+                    <span class="percentage-label">{{ progressStatus }}</span>
+                  </template>
+                </el-progress>
+              </el-col>
+            </el-row>
+
+            <el-row>
+              <el-col :span="Number(12)">
+                <el-tag style="width: 110px; height: 40px; font-size: 14px;"
+                        color="#FFFFFF"
+                >
+                  章节分数
+                </el-tag>
+              </el-col>
+
+              <el-col :span="Number(12)">
+                <p>{{ parseFloat(this.videoScore) + parseFloat(this.testScore) }} / {{ this.session_info.score }}</p>
+              </el-col>
+            </el-row>
+
+          </div>
+
+          <div>
+            <el-button style="margin-left: 10px; margin-right: 10px;"
+                       type="primary"
+                       @click="handleBeginQuestions">
+              开始做题
+            </el-button>
+          </div>
+        </el-col>
+      </el-row>
+    </div>
+
+    <div class="comment-area" style="margin-top: 20px">
+      <el-tag style="width: 100%; height: 50px; font-size: 20px">Comments</el-tag>
+      <el-input
+          v-model="commentContent"
+          placeholder="Please input">
+        <template #append>
+          <el-button type="primary" @click="postComment">发送</el-button>
+        </template>
+      </el-input>
+      <el-timeline style="margin-top: 25px">
+        <el-timeline-item v-for="comment in comments.filter((item) => item.father_comment_id === -1)" :key="comment"
+                          :timestamp="comment.comment_date" placement="top">
+          <div>
+            <el-card class="father-comment">
+              <h4 style="color: #409EFF">{{ comment.user_id }}</h4>
+              <p>{{ comment.content }}</p>
+              <el-popover placement="bottom" :width="600" trigger="click" @show="replyContent = ''">
+                <template #reference>
+                  <el-button style="margin-right: 16px">回复</el-button>
+                </template>
+                <el-input
+                    v-model="replyContent"
+                    placeholder="Please input your reply">
+                  <template #append>
+                    <el-button type="primary" @click="postReply(comment, comment)">发送</el-button>
+                  </template>
+                </el-input>
+              </el-popover>
+              <el-button v-if="show_sonComments.some((item) => item.comment_id === comment.id && item.show === true)"
+                         type="primary" @click="show_sonComment(comment, false)">
+                收起回复
+              </el-button>
+              <el-button v-if="show_sonComments.some((item) => item.comment_id === comment.id && item.show === false)"
+                         type="primary" @click="show_sonComment(comment, true)">
+                展开回复
+              </el-button>
+            </el-card>
+            <div class="sonComment-area" style="margin-top: 10px"
+                 v-if="show_sonComments.some((item) => item.comment_id === comment.id && item.show === true)">
+              <el-timeline-item
+                  v-for="sonComment in comments.filter((item) => item.father_comment_id === comment.id)"
+                  :key="sonComment" :timestamp="sonComment.comment_date" placement="top">
+                <el-card class="son-comment">
+                  <el-row>
+                    <h4 style="color: #409EFF">{{ sonComment.user_id }}</h4>
+                    <p style="margin-top: 19px; margin-left: 8px; margin-right: 8px;"> reply to </p>
+                    <h4 style="color: #409EFF"> {{ sonComment.reply_user_id }}</h4>
+                  </el-row>
+
+                  <p>{{ sonComment.content }}</p>
+                  <el-popover placement="bottom" :width="600" trigger="click" @show="replyContent = ''">
+                    <template #reference>
+                      <el-button style="margin-right: 16px">回复</el-button>
+                    </template>
+                    <el-input
+                        v-model="replyContent"
+                        placeholder="Please input your reply">
+                      <template #append>
+                        <el-button type="primary" @click="postReply(comment, sonComment)">发送</el-button>
+                      </template>
+                    </el-input>
+                  </el-popover>
+                </el-card>
+              </el-timeline-item>
             </div>
           </div>
-        </template>
-        <template #footer>
-          <div style="flex: auto">
-            <el-button @click="handleCloseQuestions">Cancel</el-button>
-            <el-button type="primary" @click="confirmSubmit">Submit</el-button>
-          </div>
-        </template>
-      </el-drawer>
+        </el-timeline-item>
+      </el-timeline>
+    </div>
 
-      <el-dialog v-model="afkDialogVisible" title="AFK Checking" @close="passAfkCheck" width="30%">
-        <h3>Are you still watching the video?</h3>
-        <span>Countdown: {{ afkTimeString }}</span>
-        <template #footer>
+    <el-drawer v-model="questionsVisible"
+               direction="rtl"
+               :before-close="handleCloseQuestions"
+    >
+      <template #title>
+        <h4>Questions</h4>
+      </template>
+      <template #default>
+        <div>
+          <p>Your Highest Score: {{ this.testScore }}</p>
+          <p>{{ this.questionTimeString }}</p>
+          <div class="question-area" v-for="question in questions" :key="question">
+            <h3>{{ question.title }}</h3>
+            <el-radio-group v-model="question.answer">
+              <el-radio v-for="choice in question.choices" :key="choice" :label="choice">{{ choice }}</el-radio>
+            </el-radio-group>
+          </div>
+        </div>
+      </template>
+      <template #footer>
+        <div style="flex: auto">
+          <el-button @click="handleCloseQuestions">Cancel</el-button>
+          <el-button type="primary" @click="confirmSubmit">Submit</el-button>
+        </div>
+      </template>
+    </el-drawer>
+
+    <el-dialog v-model="afkDialogVisible" title="AFK Checking" @close="passAfkCheck" width="30%">
+      <h3>Are you still watching the video?</h3>
+      <span>Countdown: {{ afkTimeString }}</span>
+      <template #footer>
               <span class="dialog-footer">
                 <el-button type="primary" @click="passAfkCheck">
                   Yes
                 </el-button>
               </span>
-        </template>
-      </el-dialog>
-    </el-main>
+      </template>
+    </el-dialog>
   </div>
 
 </template>
@@ -279,6 +275,7 @@ export default {
       questions: [],
       questionTimer: '',
       questionTimeInt: 3600000,
+      totalTimeInt: 0,
       questionTimeString: '',
       progressStatus: 'watched',
       // Away From Keyboard
@@ -354,7 +351,7 @@ export default {
 
     resetQuestionTimer() {
       clearInterval(this.questionTimer)
-      this.questionTimeInt = 3600000
+      this.questionTimeInt = this.totalTimeInt
       this.convertQuestionTimeToString()
     },
 
@@ -636,6 +633,7 @@ export default {
     },
 
     getTestBySession() {
+      this.totalTimeInt = 0
       axios({
         method: 'GET',
         url: 'http://localhost:8080/education/video/getAllTestByCourseAndSession?course_id='
@@ -650,9 +648,14 @@ export default {
             questionType: test.question_type,
             choices: test.choices.split(','),
             correctAnswer: test.correct_answer,
+            time_limit: test.time_limit,
             answer: ref('')
           })
+
+          this.totalTimeInt += 60000 * test.time_limit
         }
+
+        this.questionTimeInt = this.totalTimeInt
       })
     },
 

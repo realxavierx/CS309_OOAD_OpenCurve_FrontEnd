@@ -136,7 +136,7 @@ export default {
       if (keyPath[0] === '2') {
         this.show_notifications = this.notifications.filter(n => n.course_id.trim() === (key + '000'))
       } else {
-        this.show_notifications = this.notifications.filter(n => n.course_id === key)
+        this.show_notifications = this.notifications.filter(n => n.course_id.trim() === key)
       }
 
       this.notifications_empty = (this.show_notifications.length === 0)

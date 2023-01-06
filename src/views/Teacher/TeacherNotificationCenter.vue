@@ -20,7 +20,6 @@
 
           <el-menu @select="handleMenuSelect" mode="vertical" class="side_menu" :default-openeds="Array('1', '2')">
 
-
             <el-sub-menu index="1">
               <template #title>
                 <span>课程通知</span>
@@ -217,6 +216,7 @@ export default {
               this.sendMailToStudents(this.form.course_id, this.form.title, this.form.content)
             }
             this.cancelAddNotification()
+            this.getTeacherNotification()
           })
     },
 
@@ -257,11 +257,13 @@ export default {
     },
 
     handleMenuSelect(key, keyPath) {
-      console.log(key, keyPath)
+      console.log("key:" + key)
+      console.log("path:" + keyPath)
+
       if (keyPath[0] === '2') {
         this.show_notifications = this.notifications.filter(n => n.course_id.trim() === (key + '000'))
       } else {
-        this.show_notifications = this.notifications.filter(n => n.course_id === key)
+        this.show_notifications = this.notifications.filter(n => n.course_id.trim() === key)
       }
 
       this.notifications_empty = (this.show_notifications.length === 0)

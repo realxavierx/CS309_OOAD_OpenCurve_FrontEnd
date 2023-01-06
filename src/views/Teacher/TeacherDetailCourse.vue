@@ -2,13 +2,10 @@
   <div class="detail_course">
     <!-- 页面头部 -->
 
-    <h3>video room</h3>
+    <h3> {{course_id}}</h3>
     <div class="live-room">
       <el-row>
         <el-col :span="18">
-          <div class="video-title">
-            {{ videoOptions.title }}
-          </div>
           <div class="video-content">
             <vue3-video-play v-bind="videoOptions"></vue3-video-play>
           </div>
@@ -167,6 +164,10 @@
               <el-radio-button :label="questionForm.choices[2]">C</el-radio-button>
               <el-radio-button :label="questionForm.choices[3]">D</el-radio-button>
             </el-radio-group>
+          </el-form-item>
+
+          <el-form-item label="Time Limit(minutes)">
+            <el-input-number v-model="questionForm.time_limit" :min="1" :step="1" :precision="0"/>
           </el-form-item>
         </el-form>
 
@@ -334,7 +335,8 @@ export default {
       questionType: '',
       title: '',
       choices: ['', '', '', ''],
-      correctAnswer: ''
+      correctAnswer: '',
+      time_limit: 0
     })
 
     return {
@@ -503,6 +505,7 @@ export default {
       this.questionForm.questionType = question.questionType
       this.questionForm.choices = question.choices
       this.questionForm.correctAnswer = question.correctAnswer
+      this.questionForm.time_limit = question.time_limit
     },
 
     cancelAddQuestion() {
@@ -511,6 +514,7 @@ export default {
       this.questionForm.questionType = ''
       this.questionForm.choices = ['', '', '', '']
       this.questionForm.correctAnswer = ''
+      this.questionForm.time_limit = 0
       this.$refs.questionFormRef.resetFields()
       this.questionTitle = '添加问题'
     },
@@ -537,7 +541,8 @@ export default {
           questionType: this.questionForm.questionType,
           title: this.questionForm.title,
           choices: this.questionForm.choices.toString().replace('[','').replace(']',''),
-          correct_answer: this.questionForm.correctAnswer
+          correct_answer: this.questionForm.correctAnswer,
+          time_limit: this.questionForm.time_limit
         },
         transformRequest: [function (data) {
           let str = '';
@@ -567,7 +572,8 @@ export default {
           questionType: this.questionForm.questionType,
           title: this.questionForm.title,
           choices: this.questionForm.choices.toString().replace('[','').replace(']',''),
-          correct_answer: this.questionForm.correctAnswer
+          correct_answer: this.questionForm.correctAnswer,
+          time_limit: this.questionForm.time_limit
         },
         transformRequest: [function (data) {
           let str = '';
