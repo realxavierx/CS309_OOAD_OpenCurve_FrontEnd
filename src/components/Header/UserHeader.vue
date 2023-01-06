@@ -139,7 +139,7 @@ export default {
     setTimeout(() => {
       this.getInfo()
       this.getType()
-    }, 100);
+    }, 200);
     console.log(sessionStorage.getItem('NICK_NAME'))
   }
 

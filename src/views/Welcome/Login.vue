@@ -173,6 +173,7 @@ export default {
           sessionStorage.setItem('AVATAR', res.data.data.user.picture_url)
           localStorage.setItem('USER_CNT', '1')
 
+          this.getInfo()
           //路由跳转
           if (this.userType === 'Teacher') {
             router.push('/userPage/TeacherMain')
@@ -189,7 +190,34 @@ export default {
       // sessionStorage.removeItem('SESSION_KEY')
       // sessionStorage.getItem('SESSION_KEY')
     },
+    getInfo() {
+      this.axios({
+        method: 'GET',
+        url: 'http://localhost:8080/education/Info/getInfo/?id=' + sessionStorage.getItem('USER_ID') + "&userType=" + sessionStorage.getItem('TYPE'),
+      }).then(response => {
+        let resp = response.data.data.Info
+        if (this.userType === 'Student') {
+          sessionStorage.setItem('AVATAR',resp.picture_url)
+          sessionStorage.setItem('NICK_NAME', resp.name)
+          sessionStorage.setItem('BIRTHDAY',resp.birthday)
+          sessionStorage.setItem('COLLEGE',resp.college)
+          sessionStorage.setItem('MAJOR',resp.department)
+          sessionStorage.setItem('GENDER',resp.gender)
+          sessionStorage.setItem('REGIONCODE',resp.region)
+          sessionStorage.setItem('ADDRESS',resp.address)
+          sessionStorage.setItem('GRADE',resp.grade)
+        } else if (this.userType === 'Teacher') {
+          sessionStorage.setItem('AVATAR',resp.picture_url)
+          sessionStorage.setItem('NICK_NAME', resp.name)
+          sessionStorage.setItem('MAJOR',resp.department)
+          sessionStorage.setItem('GENDER',resp.gender)
+        }
 
+      })
+    }
+
+  },
+  mounted() {
   }
 }
 </script>
@@ -216,7 +244,7 @@ export default {
   background-image: url(../../img/login2.png);
   background-size: cover;
   border-radius: 10px;
-  box-shadow: rgb(244, 230, 230) 0px 0px 10px 3px;
+  box-shadow: rgb(244, 230, 230) 0 0 10px 3px;
   text-align: center;
   color: rgb(0, 0, 0);
 }
