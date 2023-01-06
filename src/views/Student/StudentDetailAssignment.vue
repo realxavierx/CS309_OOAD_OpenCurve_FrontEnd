@@ -207,8 +207,11 @@ export default {
             console.log(response.data)
             ElNotification({
               title: 'Success',
-              message: 'This is a success message',
+              message: '提交作业成功！',
               type: 'success',
+            })
+            router.push({
+              name: 'StudentAssignmentCenter'
             })
           })
     },

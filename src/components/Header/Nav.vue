@@ -7,40 +7,6 @@
           <li>
             <div @click="toHomePage">Home</div>
           </li>
-          <li class="dropdown">
-            <div>About</div>
-            <ul>
-              <li>
-                <div>About Version</div>
-              </li>
-              <li>
-                <div>About Version</div>
-              </li>
-              <li>
-                <div>Contact Us</div>
-              </li>
-              <li>
-                <div>Contact Us</div>
-              </li>
-            </ul>
-          </li>
-          <li class="dropdown">
-            <div>Contact</div>
-            <ul>
-              <li>
-                <div>About Version</div>
-              </li>
-              <li>
-                <div>About Version</div>
-              </li>
-              <li>
-                <div>Contact Us</div>
-              </li>
-              <li>
-                <div>Contact Us</div>
-              </li>
-            </ul>
-          </li>
           <li>
             <div @click="signShow()">Login</div>
           </li>
@@ -57,13 +23,31 @@
 
 <script>
 
+import router from "@/router";
+
 export default {
   methods: {
 
     toHomePage() {
-      this.$router.push({
-        path: '/',
-      })
+      if (sessionStorage.getItem('USER_ID')) {
+        if (sessionStorage.getItem('TYPE') === 'Student') {
+          router.push({
+            name: 'StudentMain'
+          })
+        } else if (sessionStorage.getItem('TYPE') === 'Teacher') {
+          router.push({
+            name: 'TeacherMain'
+          })
+        } else {
+          router.push({
+            name: 'AdminMain'
+          })
+        }
+      } else {
+        this.$router.push({
+          path: '/',
+        })
+      }
     },
 
     signShow() {
@@ -73,17 +57,23 @@ export default {
     },
 
     toUserCenter() {
-      if (localStorage.getItem('USER_ID')) {
-        this.$router.push({
-          path: '/userPage',
-        })
+      if (sessionStorage.getItem('USER_ID')) {
+        if (sessionStorage.getItem('TYPE') === 'Student') {
+          router.push({
+            name: 'StudentSelfCenter'
+          })
+        } else if (sessionStorage.getItem('TYPE') === 'Teacher') {
+          router.push({
+            name: 'TeacherSelfCenter'
+          })
+        }
+
       } else {
         this.$router.push({
           path: '/Welcome/login',
-          
         })
       }
-      
+
     }
   }
 }
